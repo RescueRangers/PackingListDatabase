@@ -1,0 +1,178 @@
+﻿<Window x:Class="Packlists.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Packlists.Converters"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore"
+        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+        md:DialogServiceViews.IsRegistered="True"
+        Height="600"
+        Width="1100"
+        Title="MVVM Light Application"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <local:PacklistsToColorConverter x:Key="ColorConverter"/>
+            <local:MaterialsToColorConverter x:Key="MaterialsToColorConverter"/>
+            <ResourceDictionary.MergedDictionaries>
+                
+                <ResourceDictionary Source="Skins/MainSkin.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid x:Name="LayoutRoot">
+
+        <ScrollViewer>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="150"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+
+                <Menu Grid.Column="0"
+                      Grid.Row="0"
+                      Grid.ColumnSpan="5">
+                    <MenuItem Header="Items" Command="{Binding OpenItemsPanelCommand}"/>
+                    <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
+                </Menu>
+
+                <DataGrid Grid.Column="0"
+                          Grid.Row="2"
+                          Grid.RowSpan="3"
+                          ItemsSource="{Binding PacklistView}" 
+                          SelectedItem="{Binding SelectedPackliste}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="True"
+                          x:Name="Years"
+                          BeginningEdit="Years_BeginningEdit">
+                    
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="145" 
+                                            Header="Year" 
+                                            Binding="{Binding PacklisteNumber}"
+                                            SortDirection="Descending"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <GroupBox Header="Packlists:"
+                          Grid.Column="1"
+                          Grid.Row="4"
+                          Margin="5">
+                    <ListView ItemsSource="{Binding SelectedDay.Packlists}"
+                              SelectedItem="{Binding SelectedPackliste}"
+                              VerticalAlignment="Top">
+
+                        <ListView.InputBindings>
+                            <KeyBinding Key="Delete" Command="{Binding RemovePacklisteCommand}" />
+                        </ListView.InputBindings>
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding}"
+                                           Margin="5"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </GroupBox>
+                
+                <Button Grid.Row="5"
+                        Grid.Column="1"
+                        Margin="5"
+                        Command="{Binding PrintPacklisteCommand}"
+                        Content="Print packliste"/>
+
+
+                <ListView ItemsSource="{Binding SelectedPackliste.Items}"
+                          Grid.Column="2"
+                          Grid.Row="2"
+                          Grid.RowSpan="3"
+                          Margin="5"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.CanContentScroll="False">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Background="{Binding Materials, Converter={StaticResource MaterialsToColorConverter}}"
+                                    Width="Auto">
+                            <TextBlock Text="{Binding ItemName}"
+                                        Margin="10 5"/>
+                            <TextBlock Text="{Binding Quantity}"
+                                        Margin="10 5"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+                
+                
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="2"
+                            Grid.Row="5">
+                    <TextBlock Text="Item number: " 
+                               Margin="5 5"
+                               VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.ItemsView}"
+                              SelectedItem="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedItem}"
+                              Margin="5"
+                              MinWidth="120"
+                              VerticalAlignment="Center"/>
+                    <TextBlock Text="Qty: "
+                               Margin="5"
+                               VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedItem.Quantity, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             MinWidth="25"
+                             MinHeight="25"/>
+                    <Button Content="Add"
+                            Margin="5"
+                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.AddItemToPacklisteCommand}"
+                            VerticalAlignment="Center"
+                            Padding="5"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="6"
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            Grid.ColumnSpan="5">
+
+                    <Button Command="{Binding SaveCommand}"
+                            Content="Save"
+                            Margin="5" 
+                            Padding="10 0"/>
+
+                    <Button Command="{Binding AddEmptyPacklisteCommand}"
+                            Content="Add empty packliste"
+                            Margin="5" 
+                            Padding="10 0"/>
+                    
+                    <Button Command="{Binding ImportPacklisteCommand}"
+                            Content="Import packliste"
+                            Margin="5"
+                            Padding="10 0"/>
+                </StackPanel>
+
+            </Grid>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</Window>

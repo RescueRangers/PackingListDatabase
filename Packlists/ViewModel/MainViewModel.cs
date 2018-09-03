@@ -1,0 +1,378 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Annotations;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
+using MvvmDialogs;
+using MvvmDialogs.FrameworkDialogs.OpenFile;
+using Packlists.Converters;
+using Packlists.ExcelImport;
+using Packlists.Model;
+using Packlists.Model.Printing;
+
+namespace Packlists.ViewModel
+{
+    /// <summary>
+    /// This class contains properties that the main View can data bind to.
+    /// <para>
+    /// See http://www.mvvmlight.net
+    /// </para>
+    /// </summary>
+    public class MainViewModel : ViewModelBase
+    {
+        private readonly IDataService _dataService;
+        private readonly IDialogService _dialogService;
+        private readonly IPrintingService _printing;
+
+        private ListCollectionView _packlistView;
+
+        private Day _selectedDay;
+
+        private Packliste _selectedPackliste;
+
+        private ListCollectionView _itemsView;
+
+        private Item _selectedItem;
+
+        private string _newYear;
+        
+        private string _searchFilter;
+
+        #region Properties
+
+
+        /// <summary>
+        /// Sets and gets the NewYear property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string NewYear
+        {
+            get => _newYear;
+            set => Set(nameof(NewYear), ref _newYear, value);
+        }
+
+        /// <summary>
+        /// Sets and gets the SearchFilter property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public string SearchFilter
+        {
+            get
+            {
+                return _searchFilter;
+            }
+
+            set
+            {
+                if (_searchFilter == value)
+                {
+                    return;
+                }
+
+                AddFilter(value);
+                _packlistView.Refresh();
+               
+
+                var oldValue = _searchFilter;
+                _searchFilter = value;
+                RaisePropertyChanged(nameof(SearchFilter), oldValue, value, true);
+            }
+        }
+
+        
+        /// <summary>
+        /// Sets and gets the SelectedItem property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public Item SelectedItem
+        {
+            get => _selectedItem;
+
+            set
+            {
+                if (_selectedItem == value)
+                {
+                    return;
+                }
+
+                var oldValue = _selectedItem;
+                _selectedItem = value;
+                RaisePropertyChanged(nameof(SelectedItem), oldValue, value, true);
+            }
+        }
+
+        /// <summary>
+        /// Sets and gets the Items property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public ListCollectionView ItemsView
+        {
+            get => _itemsView;
+
+            set
+            {
+                if (_itemsView == value)
+                {
+                    return;
+                }
+
+                var oldValue = _itemsView;
+                _itemsView = value;
+                RaisePropertyChanged(nameof(ItemsView), oldValue, value, true);
+            }
+        }
+
+        /// <summary>
+        /// Sets and gets the SelectedPackliste property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public Packliste SelectedPackliste
+        {
+            get => _selectedPackliste;
+
+            set
+            {
+                if (_selectedPackliste == value)
+                {
+                    return;
+                }
+
+                var oldValue = _selectedPackliste;
+                _selectedPackliste = value;
+                RaisePropertyChanged(nameof(SelectedPackliste), oldValue, value, true);
+            }
+        }
+
+        /// <summary>
+        /// Sets and gets the SelectedDay property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public Day SelectedDay
+        {
+            get => _selectedDay;
+
+            set
+            {
+                if (_selectedDay == value)
+                {
+                    return;
+                }
+
+                var oldValue = _selectedDay;
+                _selectedDay = value;
+                RaisePropertyChanged(nameof(SelectedDay), oldValue, value, true);
+            }
+        }
+
+        
+        /// <summary>
+        /// Sets and gets the YearsView property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public ListCollectionView PacklistView
+        {
+            get => _packlistView;
+
+            set
+            {
+                if (_packlistView == value)
+                {
+                    return;
+                }
+
+                var oldValue = _packlistView;
+                _packlistView = value;
+                RaisePropertyChanged(nameof(PacklistView), oldValue, value, true);
+            }
+        }
+
+        #endregion
+
+        public ICommand AddEmptyPacklisteCommand { get; private set; }
+        public ICommand AddItemToPacklisteCommand { get; private set; }
+        public ICommand OpenItemsPanelCommand { get; set; }
+        public ICommand SaveCommand { get; set; }
+        public ICommand OpenMaterialsPanelCommand { get; set; }
+        public ICommand ImportPacklisteCommand { get; set; }
+        public ICommand RemovePacklisteCommand { get; set; }
+        public ICommand AddYearCommand { get; set; }
+        public ICommand PrintPacklisteCommand { get; set; }
+        public ICommand PrintItemTableCommand { get; set; }
+
+        
+        /// <summary>
+        /// Initializes a new instance of the MainViewModel class.
+        /// </summary>
+        public MainViewModel(IDataService dataService, IPrintingService printing, IDialogService dialogService)
+        {
+            LoadCommands();
+            _dataService = dataService;
+            _printing = printing;
+            _dialogService = dialogService;
+            //_dialogService = dialogService;
+            _dataService.GetPacklists(
+                (packlists, items, error) =>
+                {
+                    if (error != null)
+                    {
+                        // Report error here
+                        return;
+                    }
+
+                    //_packlistView.Source = years;
+                    _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
+                    _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
+                });
+            
+        }
+
+        private void LoadCommands()
+        {
+            AddEmptyPacklisteCommand = new RelayCommand(AddEmptyPackliste, () => SelectedDay != null);
+            AddItemToPacklisteCommand = new RelayCommand(AddItemToPackliste, ()=> SelectedItem != null && SelectedItem.Quantity > 0);
+            OpenItemsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowItemsPanel"), true);
+            OpenMaterialsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMaterialsPanel"), true);
+            SaveCommand = new RelayCommand(Save, true);
+            ImportPacklisteCommand = new RelayCommand(ImportPacklisteData, true);
+            RemovePacklisteCommand = new RelayCommand(RemovePackliste, () => SelectedPackliste != null);
+            AddYearCommand = new RelayCommand(AddYear, CanAddYear);
+            PrintPacklisteCommand = new RelayCommand(PrintPackliste,
+                () => SelectedPackliste?.PacklisteData != null);
+            
+        }
+
+        private void PrintPackliste()
+        {
+            var printDialog = new PrintDialog();
+
+            if (printDialog.ShowDialog() == true)
+            {
+                _printing.Print(SelectedPackliste.PacklisteData);
+            }
+        }
+
+        private void AddYear()
+        {
+            PacklistView.AddNewItem(new Year(int.Parse(NewYear)));
+        }
+
+        private bool CanAddYear()
+        {
+            if (string.IsNullOrWhiteSpace(NewYear))
+            {
+                return false;
+            }
+
+            var isNumber = int.TryParse(NewYear, out var numbeResult);
+
+            if (isNumber)
+            {
+                return (numbeResult > 1 && numbeResult <= 9999);
+            }
+
+            return false;
+        }
+
+        private void RemovePackliste()
+        {
+            SelectedDay.Packlists.Remove(SelectedPackliste);
+        }
+
+        private void ImportPacklisteData()
+        {
+            FileInfo excelFile;
+            var openFileOptions = new OpenFileDialogSettings
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx",
+                Title = "Open excel file with items",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+
+            var succes =_dialogService.ShowOpenFileDialog(this, openFileOptions);
+
+            if (succes == true)
+            {
+                excelFile = new FileInfo(openFileOptions.FileName);
+            }
+            else
+            {
+                return;
+            }
+
+            ImportPackliste.FromExcel((packliste, error) =>
+            {
+                if (error != null)
+                {
+                    _dialogService.ShowMessageBox(this, error.Message, "Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    return;
+                }
+                
+                SelectedDay.Packlists.Add(packliste);
+
+            },excelFile, _dataService);
+
+        }
+
+        private void Save()
+        {
+            _dataService.SaveData();
+        }
+
+        private void OpenItemsPanel(string message)
+        {
+            MessengerInstance.Send(new NotificationMessage(message));
+        }
+
+        private void AddItemToPackliste()
+        {
+            SelectedPackliste.Items.Add(SelectedItem);
+        }
+
+        private void AddEmptyPackliste()
+        {
+            if(SelectedDay.Packlists == null) 
+                SelectedDay.Packlists = new ObservableCollection<Packliste>();
+
+            SelectedDay.Packlists.Add(new Packliste
+            {
+                Items = new ObservableCollection<Item>(),
+                PacklisteNumber = -1,
+            });
+        }
+
+        private void AddFilter(string value)
+        {
+            _packlistView.Filter = o =>
+            {
+                if (string.IsNullOrWhiteSpace(_searchFilter)) return true;
+
+                var result = o is Year year && year.YearNumber.ToString().ToLower().Contains(value.ToLower());
+                return result;
+            };
+            
+        }
+
+        ////public override void Cleanup()
+        ////{
+        ////    // Clean up if needed
+
+        ////    base.Cleanup();
+        ////}
+    }
+}
