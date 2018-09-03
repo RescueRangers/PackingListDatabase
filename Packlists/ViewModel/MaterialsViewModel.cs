@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
+﻿using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -11,23 +9,19 @@ namespace Packlists.ViewModel
 {
     public class MaterialsViewModel : ViewModelBase
     {
-        private IDataService _dataService;
-        private IDialogService _dialogService = new DialogService();
-        private ObservableCollection<Material> _materials;
+        private readonly IDataService _dataService;
+        private readonly IDialogService _dialogService;
 
         private ListCollectionView _materialView;
 
         /// <summary>
         /// Sets and gets the MaterialView property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast-ed by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView MaterialView
         {
-            get
-            {
-                return _materialView;
-            }
+            get => _materialView;
 
             set
             {
@@ -44,15 +38,16 @@ namespace Packlists.ViewModel
 
         public ICommand SaveCommand { get; set; }
 
-        public MaterialsViewModel(IDataService dataService)
+        public MaterialsViewModel(IDataService dataService, IDialogService dialogService)
         {
             _dataService = dataService;
+            _dialogService = dialogService;
 
-            _dataService.GetItems((items, materials, error) =>
+            _dataService.GetItems((items, materials, exception) =>
             {
-                if (error != null)
+                if (exception != null)
                 {
-                    //TODO: Report error
+                    _dialogService.ShowMessageBox(this, $"{exception.Message}\r\n{exception.StackTrace}");
                     return;
                 }
 

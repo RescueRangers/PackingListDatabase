@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using OfficeOpenXml;
-using PdfRpt.Core.Contracts;
-using PdfRpt.DataSources;
-using PdfRpt.FluentInterface;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Packlists.Model.Printing

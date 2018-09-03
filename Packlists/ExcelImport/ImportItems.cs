@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using Packlists.Model;
-using Packlists.ViewModel;
 
 namespace Packlists.ExcelImport
 {

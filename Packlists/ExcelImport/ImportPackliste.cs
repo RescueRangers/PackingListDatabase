@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using OfficeOpenXml;
 using Packlists.Model;
 
@@ -27,7 +24,7 @@ namespace Packlists.ExcelImport
                     throw exception;
                 }
 
-                items = (List<Item>)itemss;
+                items = itemss.ToList();
 
             }));
 
@@ -49,23 +46,24 @@ namespace Packlists.ExcelImport
 
                 var packlisteData = GetPacklisteData(worksheet, englishPackliste);
 
-                var packlisteItems = (List<Item>) GetItems(items, packlisteData);
+                var packlisteItems = (List<ItemWithQty>) GetItems(items, packlisteData, dataService);
 
-                var results = packlisteItems.GroupBy(item => item.ItemName).Select(g =>
-                    new Item {ItemName = g.First().ItemName, Quantity = g.Sum(i => i.Quantity), Materials = g.First().Materials}).ToList();
+                var results = packlisteItems.GroupBy(item => item.Item).Select(g =>
+                    new ItemWithQty {Item = g.First().Item, Quantity = g.Sum(i => i.Quantity)}).ToList();
 
                 var packliste = new Packliste
                 {
                     PacklisteData = packlisteData,
-                    Items = results,
-                    PacklisteNumber = packlisteNumber
+                    ItemsWithQties = results,
+                    PacklisteNumber = packlisteNumber,
+                    PacklisteDate = packDate
                 };
                 callback(packliste, null);
             }
             
         }
 
-        private static IEnumerable<Item> GetItems(ICollection<Item> items, Dictionary<Tuple<int, int>, object> packlisteData)
+        private static IEnumerable<ItemWithQty> GetItems(ICollection<Item> items, Dictionary<Tuple<int, int>, object> packlisteData, IDataService dataService)
         {
 
             if (items == null)
@@ -73,7 +71,7 @@ namespace Packlists.ExcelImport
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var packlisteItems = new List<Item>();
+            var packlisteItems = new List<ItemWithQty>();
             var quantityColumn = packlisteData.SingleOrDefault(c => c.Value != null && (c.Value.ToString().ToLower().Contains("qty") ||
                                                                                         c.Value.ToString().ToLower().Contains("antal"))).Key.Item2;
 
@@ -85,7 +83,8 @@ namespace Packlists.ExcelImport
             foreach (var item in itemData)
             {
                 var newItem = items.FirstOrDefault(itm => string.Equals(itm.ItemName, item.Value.ToString(), StringComparison.CurrentCultureIgnoreCase));
-                
+                var itemWithQty = new ItemWithQty();
+
                 float quantityValue;
                 var quantityResult =
                     packlisteData.TryGetValue(new Tuple<int, int>(item.Key.Item1, quantityColumn),
@@ -109,14 +108,27 @@ namespace Packlists.ExcelImport
                     newItem = new Item
                     {
                         ItemName = item.Value.ToString(),
+                    };
+
+                    itemWithQty = new ItemWithQty
+                    {
+                        Item = newItem,
                         Quantity = quantityValue
                     };
+
+                    //dataService.SaveData();
                 }
                 else
                 {
-                    newItem.Quantity = quantityValue;
+                    itemWithQty = new ItemWithQty
+                    {
+                        Item = newItem,
+                        Quantity = quantityValue
+                    };
+
+                    //dataService.SaveData();
                 }
-                packlisteItems.Add(newItem);
+                packlisteItems.Add(itemWithQty);
             }
 
             return packlisteItems;

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Annotations;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -14,7 +10,6 @@ using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
-using Packlists.Converters;
 using Packlists.ExcelImport;
 using Packlists.Model;
 using Packlists.Model.Printing;
@@ -41,7 +36,7 @@ namespace Packlists.ViewModel
 
         private ListCollectionView _itemsView;
 
-        private Item _selectedItem;
+        private ItemWithQty _selectedItem;
 
         private string _newYear;
         
@@ -95,7 +90,7 @@ namespace Packlists.ViewModel
         /// Changes to that property's value raise the PropertyChanged event. 
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
-        public Item SelectedItem
+        public ItemWithQty SelectedItem
         {
             get => _selectedItem;
 
@@ -113,7 +108,7 @@ namespace Packlists.ViewModel
         }
 
         /// <summary>
-        /// Sets and gets the Items property.
+        /// Sets and gets the ItemsWithQties property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
@@ -159,7 +154,7 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the SelectedDay property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public Day SelectedDay
         {
@@ -182,7 +177,7 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the YearsView property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView PacklistView
         {
@@ -215,6 +210,7 @@ namespace Packlists.ViewModel
         public ICommand PrintItemTableCommand { get; set; }
 
         
+        /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -278,11 +274,11 @@ namespace Packlists.ViewModel
                 return false;
             }
 
-            var isNumber = int.TryParse(NewYear, out var numbeResult);
+            var isNumber = int.TryParse(NewYear, out var numbersResult);
 
             if (isNumber)
             {
-                return (numbeResult > 1 && numbeResult <= 9999);
+                return (numbersResult > 1 && numbersResult <= 9999);
             }
 
             return false;
@@ -303,9 +299,9 @@ namespace Packlists.ViewModel
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
-            var succes =_dialogService.ShowOpenFileDialog(this, openFileOptions);
+            var success =_dialogService.ShowOpenFileDialog(this, openFileOptions);
 
-            if (succes == true)
+            if (success == true)
             {
                 excelFile = new FileInfo(openFileOptions.FileName);
             }
@@ -323,7 +319,7 @@ namespace Packlists.ViewModel
                     return;
                 }
                 
-                SelectedDay.Packlists.Add(packliste);
+                _dataService.Add(packliste);
 
             },excelFile, _dataService);
 
@@ -341,7 +337,7 @@ namespace Packlists.ViewModel
 
         private void AddItemToPackliste()
         {
-            SelectedPackliste.Items.Add(SelectedItem);
+            SelectedPackliste.ItemsWithQties.Add(SelectedItem);
         }
 
         private void AddEmptyPackliste()
@@ -351,7 +347,7 @@ namespace Packlists.ViewModel
 
             SelectedDay.Packlists.Add(new Packliste
             {
-                Items = new ObservableCollection<Item>(),
+                ItemsWithQties = new ObservableCollection<ItemWithQty>(),
                 PacklisteNumber = -1,
             });
         }

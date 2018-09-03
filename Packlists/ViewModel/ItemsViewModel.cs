@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using GalaSoft.MvvmLight.Messaging;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
 using Packlists.Messages;
@@ -23,8 +18,6 @@ namespace Packlists.ViewModel
     public class ItemsViewModel : ViewModelBase
     {
         private IDataService _dataService;
-        private ObservableCollection<Item> _items;
-        private ObservableCollection<Material> _materials;
         private readonly IDialogService _dialogService;
         private readonly IProgressDialogService _progressDialog;
         private FileInfo _excelFile;
@@ -158,7 +151,7 @@ namespace Packlists.ViewModel
         }
 
         /// <summary>
-        /// Sets and gets the Items property.
+        /// Sets and gets the ItemsWithQties property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
@@ -219,7 +212,6 @@ namespace Packlists.ViewModel
 
         private void ImportItems()
         {
-            FileInfo excelFile;
             var openFileOptions = new OpenFileDialogSettings
             {
                 Filter = "Excel files (*.xlsx)|*.xlsx",
@@ -227,9 +219,9 @@ namespace Packlists.ViewModel
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
-            var succes = _dialogService.ShowOpenFileDialog(this, openFileOptions);
+            var success = _dialogService.ShowOpenFileDialog(this, openFileOptions);
 
-            if (succes == true)
+            if (success == true)
             {
                 _excelFile = new FileInfo(openFileOptions.FileName);
             }
@@ -291,7 +283,7 @@ namespace Packlists.ViewModel
             {
                 if (exception != null)
                 {
-                    //TODO: Report error
+                    _dialogService.ShowMessageBox(this, $"{exception.Message}\r\n{exception.StackTrace}");
                 }
 
                 //_materials = new ObservableCollection<Material>(materials);

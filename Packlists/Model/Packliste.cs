@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 using Packlists.Converters;
 
 namespace Packlists.Model
 {
-    public class Packliste : ObservableObject
+    public class Packliste : EditableModelBase<Packliste>
     {
         private int _packlisteNumber;
 
@@ -35,16 +33,16 @@ namespace Packlists.Model
             set => Set(nameof(PacklisteNumber), ref _packlisteNumber, value);
         }
 
-       private ICollection<Item> _items;
+       private ICollection<ItemWithQty> _itemsWithQties;
 
         /// <summary>
-        /// Sets and gets the Items property.
+        /// Sets and gets the ItemsWithQties property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ICollection<Item> Items
+        public ICollection<ItemWithQty> ItemsWithQties
         {
-            get => _items;
-            set => Set(nameof(Items), ref _items, value);
+            get => _itemsWithQties;
+            set => Set(nameof(ItemsWithQties), ref _itemsWithQties, value);
         }
 
         private Dictionary<Tuple<int, int>,object> _packlisteData;

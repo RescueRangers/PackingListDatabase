@@ -11,6 +11,7 @@ namespace Packlists.Model
         public DbSet<Item> Items { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<MaterialWithUsage> MaterialsWithUsage { get; set; }
+        public DbSet<ItemWithQty> ItemWithQties { get; set; }
 
         public PacklisteContext()
         {
@@ -18,9 +19,10 @@ namespace Packlists.Model
             //modelBuilder.Entity<Year>().HasMany<Month>(m => m.Months).WithOptional().WillCascadeOnDelete(true);
             //modelBuilder.Entity<Month>().HasMany<Day>(d => d.Days).WithOptional().WillCascadeOnDelete(true);
             //modelBuilder.Entity<Day>().HasMany(p => p.Packlists).WithOptional().WillCascadeOnDelete(true);
-            modelBuilder.Entity<Packliste>().HasMany(i => i.Items).WithOptional().WillCascadeOnDelete(false);
+            modelBuilder.Entity<Packliste>().HasMany(i => i.ItemsWithQties).WithRequired().WillCascadeOnDelete(false);
             modelBuilder.Entity<MaterialWithUsage>().HasRequired(m => m.Material);
             modelBuilder.Entity<Item>().HasMany(m => m.Materials).WithOptional().WillCascadeOnDelete(true);
+            modelBuilder.Entity<ItemWithQty>().HasRequired(i => i.Item);
 
             OnModelCreating(modelBuilder);
 

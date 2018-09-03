@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
-using System.Data.Entity.Migrations;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
-using Org.BouncyCastle.Asn1.X509.Qualified;
 using Packlists.Messages;
-using Z.EntityFramework.Extensions;
 
 namespace Packlists.Model
 {
@@ -24,7 +21,7 @@ namespace Packlists.Model
         public DataService()
         {
             _packlisteContext = new PacklisteContext();
-            _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.Items));
+            _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties));
             _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
             _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
         }
@@ -34,7 +31,7 @@ namespace Packlists.Model
         {
             if (_packlists == null)
             {
-                _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.Items));
+                _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties));
             }
 
             if (_items == null)
@@ -63,8 +60,6 @@ namespace Packlists.Model
         public void AddItems(IEnumerable<Item> items)
         {
             _packlisteContext.BulkInsert(items, options => options.IncludeGraph = true);
-            //_packlisteContext.BulkMerge(items, options => options.IncludeGraph = true);
-            //_packlisteContext.Items.AddOrUpdate(items.ToArray());
             _items = new ObservableCollection<Item>(_packlisteContext.Items.Include("Materials.Material"));
             _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
             Messenger.Default.Send(new UpdateItemsModelMessage());
@@ -72,27 +67,12 @@ namespace Packlists.Model
 
         public void SaveData()
         {
-            //if (sender.ToString().Contains("Materials"))
-            //{
-                
-            //}
-            //if (sender.ToString().Contains("Items"))
-            //{
-                
-            //}
-            //if (sender.ToString().Contains("Main"))
-            //{
-                
-            //}
-
             var deletedMaterials = _packlisteContext.Materials.ToArray().Except(_materials).ToArray();
             var deletedItems = _packlisteContext.Items.ToArray().Except(_items).ToArray();
-            //var deletedMaterialsWithUsag = _packlisteContext.MaterialsWithUsage.Except(_materialWithUsage);
             var deletedPacklists = _packlisteContext.Packlistes.ToArray().Except(_packlists).ToArray();
 
             _packlisteContext.Materials.RemoveRange(deletedMaterials);
             _packlisteContext.Items.RemoveRange(deletedItems);
-            //_packlisteContext.MaterialsWithUsage.RemoveRange(deletedMaterialsWithUsag);
             _packlisteContext.Packlistes.RemoveRange(deletedPacklists);
 
             var changes = _packlisteContext.SaveChangesAsync();
@@ -125,6 +105,14 @@ namespace Packlists.Model
                 var material = (Material) obj;
                 _packlisteContext.Materials.Add(material);
                 _materials.Add(material);
+            }
+
+            if (type == typeof(Packliste))
+            {
+                var packliste = (Packliste) obj;
+
+                _packlisteContext.Packlistes.Add(packliste);
+                _packlists.Add(packliste);
             }
 
         }

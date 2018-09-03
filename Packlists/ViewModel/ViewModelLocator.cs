@@ -9,16 +9,8 @@
   DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
 */
 
-using Autofac;
-using Autofac.Extras.CommonServiceLocator;
-using CommonServiceLocator;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Ioc;
-using MvvmDialogs;
+using System;
 using Ninject;
-using Packlists.Model;
-using Packlists.Model.Printing;
-using Packlists.Model.ProgressBar;
 
 namespace Packlists.ViewModel
 {
@@ -29,40 +21,13 @@ namespace Packlists.ViewModel
     /// See http://www.mvvmlight.net
     /// </para>
     /// </summary>
-    public class ViewModelLocator
+    public class ViewModelLocator : IDisposable
     {
-        private IKernel _kernel;
+        private readonly IKernel _kernel;
 
         public ViewModelLocator()
         {
             _kernel = new StandardKernel(new NinjectSettings{AllowNullInjection = true}, new DependencyModule());
-            
-
-            //Main = _kernel.Get<MainViewModel>();
-            //Items = _kernel.Get<ItemsViewModel>();
-            //Materials = _kernel.Get<MaterialsViewModel>();
-
-            //var container = new ContainerBuilder();
-
-
-            //ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container.Build()));
-            ////ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-
-            //container.RegisterType<DataService>().As<IDataService>().SingleInstance();
-            //container.RegisterType<DialogService>().As<IDialogService>().SingleInstance();
-            //container.RegisterType<ProgressDialogService>().As<IProgressDialogService>().SingleInstance();
-            //container.RegisterType<PrintingService>().As<IPrintingService>().SingleInstance();
-
-            //container.RegisterType<MainViewModel>().SingleInstance();
-            //container.RegisterType<ItemsViewModel>().InstancePerDependency();
-            //container.RegisterType<MaterialsViewModel>().InstancePerDependency();
-            //container.RegisterType<ProgressDialog>().InstancePerDependency();
-
-
-
-            ////SimpleIoc.Default.Register<MainViewModel>();
-            ////SimpleIoc.Default.Register<ItemsViewModel>();
-            ////SimpleIoc.Default.Register<MaterialsViewModel>();
         }
 
         
@@ -87,6 +52,11 @@ namespace Packlists.ViewModel
         /// </summary>
         public static void Cleanup()
         {
+        }
+
+        public void Dispose()
+        {
+            _kernel.Dispose();
         }
     }
 }

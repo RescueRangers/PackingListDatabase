@@ -9,7 +9,7 @@
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         md:DialogServiceViews.IsRegistered="True"
         mc:Ignorable="d"
-        Title="ItemsView" Height="450" Width="800"
+        Title="ItemsWithQtiesView" Height="450" Width="800"
         DataContext="{Binding Items, Source={StaticResource Locator}}">
     
     <Grid>
@@ -124,7 +124,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <TextBox Text="No material yet, add material using the buttn below."/>
+                                        <TextBox Text="No material yet, add material using the button below."/>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>

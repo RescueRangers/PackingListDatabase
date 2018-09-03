@@ -58,41 +58,18 @@
                           ItemsSource="{Binding PacklistView}" 
                           SelectedItem="{Binding SelectedPackliste}"
                           AutoGenerateColumns="False"
-                          CanUserAddRows="True"
-                          x:Name="Years"
-                          BeginningEdit="Years_BeginningEdit">
+                          CanUserAddRows="True">
                     
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="145" 
-                                            Header="Year" 
+                        <DataGridTextColumn Width="*" 
+                                            Header="Packlists" 
                                             Binding="{Binding PacklisteNumber}"
                                             SortDirection="Descending"/>
+                        <DataGridTextColumn Header="Pack date"
+                                            Binding="{Binding PacklisteDate, StringFormat=d, ConverterCulture=PL-pl}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <GroupBox Header="Packlists:"
-                          Grid.Column="1"
-                          Grid.Row="4"
-                          Margin="5">
-                    <ListView ItemsSource="{Binding SelectedDay.Packlists}"
-                              SelectedItem="{Binding SelectedPackliste}"
-                              VerticalAlignment="Top">
-
-                        <ListView.InputBindings>
-                            <KeyBinding Key="Delete" Command="{Binding RemovePacklisteCommand}" />
-                        </ListView.InputBindings>
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding}"
-                                           Margin="5"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </GroupBox>
-                
                 <Button Grid.Row="5"
                         Grid.Column="1"
                         Margin="5"
@@ -100,7 +77,7 @@
                         Content="Print packliste"/>
 
 
-                <ListView ItemsSource="{Binding SelectedPackliste.Items}"
+                <ListView ItemsSource="{Binding SelectedPackliste.ItemsWithQties}"
                           Grid.Column="2"
                           Grid.Row="2"
                           Grid.RowSpan="3"
@@ -110,9 +87,9 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
-                                    Background="{Binding Materials, Converter={StaticResource MaterialsToColorConverter}}"
+                                    Background="{Binding Item.Materials, Converter={StaticResource MaterialsToColorConverter}}"
                                     Width="Auto">
-                            <TextBlock Text="{Binding ItemName}"
+                            <TextBlock Text="{Binding Item.ItemName}"
                                         Margin="10 5"/>
                             <TextBlock Text="{Binding Quantity}"
                                         Margin="10 5"/>

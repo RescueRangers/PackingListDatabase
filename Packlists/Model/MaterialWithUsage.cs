@@ -1,6 +1,4 @@
-﻿using GalaSoft.MvvmLight;
-
-namespace Packlists.Model
+﻿namespace Packlists.Model
 {
     public class MaterialWithUsage : EditableModelBase<MaterialWithUsage>
     {

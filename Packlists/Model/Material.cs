@@ -1,8 +1,6 @@
-﻿using GalaSoft.MvvmLight;
-
-namespace Packlists.Model
+﻿namespace Packlists.Model
 {
-    public class Material : ObservableObject
+    public class Material : EditableModelBase<Material>
     {
         private string _materialName;
 

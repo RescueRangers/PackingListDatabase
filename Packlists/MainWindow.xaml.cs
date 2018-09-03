@@ -1,7 +1,5 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using GalaSoft.MvvmLight.Messaging;
-using Packlists.Model;
 using Packlists.ViewModel;
 
 namespace Packlists
@@ -37,12 +35,6 @@ namespace Packlists
                 default:
                     break;
             }
-        }
-
-        private void Years_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            var year = (Year) e.Row.Item;
-            e.Cancel = year.IsEdited;
         }
     }
 }
