@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Packlists.Model.Printing
@@ -64,12 +65,21 @@ namespace Packlists.Model.Printing
                 foreach (var data in packlisteData)
                 {
                     worksheet.Cells[data.Key.Item1, data.Key.Item2].Value = data.Value;
+                    if (data.Value is DateTime)
+                    {
+                        worksheet.Cells[data.Key.Item1, data.Key.Item2].Style.Numberformat.Format = "yyyy-mm-dd";
+                        worksheet.Cells[data.Key.Item1, data.Key.Item2].AutoFitColumns();
+                    }
                 }
                 
-                worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
-                //worksheet.PrinterSettings.FitToPage = true;
-                worksheet.PrinterSettings.FitToWidth = 1;
                 worksheet.PrinterSettings.RepeatRows = new ExcelAddress("$1:$" + headerRow);
+
+                worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
+                worksheet.PrinterSettings.Orientation = eOrientation.Portrait;
+                worksheet.PrinterSettings.HorizontalCentered = true;
+                worksheet.PrinterSettings.FitToPage = true;
+                worksheet.PrinterSettings.FitToWidth = 1;
+                worksheet.PrinterSettings.FitToHeight = 0;
 
                 excel.Save();
             }

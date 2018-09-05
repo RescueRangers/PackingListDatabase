@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -258,7 +259,10 @@ namespace Packlists.ViewModel
                     _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
                 });
 
-            _selectedMonth = DateTime.Now;
+            _selectedMonth = DateTime.Today;
+
+            _packlistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
+
         }
 
         private void LoadCommands()
