@@ -154,10 +154,17 @@ namespace Packlists.ExcelImport
                 dataRange = worksheet.Cells[endRow + 1, 1, rowDimension, columnDimension]
                     .Where(c => c.Address.Contains("A") && c.Text.ToLower().Contains("totaler")).Select(c => c.End.Row + 3).ToArray();
             }
-            
-            //Offset the target row by 3 for visual distinction from header
-            var targetRow = 1;
 
+            //Add table headers to the last row of pack list header
+            for (var column = 1; column <= columnDimension; column++)
+            {
+                var value = worksheet.Cells[dataRange[0] - 2, column].Value;
+
+                if (value == null) continue;
+
+                packlisteData.Add(new Tuple<int, int>(endRow + 1, column), value);
+            }
+            
             foreach (var row in dataRange)
             {
                 for (var column = 1; column <= columnDimension; column++)
@@ -166,10 +173,9 @@ namespace Packlists.ExcelImport
                     
                     if (value == null) continue;
 
-                    packlisteData.Add(new Tuple<int, int>(targetRow, column), worksheet.Cells[row, column].Value);
+                    packlisteData.Add(new Tuple<int, int>(row, column), worksheet.Cells[row, column].Value);
                 }
 
-                targetRow++;
             }
 
             return packlisteData;
