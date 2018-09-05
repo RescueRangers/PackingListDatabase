@@ -2,12 +2,14 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
 using Packlists.Messages;
@@ -173,12 +175,22 @@ namespace Packlists.ViewModel
             _dialogService = dialogService;
             _progressDialog = progressDialog;
 
+            MessengerInstance.Register<FilterItemsMessage>(this, FilterMessageReceived);
+
             MessengerInstance.Register<UpdateItemsModelMessage>(this, OnMessageReceived);
 
             LoadData();
             LoadCommands();
             AddFilter(string.Empty);
             ItemsView.Refresh();
+        }
+
+        private void FilterMessageReceived(FilterItemsMessage obj)
+        {
+            SearchFilter = obj.ItemName;
+            var items = ItemsView.Cast<Item>();
+            
+            SelectedItem = items.FirstOrDefault();
         }
 
         private void OnMessageReceived(UpdateItemsModelMessage obj)

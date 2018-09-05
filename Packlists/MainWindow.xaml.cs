@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
+using Packlists.Model;
 using Packlists.ViewModel;
 
 namespace Packlists
@@ -26,7 +29,7 @@ namespace Packlists
             {
                 case "ShowItemsPanel":
                     var itemsView = new ItemsView();
-                    itemsView.ShowDialog();
+                    itemsView.Show();
                     break;
                 case "ShowMaterialsPanel":
                     var materialsView = new MaterialsView();
@@ -42,5 +45,6 @@ namespace Packlists
             var calendar = (System.Windows.Controls.Calendar)sender;
             calendar.DisplayMode = System.Windows.Controls.CalendarMode.Year;
         }
+        
     }
 }

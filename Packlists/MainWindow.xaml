@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:converters="clr-namespace:Packlists.Converters"
         xmlns:dp="clr-namespace:Packlists.DependencyProperties"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
@@ -94,8 +96,16 @@
                           Grid.RowSpan="3"
                           Margin="5"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          ScrollViewer.CanContentScroll="False">
-                <ListView.ItemTemplate>
+                          ScrollViewer.CanContentScroll="False"
+                          SelectedItem="{Binding SelectedItem}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <cmd:EventToCommand Command="{Binding EditItemCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
                                     Background="{Binding Item.Materials, Converter={StaticResource MaterialsToColorConverter}}"

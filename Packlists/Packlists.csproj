@@ -133,6 +133,7 @@
     <Compile Include="MaterialsView.xaml.cs">
       <DependentUpon>MaterialsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Messages\FilterItemsMessage.cs" />
     <Compile Include="Messages\UpdateItemsModelMessage.cs" />
     <Compile Include="Migrations\201808301340366_Initial.cs" />
     <Compile Include="Migrations\201808301340366_Initial.Designer.cs">

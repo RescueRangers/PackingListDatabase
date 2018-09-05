@@ -12,6 +12,7 @@ using GalaSoft.MvvmLight.Messaging;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
 using Packlists.ExcelImport;
+using Packlists.Messages;
 using Packlists.Model;
 using Packlists.Model.Printing;
 
@@ -229,10 +230,9 @@ namespace Packlists.ViewModel
         public ICommand SaveCommand { get; set; }
         public ICommand OpenMaterialsPanelCommand { get; set; }
         public ICommand ImportPacklisteCommand { get; set; }
-        public ICommand RemovePacklisteCommand { get; set; }
-        public ICommand AddYearCommand { get; set; }
         public ICommand PrintPacklisteCommand { get; set; }
         public ICommand PrintItemTableCommand { get; set; }
+        public ICommand EditItemCommand { get; set; }
 
         
         /// <inheritdoc />
@@ -259,11 +259,9 @@ namespace Packlists.ViewModel
                     _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
                 });
 
-            _selectedMonth = DateTime.Today;
 
-            _packlistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
-            _packlistView.Refresh();
-
+            PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
+            SelectedMonth = DateTime.Today;
         }
 
         private void LoadCommands()
@@ -274,11 +272,17 @@ namespace Packlists.ViewModel
             OpenMaterialsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMaterialsPanel"), true);
             SaveCommand = new RelayCommand(Save, true);
             ImportPacklisteCommand = new RelayCommand(ImportPacklisteData, true);
-            RemovePacklisteCommand = new RelayCommand(RemovePackliste, () => SelectedPackliste != null);
-            AddYearCommand = new RelayCommand(AddYear, CanAddYear);
             PrintPacklisteCommand = new RelayCommand(PrintPackliste,
                 () => SelectedPackliste?.PacklisteData != null);
+            EditItemCommand = new RelayCommand(EditItem, true);
             
+        }
+
+        private void EditItem()
+        {
+            MessengerInstance.Send(new NotificationMessage("ShowItemsPanel"));
+            MessengerInstance.Send<FilterItemsMessage>(new FilterItemsMessage(SelectedItem.Item.ItemName));
+            //MessengerInstance.Send(new NotificationMessage(SelectedItem.Item.ItemName));
         }
 
         private void PrintPackliste()
