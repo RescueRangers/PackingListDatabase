@@ -167,6 +167,11 @@
                             Content="Import packliste"
                             Margin="5"
                             Padding="10 0"/>
+
+                    <Button Command="{Binding CreateTarmPacklisteCommand}"
+                            Content="Create packliste for tarm"
+                            Margin="5"
+                            Padding="10 0"/>
                 </StackPanel>
 
             </Grid>

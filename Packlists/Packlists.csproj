@@ -125,6 +125,7 @@
     <Compile Include="Converters\ValueTupleConverter.cs" />
     <Compile Include="DependencyProperties\DatePickerCalendar.cs" />
     <Compile Include="DependencyModule.cs" />
+    <Compile Include="ExcelImport\CreateFromPackliste.cs" />
     <Compile Include="ExcelImport\ImportItems.cs" />
     <Compile Include="ExcelImport\ImportPackliste.cs" />
     <Compile Include="ItemsView.xaml.cs">

@@ -233,6 +233,7 @@ namespace Packlists.ViewModel
         public ICommand PrintPacklisteCommand { get; set; }
         public ICommand PrintItemTableCommand { get; set; }
         public ICommand EditItemCommand { get; set; }
+        public ICommand CreateTarmPacklisteCommand { get; set; }
 
         
         /// <inheritdoc />
@@ -276,7 +277,42 @@ namespace Packlists.ViewModel
             PrintPacklisteCommand = new RelayCommand(PrintPackliste,
                 () => SelectedPackliste?.PacklisteData != null);
             EditItemCommand = new RelayCommand(EditItem, true);
-            
+            CreateTarmPacklisteCommand = new RelayCommand(CreateTarmPackliste, true);
+        }
+
+        private void CreateTarmPackliste()
+        {
+            FileInfo excelFile;
+            var openFileOptions = new OpenFileDialogSettings
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx",
+                Title = "Packliste in excel",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+
+            var success =_dialogService.ShowOpenFileDialog(this, openFileOptions);
+
+            if (success == true)
+            {
+                excelFile = new FileInfo(openFileOptions.FileName);
+            }
+            else
+            {
+                return;
+            }
+
+            CreateFromPackliste.FromExcel((packliste, error) =>
+            {
+                if (error != null)
+                {
+                    _dialogService.ShowMessageBox(this, error.Message, "Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    return;
+                }
+                
+                _dataService.Add(packliste);
+
+            },excelFile, _dataService);
         }
 
         private void EditItem()
@@ -328,7 +364,7 @@ namespace Packlists.ViewModel
             var openFileOptions = new OpenFileDialogSettings
             {
                 Filter = "Excel files (*.xlsx)|*.xlsx",
-                Title = "Open excel file with items",
+                Title = "Packliste in excel",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
