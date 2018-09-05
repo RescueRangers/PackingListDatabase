@@ -262,6 +262,7 @@ namespace Packlists.ViewModel
             _selectedMonth = DateTime.Today;
 
             _packlistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
+            _packlistView.Refresh();
 
         }
 
