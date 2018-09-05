@@ -261,6 +261,7 @@ namespace Packlists.ViewModel
 
 
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
+            PacklistView.SortDescriptions.Add(new SortDescription("PacklisteNumber", ListSortDirection.Ascending));
             SelectedMonth = DateTime.Today;
         }
 
@@ -282,7 +283,6 @@ namespace Packlists.ViewModel
         {
             MessengerInstance.Send(new NotificationMessage("ShowItemsPanel"));
             MessengerInstance.Send<FilterItemsMessage>(new FilterItemsMessage(SelectedItem.Item.ItemName));
-            //MessengerInstance.Send(new NotificationMessage(SelectedItem.Item.ItemName));
         }
 
         private void PrintPackliste()
