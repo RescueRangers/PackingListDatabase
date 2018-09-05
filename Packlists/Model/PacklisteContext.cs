@@ -22,7 +22,7 @@ namespace Packlists.Model
             modelBuilder.Entity<Packliste>().HasMany(i => i.ItemsWithQties).WithRequired().WillCascadeOnDelete(false);
             modelBuilder.Entity<MaterialWithUsage>().HasRequired(m => m.Material);
             modelBuilder.Entity<Item>().HasMany(m => m.Materials).WithOptional().WillCascadeOnDelete(true);
-            modelBuilder.Entity<ItemWithQty>().HasRequired(i => i.Item);
+            modelBuilder.Entity<ItemWithQty>().HasRequired(i => i.Item).WithOptional().WillCascadeOnDelete(true);
 
             OnModelCreating(modelBuilder);
 

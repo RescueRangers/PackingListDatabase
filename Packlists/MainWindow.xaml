@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Packlists.Converters"
+        xmlns:converters="clr-namespace:Packlists.Converters"
+        xmlns:dp="clr-namespace:Packlists.DependencyProperties"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
@@ -15,8 +16,8 @@
     
     <Window.Resources>
         <ResourceDictionary>
-            <local:PacklistsToColorConverter x:Key="ColorConverter"/>
-            <local:MaterialsToColorConverter x:Key="MaterialsToColorConverter"/>
+            <converters:PacklistsToColorConverter x:Key="ColorConverter"/>
+            <converters:MaterialsToColorConverter x:Key="MaterialsToColorConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
@@ -29,7 +30,7 @@
         <ScrollViewer>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -37,10 +38,10 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="120"/>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="150"/>
+                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="60"/>
                     <RowDefinition Height="60"/>
                 </Grid.RowDefinitions>
@@ -53,33 +54,44 @@
                 </Menu>
 
                 <DataGrid Grid.Column="0"
+                          Grid.ColumnSpan="2"
                           Grid.Row="2"
                           Grid.RowSpan="3"
                           ItemsSource="{Binding PacklistView}" 
                           SelectedItem="{Binding SelectedPackliste}"
                           AutoGenerateColumns="False"
-                          CanUserAddRows="True">
+                          CanUserAddRows="True"
+                          Margin="5 5 0 5">
                     
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="*" 
-                                            Header="Packlists" 
+                        <DataGridTextColumn Header="Packlists" 
                                             Binding="{Binding PacklisteNumber}"
                                             SortDirection="Descending"/>
+
                         <DataGridTextColumn Header="Pack date"
                                             Binding="{Binding PacklisteDate, StringFormat=d, ConverterCulture=PL-pl}"/>
+
+                        <DataGridTextColumn Header="Destination"
+                                            Binding="{Binding Destination}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <Button Grid.Row="5"
-                        Grid.Column="1"
+                        Grid.Column="0"
                         Margin="5"
                         Command="{Binding PrintPacklisteCommand}"
                         Content="Print packliste"/>
 
+                <DatePicker dp:DatePickerCalendar.IsMonthYear="True"
+                            dp:DatePickerDateFormat.DateFormat="yyyy-MM"
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            Margin="5 5 5 0"
+                            SelectedDate="{Binding SelectedMonth}"/>
 
                 <ListView ItemsSource="{Binding SelectedPackliste.ItemsWithQties}"
                           Grid.Column="2"
-                          Grid.Row="2"
+                          Grid.Row="1"
                           Grid.RowSpan="3"
                           Margin="5"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -90,9 +102,11 @@
                                     Background="{Binding Item.Materials, Converter={StaticResource MaterialsToColorConverter}}"
                                     Width="Auto">
                             <TextBlock Text="{Binding Item.ItemName}"
-                                        Margin="10 5"/>
+                                        Margin="10 5"
+                                       MinWidth="150"/>
                             <TextBlock Text="{Binding Quantity}"
-                                        Margin="10 5"/>
+                                        Margin="10 5"
+                                       MinWidth="75"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>

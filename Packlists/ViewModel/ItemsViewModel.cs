@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -40,14 +41,8 @@ namespace Packlists.ViewModel
         /// </summary>
         public MaterialWithUsage SelectedMaterial
         {
-            get
-            {
-                return _selectedMaterial;
-            }
-            set
-            {
-                Set(nameof(SelectedMaterial), ref _selectedMaterial, value);
-            }
+            get => _selectedMaterial;
+            set => Set(nameof(SelectedMaterial), ref _selectedMaterial, value);
         }
 
         /// <summary>
@@ -57,10 +52,7 @@ namespace Packlists.ViewModel
         /// </summary>
         public ListCollectionView MaterialsView
         {
-            get
-            {
-                return _materialsView;
-            }
+            get => _materialsView;
 
             set
             {
@@ -78,14 +70,11 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the NewItemName property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public string NewItemName
         {
-            get
-            {
-                return _newItemName;
-            }
+            get => _newItemName;
 
             set
             {
@@ -107,10 +96,7 @@ namespace Packlists.ViewModel
         /// </summary>
         public string SearchFilter
         {
-            get
-            {
-                return _searchFilter;
-            }
+            get => _searchFilter;
 
             set
             {
@@ -153,7 +139,7 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the ItemsWithQties property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView ItemsView
         {
@@ -186,7 +172,6 @@ namespace Packlists.ViewModel
             _dataService = dataService;
             _dialogService = dialogService;
             _progressDialog = progressDialog;
-            //AddFilter(string.Empty);
 
             MessengerInstance.Register<UpdateItemsModelMessage>(this, OnMessageReceived);
 
@@ -236,8 +221,6 @@ namespace Packlists.ViewModel
                 WindowTitle = "Importing items"
             };
             _progressDialog.Execute(Import, options);
-            //await Import();
-
         }
 
         private async void Import(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
@@ -259,8 +242,6 @@ namespace Packlists.ViewModel
                     _dialogService.ShowMessageBox(this, error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-
-                //_dataService.AddItems(items);
 
                 LoadData();
 
@@ -286,12 +267,10 @@ namespace Packlists.ViewModel
                     _dialogService.ShowMessageBox(this, $"{exception.Message}\r\n{exception.StackTrace}");
                 }
 
-                //_materials = new ObservableCollection<Material>(materials);
-                //_items = new ObservableCollection<Item>(items);
                 MaterialsView = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
-                //_materialsView.Refresh();
                 ItemsView = (ListCollectionView)CollectionViewSource.GetDefaultView(items);
-                //_itemsView.Refresh();
+                MaterialsView.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
+
             });
         }
 
@@ -315,7 +294,8 @@ namespace Packlists.ViewModel
             };
             _progressDialog.Execute(SaveItems, options);
 
-            //_dataService.SaveData();
+            //TODO: Send a message for updating items data, register for the message in Main
+
         }
 
         private void SaveItems(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
@@ -347,9 +327,7 @@ namespace Packlists.ViewModel
 
         private void AddNewItem()
         {
-            //_items.Add(new Item{ItemName = _newItemName});
             ItemsView.AddNewItem(new Item {ItemName = _newItemName});
-            //if (ItemsView.AddNew() is Item newItem) newItem.ItemName = _newItemName;
         }
 
         private void AddFilter(string value)

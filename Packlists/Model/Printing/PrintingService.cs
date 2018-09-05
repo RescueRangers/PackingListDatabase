@@ -65,7 +65,9 @@ namespace Packlists.Model.Printing
                 {
                     worksheet.Cells[data.Key.Item1, data.Key.Item2].Value = data.Value;
                 }
-
+                
+                worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
+                //worksheet.PrinterSettings.FitToPage = true;
                 worksheet.PrinterSettings.FitToWidth = 1;
                 worksheet.PrinterSettings.RepeatRows = new ExcelAddress("$1:$" + headerRow);
 

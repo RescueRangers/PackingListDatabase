@@ -12,6 +12,18 @@ namespace Packlists.Model
 
         private DateTime _packlisteDate;
 
+        private string _destination;
+
+        /// <summary>
+        /// Sets and gets the Destination property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string Destination
+        {
+            get => _destination;
+            set => Set(nameof(Destination), ref _destination, value);
+        }
+
         /// <summary>
         /// Sets and gets the PacklisteDate property.
         /// Changes to that property's value raise the PropertyChanged event. 

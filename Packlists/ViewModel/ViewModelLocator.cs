@@ -14,6 +14,7 @@ using Ninject;
 
 namespace Packlists.ViewModel
 {
+    /// <inheritdoc />
     /// <summary>
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
@@ -21,7 +22,7 @@ namespace Packlists.ViewModel
     /// See http://www.mvvmlight.net
     /// </para>
     /// </summary>
-    public class ViewModelLocator : IDisposable
+    public sealed class ViewModelLocator : IDisposable
     {
         private readonly IKernel _kernel;
 

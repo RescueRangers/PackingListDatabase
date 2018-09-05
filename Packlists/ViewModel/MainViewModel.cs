@@ -42,8 +42,35 @@ namespace Packlists.ViewModel
         
         private string _searchFilter;
 
+        private DateTime _selectedMonth;
+
         #region Properties
 
+
+        /// <summary>
+        /// Sets and gets the SelectedMonth property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcast by the MessengerInstance when it changes.
+        /// </summary>
+        public DateTime SelectedMonth
+        {
+            get => _selectedMonth;
+
+            set
+            {
+                if (_selectedMonth == value)
+                {
+                    return;
+                }
+
+                AddFilter(value);
+                _packlistView.Refresh();
+
+                var oldValue = _selectedMonth;
+                _selectedMonth = value;
+                RaisePropertyChanged(nameof(SelectedMonth), oldValue, value, true);
+            }
+        }
 
         /// <summary>
         /// Sets and gets the NewYear property.
@@ -58,14 +85,11 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the SearchFilter property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public string SearchFilter
         {
-            get
-            {
-                return _searchFilter;
-            }
+            get => _searchFilter;
 
             set
             {
@@ -74,8 +98,8 @@ namespace Packlists.ViewModel
                     return;
                 }
 
-                AddFilter(value);
-                _packlistView.Refresh();
+                //AddFilter(value);
+                //_packlistView.Refresh();
                
 
                 var oldValue = _searchFilter;
@@ -88,7 +112,7 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the SelectedItem property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ItemWithQty SelectedItem
         {
@@ -110,7 +134,7 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the ItemsWithQties property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView ItemsView
         {
@@ -132,7 +156,7 @@ namespace Packlists.ViewModel
         /// <summary>
         /// Sets and gets the SelectedPackliste property.
         /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public Packliste SelectedPackliste
         {
@@ -220,7 +244,6 @@ namespace Packlists.ViewModel
             _dataService = dataService;
             _printing = printing;
             _dialogService = dialogService;
-            //_dialogService = dialogService;
             _dataService.GetPacklists(
                 (packlists, items, error) =>
                 {
@@ -234,7 +257,8 @@ namespace Packlists.ViewModel
                     _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
                     _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
                 });
-            
+
+            _selectedMonth = DateTime.Now;
         }
 
         private void LoadCommands()
@@ -352,13 +376,15 @@ namespace Packlists.ViewModel
             });
         }
 
-        private void AddFilter(string value)
+        private void AddFilter(DateTime value)
         {
             _packlistView.Filter = o =>
             {
-                if (string.IsNullOrWhiteSpace(_searchFilter)) return true;
+                //if (string.IsNullOrWhiteSpace(_searchFilter)) return true;
 
-                var result = o is Year year && year.YearNumber.ToString().ToLower().Contains(value.ToLower());
+                var result = o is Packliste packliste &&
+                             (packliste.PacklisteDate.Year == value.Year &&
+                              packliste.PacklisteDate.Month == value.Month);
                 return result;
             };
             

@@ -1,4 +1,5 @@
-﻿using System.Windows.Data;
+﻿using System.ComponentModel;
+using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -55,6 +56,8 @@ namespace Packlists.ViewModel
                 MaterialView = (ListCollectionView) CollectionViewSource.GetDefaultView(materials);
 
             });
+
+            MaterialView.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
 
             SaveCommand = new RelayCommand(Save, true);
         }

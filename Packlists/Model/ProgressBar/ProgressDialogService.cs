@@ -220,7 +220,9 @@ namespace Packlists.Model.ProgressBar
 
                 Task<T> task = action(cancellationToken, viewModel.Progress);
 
+#pragma warning disable 4014
                 task.ContinueWith(_ => viewModel.Close = true);
+#pragma warning restore 4014
 
                 window.ShowDialog();
 
@@ -251,7 +253,9 @@ namespace Packlists.Model.ProgressBar
 
                 Task task = action(cancellationToken, viewModel.Progress);
 
+#pragma warning disable 4014
                 task.ContinueWith(_ => viewModel.Close = true);
+#pragma warning restore 4014
 
                 window.ShowDialog();
 

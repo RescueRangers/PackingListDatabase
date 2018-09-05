@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
+using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using Packlists.Messages;
 
@@ -75,7 +76,7 @@ namespace Packlists.Model
             _packlisteContext.Items.RemoveRange(deletedItems);
             _packlisteContext.Packlistes.RemoveRange(deletedPacklists);
 
-            var changes = _packlisteContext.SaveChangesAsync();
+            var changes = _packlisteContext.SaveChanges();
 
             Console.WriteLine(changes);
 
@@ -86,7 +87,7 @@ namespace Packlists.Model
         /// <summary>
         /// Adds an object to the database
         /// </summary>
-        /// <param name="obj">Object can be an Item or a Material</param>
+        /// <param name="obj">Object can be an Item, Material or a Packliste</param>
         public void Add(object obj)
         {
             if (obj == null) return;
@@ -97,22 +98,34 @@ namespace Packlists.Model
             {
                 var item = (Item) obj;
 
-                _packlisteContext.Items.Add(item);
-                _items.Add(item);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _packlisteContext.Items.Add(item);
+                    _items.Add(item);
+                });
+
+                
             }
             if (type == typeof(Material))
             {
                 var material = (Material) obj;
                 _packlisteContext.Materials.Add(material);
-                _materials.Add(material);
+                
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _materials.Add(material);
+                });
             }
-
             if (type == typeof(Packliste))
             {
                 var packliste = (Packliste) obj;
 
                 _packlisteContext.Packlistes.Add(packliste);
-                _packlists.Add(packliste);
+                
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _packlists.Add(packliste);
+                });
             }
 
         }

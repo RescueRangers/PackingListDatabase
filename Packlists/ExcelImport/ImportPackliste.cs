@@ -34,17 +34,33 @@ namespace Packlists.ExcelImport
             {
                 var worksheet = excel.Workbook.Worksheets[1];
 
-                var englishPackliste =
-                    int.TryParse(
-                        worksheet.Cells.FirstOrDefault(c => c.Text.ToLower() == "number")?.Offset(0, 1).Text,
-                        out var packlisteNumber);
+                var location = worksheet.Cells[7, 2].Text;
 
-                if (!englishPackliste)
-                    int.TryParse(
-                        worksheet.Cells.FirstOrDefault(c => c.Text.ToLower() == "nummer")?.Offset(0, 1).Text,
-                        out packlisteNumber);
+                var englishPackliste = worksheet.Cells.FirstOrDefault(c =>
+                    string.Equals(c.Text, "number", StringComparison.InvariantCultureIgnoreCase))?.Address;
 
-                var packlisteData = GetPacklisteData(worksheet, englishPackliste);
+                var packlisteNumber = 0;
+
+                if (englishPackliste != null)
+                {
+                    packlisteNumber = worksheet.Cells[englishPackliste].Offset(0, 1).Value != null
+                        ? int.Parse(worksheet.Cells[englishPackliste].Offset(0, 1).Text)
+                        : int.Parse(worksheet.Cells[englishPackliste].Offset(0, 2).Text);
+                }
+
+                if (englishPackliste == null)
+                {
+                    var nonEnglishPackliste = worksheet.Cells.FirstOrDefault(c =>
+                        string.Equals(c.Text, "nummer", StringComparison.InvariantCultureIgnoreCase))?.Address;
+                    
+                    packlisteNumber = worksheet.Cells[nonEnglishPackliste].Offset(0, 1).Value != null
+                        ? int.Parse(worksheet.Cells[nonEnglishPackliste].Offset(0, 1).Text)
+                        : int.Parse(worksheet.Cells[nonEnglishPackliste].Offset(0, 2).Text);
+                }
+                
+                //var test = worksheet.Cells.FirstOrDefault(c => c.Text.ToLower() == "nummer")?.Offset(0, 2).End.Column;
+
+                var packlisteData = GetPacklisteData(worksheet, englishPackliste != null);
 
                 var packlisteItems = (List<ItemWithQty>) GetItems(items, packlisteData, dataService);
 
@@ -56,7 +72,8 @@ namespace Packlists.ExcelImport
                     PacklisteData = packlisteData,
                     ItemsWithQties = results,
                     PacklisteNumber = packlisteNumber,
-                    PacklisteDate = packDate
+                    PacklisteDate = packDate,
+                    Destination = location
                 };
                 callback(packliste, null);
             }
@@ -78,12 +95,13 @@ namespace Packlists.ExcelImport
             var itemData = packlisteData.Where(d =>
                 d.Key.Item2 == 1 && d.Value != null && (d.Value.ToString().ToLower().Contains("industri") == false &&
                                                         d.Value.ToString().ToLower().Contains("total") == false &&
-                                                        d.Value.ToString().ToLower().Contains("item") == false));
+                                                        d.Value.ToString().ToLower().Contains("item") == false &&
+                                                        d.Value.ToString().ToLower().Contains("varenum") == false));
 
             foreach (var item in itemData)
             {
                 var newItem = items.FirstOrDefault(itm => string.Equals(itm.ItemName, item.Value.ToString(), StringComparison.CurrentCultureIgnoreCase));
-                var itemWithQty = new ItemWithQty();
+                ItemWithQty itemWithQty;
 
                 float quantityValue;
                 var quantityResult =
@@ -109,6 +127,9 @@ namespace Packlists.ExcelImport
                     {
                         ItemName = item.Value.ToString(),
                     };
+
+                    dataService.Add(newItem);
+                    items.Add(newItem);
 
                     itemWithQty = new ItemWithQty
                     {
@@ -158,7 +179,7 @@ namespace Packlists.ExcelImport
             }
             
             
-            //Add table headers to the last row of pack liste header
+            //Add table headers to the last row of pack list header
             for (var column = 1; column <= columnDimension; column++)
             {
                 var value = worksheet.Cells[dataRange[0] - 2, column].Value;

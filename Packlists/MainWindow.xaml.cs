@@ -36,5 +36,11 @@ namespace Packlists
                     break;
             }
         }
+
+        private void Calendar_DisplayModeChanged(object sender, System.Windows.Controls.CalendarModeChangedEventArgs e)
+        {
+            var calendar = (System.Windows.Controls.Calendar)sender;
+            calendar.DisplayMode = System.Windows.Controls.CalendarMode.Year;
+        }
     }
 }

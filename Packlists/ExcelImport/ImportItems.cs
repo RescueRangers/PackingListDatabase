@@ -108,7 +108,7 @@ namespace Packlists.ExcelImport
 
             if (addedItemCount > 0)
             {
-                message = $"Succesfully added {addedItemCount} new items and {addedMaterials} new materials.";
+                message = $"Successfully added {addedItemCount} new items and {addedMaterials} new materials.";
             }
 
             dataService.SaveData();
