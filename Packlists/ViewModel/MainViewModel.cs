@@ -328,7 +328,13 @@ namespace Packlists.ViewModel
             EditItemCommand = new RelayCommand(EditItem, true);
             CreateTarmPacklisteCommand = new RelayCommand(CreateTarmPackliste, true);
             PrintItemTableCommand = new RelayCommand(PrintItemTable, () => SelectedPackliste != null);
-            PrintMonthlyCommand = new RelayCommand(PrintMonthlyReport, PacklistView != null && PacklistView.Count > 1);
+            PrintMonthlyCommand = new RelayCommand(PrintMonthlyReport, CanPrintMonthly);
+        }
+
+        private bool CanPrintMonthly()
+        {
+            if(PacklistView == null) return false;
+            return PacklistView.Count > 1;
         }
 
         private void PrintMonthlyReport()
