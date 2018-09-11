@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -38,7 +40,7 @@ namespace Packlists.ViewModel
 
         private ListCollectionView _itemsView;
 
-        private ItemWithQty _selectedItem;
+        private ItemWithQty _selectedItemWithQty;
 
         private string _newYear;
         
@@ -46,8 +48,55 @@ namespace Packlists.ViewModel
 
         private DateTime _selectedMonth;
 
+        private Item _selectedItem;
+
+        private string _quantity;
+        
         #region Properties
 
+        /// <summary>
+        /// Sets and gets the Quantity property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcast by the MessengerInstance when it changes.
+        /// </summary>
+        public string Quantity
+        {
+            get => _quantity;
+
+            set
+            {
+                if (_quantity == value)
+                {
+                    return;
+                }
+
+                var oldValue = _quantity;
+                _quantity = value;
+                RaisePropertyChanged(nameof(Quantity), oldValue, value, true);
+            }
+        }
+
+        /// <summary>
+        /// Sets and gets the SelectedItem property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcast by the MessengerInstance when it changes.
+        /// </summary>
+        public Item SelectedItem
+        {
+            get => _selectedItem;
+
+            set
+            {
+                if (_selectedItem == value)
+                {
+                    return;
+                }
+
+                var oldValue = _selectedItem;
+                _selectedItem = value;
+                RaisePropertyChanged(nameof(SelectedItem), oldValue, value, true);
+            }
+        }
 
         /// <summary>
         /// Sets and gets the SelectedMonth property.
@@ -116,20 +165,20 @@ namespace Packlists.ViewModel
         /// Changes to that property's value raise the PropertyChanged event. 
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
-        public ItemWithQty SelectedItem
+        public ItemWithQty SelectedItemWithQty
         {
-            get => _selectedItem;
+            get => _selectedItemWithQty;
 
             set
             {
-                if (_selectedItem == value)
+                if (_selectedItemWithQty == value)
                 {
                     return;
                 }
 
-                var oldValue = _selectedItem;
-                _selectedItem = value;
-                RaisePropertyChanged(nameof(SelectedItem), oldValue, value, true);
+                var oldValue = _selectedItemWithQty;
+                _selectedItemWithQty = value;
+                RaisePropertyChanged(nameof(SelectedItemWithQty), oldValue, value, true);
             }
         }
 
@@ -234,6 +283,7 @@ namespace Packlists.ViewModel
         public ICommand PrintItemTableCommand { get; set; }
         public ICommand EditItemCommand { get; set; }
         public ICommand CreateTarmPacklisteCommand { get; set; }
+        public ICommand PrintMonthlyCommand { get; set; }
 
         
         /// <inheritdoc />
@@ -251,11 +301,10 @@ namespace Packlists.ViewModel
                 {
                     if (error != null)
                     {
-                        // Report error here
+                        //TODO: Report error here
                         return;
                     }
 
-                    //_packlistView.Source = years;
                     _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
                     _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
                 });
@@ -269,15 +318,54 @@ namespace Packlists.ViewModel
         private void LoadCommands()
         {
             AddEmptyPacklisteCommand = new RelayCommand(AddEmptyPackliste, () => SelectedDay != null);
-            AddItemToPacklisteCommand = new RelayCommand(AddItemToPackliste, ()=> SelectedItem != null && SelectedItem.Quantity > 0);
+            AddItemToPacklisteCommand = new RelayCommand(AddItemToPackliste, CanAddItemToPackliste);
             OpenItemsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowItemsPanel"), true);
             OpenMaterialsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMaterialsPanel"), true);
             SaveCommand = new RelayCommand(Save, true);
             ImportPacklisteCommand = new RelayCommand(ImportPacklisteData, true);
             PrintPacklisteCommand = new RelayCommand(PrintPackliste,
-                () => SelectedPackliste?.PacklisteData != null);
+                CanPrintPackliste);
             EditItemCommand = new RelayCommand(EditItem, true);
             CreateTarmPacklisteCommand = new RelayCommand(CreateTarmPackliste, true);
+            PrintItemTableCommand = new RelayCommand(PrintItemTable, () => SelectedPackliste != null);
+            PrintMonthlyCommand = new RelayCommand(PrintMonthlyReport, PacklistView != null && PacklistView.Count > 1);
+        }
+
+        private void PrintMonthlyReport()
+        {
+            var packlists = PacklistView.OfType<Packliste>().ToList();
+
+            _printing.PrintMonthlyReport(packlists);
+        }
+
+        private bool CanAddItemToPackliste()
+        {
+            if (string.IsNullOrWhiteSpace(Quantity)) return false;
+            if (SelectedItem == null) return false;
+
+            var qtyResult = float.TryParse(Quantity, out var qty);
+
+            return qtyResult;
+        }
+
+        private bool CanPrintPackliste()
+        {
+            if (SelectedPackliste?.PacklisteData == null)
+            {
+                return false;
+            }
+
+            return SelectedPackliste.PacklisteData.Count >= 1;
+        }
+
+        private void PrintItemTable()
+        {
+            var printDialog = new PrintDialog();
+
+            if (printDialog.ShowDialog() == true)
+            {
+                _printing.PrintItemTable(SelectedPackliste);
+            }
         }
 
         private void CreateTarmPackliste()
@@ -318,7 +406,7 @@ namespace Packlists.ViewModel
         private void EditItem()
         {
             MessengerInstance.Send(new NotificationMessage("ShowItemsPanel"));
-            MessengerInstance.Send<FilterItemsMessage>(new FilterItemsMessage(SelectedItem.Item.ItemName));
+            MessengerInstance.Send<FilterItemsMessage>(new FilterItemsMessage(SelectedItemWithQty.Item.ItemName));
         }
 
         private void PrintPackliste()
@@ -329,33 +417,6 @@ namespace Packlists.ViewModel
             {
                 _printing.Print(SelectedPackliste.PacklisteData);
             }
-        }
-
-        private void AddYear()
-        {
-            PacklistView.AddNewItem(new Year(int.Parse(NewYear)));
-        }
-
-        private bool CanAddYear()
-        {
-            if (string.IsNullOrWhiteSpace(NewYear))
-            {
-                return false;
-            }
-
-            var isNumber = int.TryParse(NewYear, out var numbersResult);
-
-            if (isNumber)
-            {
-                return (numbersResult > 1 && numbersResult <= 9999);
-            }
-
-            return false;
-        }
-
-        private void RemovePackliste()
-        {
-            SelectedDay.Packlists.Remove(SelectedPackliste);
         }
 
         private void ImportPacklisteData()
@@ -406,7 +467,13 @@ namespace Packlists.ViewModel
 
         private void AddItemToPackliste()
         {
-            SelectedPackliste.ItemsWithQties.Add(SelectedItem);
+            var itemWithQty = new ItemWithQty
+            {
+                Item = SelectedItem,
+                Quantity = float.Parse(Quantity)
+            };
+
+            SelectedPackliste.AddItem(itemWithQty);
         }
 
         private void AddEmptyPackliste()

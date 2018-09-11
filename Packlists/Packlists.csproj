@@ -153,7 +153,9 @@
     <Compile Include="Model\Day.cs" />
     <Compile Include="Model\EditableModelBase.cs" />
     <Compile Include="Model\IDataService.cs" />
+    <Compile Include="Model\ImportTransport.cs" />
     <Compile Include="Model\ItemWithQty.cs" />
+    <Compile Include="Model\MaterialAmount.cs" />
     <Compile Include="Model\Printing\IPrintingService.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Material.cs" />

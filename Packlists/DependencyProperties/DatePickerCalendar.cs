@@ -169,11 +169,10 @@ namespace Packlists.DependencyProperties
         /// </summary>
         private static void DropDownButtonPreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            var fe = sender as FrameworkElement;
-            if (fe == null) return;
+            if (!(sender is FrameworkElement fe)) return;
 
             var datePicker = fe.TryFindParent<DatePicker>();
-            if (datePicker == null || datePicker.SelectedDate == null) return;
+            if (datePicker?.SelectedDate == null) return;
 
             var dropDownButton = GetTemplateButton(datePicker);
 
@@ -256,9 +255,8 @@ namespace Packlists.DependencyProperties
 
             public static DateTime? StringToDateTime(DatePicker datePicker, string formatStr, string dateStr)
             {
-                DateTime date;
                 var canParse = DateTime.TryParseExact(dateStr, formatStr, CultureInfo.CurrentCulture,
-                                                      DateTimeStyles.None, out date);
+                                                      DateTimeStyles.None, out var date);
 
                 if (!canParse)
                     canParse = DateTime.TryParse(dateStr, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
@@ -294,8 +292,7 @@ namespace Packlists.DependencyProperties
             if (parentObject == null) return null;
 
             //check if the parent matches the type we're looking for
-            T parent = parentObject as T;
-            if (parent != null)
+            if (parentObject is T parent)
             {
                 return parent;
             }
@@ -320,19 +317,16 @@ namespace Packlists.DependencyProperties
             if (child == null) return null;
 
             //handle content elements separately
-            ContentElement contentElement = child as ContentElement;
-            if (contentElement != null)
+            if (child is ContentElement contentElement)
             {
                 DependencyObject parent = ContentOperations.GetParent(contentElement);
                 if (parent != null) return parent;
 
-                FrameworkContentElement fce = contentElement as FrameworkContentElement;
-                return fce != null ? fce.Parent : null;
+                return contentElement is FrameworkContentElement fce ? fce.Parent : null;
             }
 
             //also try searching for parent in framework elements (such as DockPanel, etc)
-            FrameworkElement frameworkElement = child as FrameworkElement;
-            if (frameworkElement != null)
+            if (child is FrameworkElement frameworkElement)
             {
                 DependencyObject parent = frameworkElement.Parent;
                 if (parent != null) return parent;

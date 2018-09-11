@@ -1,6 +1,8 @@
-﻿namespace Packlists.Model
+﻿using System;
+
+namespace Packlists.Model
 {
-    public class Material : EditableModelBase<Material>
+    public class Material : EditableModelBase<Material>, IComparable
     {
         private string _materialName;
 
@@ -38,6 +40,17 @@
         public override string ToString()
         {
             return MaterialName;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is Material that)
+            {
+                return string.Compare(MaterialName, that.MaterialName, StringComparison.Ordinal);
+            }
+
+            return -1;
+
         }
     }
 

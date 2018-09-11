@@ -20,7 +20,7 @@ namespace Packlists.ViewModel
 {
     public class ItemsViewModel : ViewModelBase
     {
-        private IDataService _dataService;
+        private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
         private readonly IProgressDialogService _progressDialog;
         private FileInfo _excelFile;
@@ -293,7 +293,6 @@ namespace Packlists.ViewModel
                 SelectedItem.Materials.Remove((MaterialWithUsage) o);
             }
             SelectedItem.Materials.Remove(SelectedMaterial);
-            //ItemsView.Refresh();
         }
 
         private void Save()

@@ -15,13 +15,13 @@
         Width="1100"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <converters:PacklistsToColorConverter x:Key="ColorConverter"/>
             <converters:MaterialsToColorConverter x:Key="MaterialsToColorConverter"/>
             <ResourceDictionary.MergedDictionaries>
-                
+
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -32,10 +32,11 @@
         <ScrollViewer>
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="220"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="310"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -50,7 +51,7 @@
 
                 <Menu Grid.Column="0"
                       Grid.Row="0"
-                      Grid.ColumnSpan="5">
+                      Grid.ColumnSpan="6">
                     <MenuItem Header="Items" Command="{Binding OpenItemsPanelCommand}"/>
                     <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
                 </Menu>
@@ -64,7 +65,7 @@
                           AutoGenerateColumns="False"
                           CanUserAddRows="True"
                           Margin="5 5 0 5">
-                    
+
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Packlists" 
                                             Binding="{Binding PacklisteNumber}"/>
@@ -82,87 +83,167 @@
                         Margin="5"
                         Command="{Binding PrintPacklisteCommand}"
                         Content="Print packliste"/>
+                
+                <Button Grid.Row="5"
+                        Grid.Column="1"
+                        Margin="5"
+                        Command="{Binding PrintItemTableCommand}"
+                        Content="Print item table"/>
 
                 <DatePicker dp:DatePickerCalendar.IsMonthYear="True"
                             dp:DatePickerDateFormat.DateFormat="yyyy-MM"
                             Grid.Column="0"
                             Grid.Row="1"
                             Margin="5 5 5 0"
-                            SelectedDate="{Binding SelectedMonth}"/>
+                            SelectedDate="{Binding SelectedMonth}" Grid.ColumnSpan="2"/>
 
-                <ListView ItemsSource="{Binding SelectedPackliste.ItemsWithQties}"
-                          Grid.Column="2"
+                <GroupBox Grid.Column="2"
+                          Grid.ColumnSpan="2"
                           Grid.Row="1"
-                          Grid.RowSpan="3"
-                          Margin="5"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          ScrollViewer.CanContentScroll="False"
-                          SelectedItem="{Binding SelectedItem}">
+                          Grid.RowSpan="5" 
+                          Header="Items">
+                    
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="300"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        
+                        <ListView ItemsSource="{Binding SelectedPackliste.ItemsWithQties}"
+                                      Margin="5"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      ScrollViewer.CanContentScroll="False"
+                                      SelectedItem="{Binding SelectedItemWithQty}" 
+                                      Grid.Row="0">
 
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <cmd:EventToCommand Command="{Binding EditItemCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <cmd:EventToCommand Command="{Binding EditItemCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
 
-                    <ListView.ItemTemplate>
-                    <DataTemplate>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="120"  Header="Items">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Item.ItemName}"
+                                                           Background="{Binding Item.Materials, Converter={StaticResource MaterialsToColorConverter}}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="75" DisplayMemberBinding="{Binding Quantity}" Header="Quantity"/>
+                                </GridView>
+                            </ListView.View>
+
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                        Background="{Binding Item.Materials, Converter={StaticResource MaterialsToColorConverter}}">
+                                        <TextBlock Text="{Binding Item.ItemName}"
+                                               Margin="10 5"
+                                               MinWidth="150"/>
+                                        <TextBlock Text="{Binding Quantity}"
+                                               Margin="10 5"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    
                         <StackPanel Orientation="Horizontal"
-                                    Background="{Binding Item.Materials, Converter={StaticResource MaterialsToColorConverter}}"
-                                    Width="Auto">
-                            <TextBlock Text="{Binding Item.ItemName}"
-                                        Margin="10 5"
-                                       MinWidth="150"/>
-                            <TextBlock Text="{Binding Quantity}"
-                                        Margin="10 5"
-                                       MinWidth="75"/>
+                                    Grid.Row="1">
+                            <TextBlock Text="Item number: " 
+                                       Margin="5 5"
+                                       VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.ItemsView}"
+                                      SelectedItem="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedItem}"
+                                      Margin="5"
+                                      MinWidth="120"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Text="Qty: "
+                                       Margin="5"
+                                       VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="5"
+                                     VerticalAlignment="Center"
+                                     MinWidth="25"
+                                     MinHeight="25"/>
+                            <Button Content="Add"
+                                    Margin="5"
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.AddItemToPacklisteCommand}"
+                                    VerticalAlignment="Center"
+                                    Padding="5"/>
                         </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    </Grid>
+                    
+                </GroupBox>
+
+                <GroupBox Grid.Column="4"
+                          Grid.Row="1"
+                          Grid.RowSpan="5"
+                          Header="Material usage">
+                    
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="300"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                    
+                        <ListView ItemsSource="{Binding SelectedPackliste.RawUsage}"
+                                  Margin="5"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.CanContentScroll="False"
+                                  Grid.Row="0">
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="140" DisplayMemberBinding="{Binding Item1}" Header="Material"/>
+                                <GridViewColumn Width="75" DisplayMemberBinding="{Binding Item2}" Header="Usage"/>
+                                <GridViewColumn Width="35" DisplayMemberBinding="{Binding Item3}" Header="Unit"/>
+                            </GridView>
+                        </ListView.View>
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal"
+                                        Background="{Binding}"
+                                        Width="Auto">
+                                    <TextBlock Text="{Binding Item1}"
+                                           Margin="10 5"
+                                           />
+                                    <TextBlock Text="{Binding Item2}"
+                                           Margin="10 5"
+                                           />
+                                    <TextBlock Text="{Binding Item3}"
+                                           Margin="10 5"
+                                           />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                        
+                    </Grid>
+                    
+                    
+                </GroupBox>
+
                 
-                
-                <StackPanel Orientation="Horizontal"
-                            Grid.Column="2"
-                            Grid.Row="5">
-                    <TextBlock Text="Item number: " 
-                               Margin="5 5"
-                               VerticalAlignment="Center"/>
-                    <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.ItemsView}"
-                              SelectedItem="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedItem}"
-                              Margin="5"
-                              MinWidth="120"
-                              VerticalAlignment="Center"/>
-                    <TextBlock Text="Qty: "
-                               Margin="5"
-                               VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedItem.Quantity, UpdateSourceTrigger=PropertyChanged}"
-                             Margin="5"
-                             VerticalAlignment="Center"
-                             MinWidth="25"
-                             MinHeight="25"/>
-                    <Button Content="Add"
-                            Margin="5"
-                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.AddItemToPacklisteCommand}"
-                            VerticalAlignment="Center"
-                            Padding="5"/>
-                </StackPanel>
 
                 <StackPanel Grid.Row="6"
                             Grid.Column="0"
                             Orientation="Horizontal"
-                            Grid.ColumnSpan="5">
+                            Grid.ColumnSpan="6">
 
                     <Button Command="{Binding SaveCommand}"
                             Content="Save"
                             Margin="5" 
                             Padding="10 0"/>
 
-                    <Button Command="{Binding AddEmptyPacklisteCommand}"
-                            Content="Add empty packliste"
+                    <Button Command="{Binding PrintMonthlyCommand}"
+                            Content="Print monthly report"
                             Margin="5" 
                             Padding="10 0"/>
-                    
+
                     <Button Command="{Binding ImportPacklisteCommand}"
                             Content="Import packliste"
                             Margin="5"

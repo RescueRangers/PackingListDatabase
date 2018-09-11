@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace Packlists.ExcelImport
                 var packliste = new Packliste
                 {
                     PacklisteData = packlisteData,
-                    ItemsWithQties = results,
+                    ItemsWithQties = new ObservableCollection<ItemWithQty>(results),
                     PacklisteNumber = packlisteNumber,
                     PacklisteDate = packDate,
                     Destination = location
@@ -170,7 +171,7 @@ namespace Packlists.ExcelImport
             {
                 var totalsRow = worksheet.Cells[endRow + 1, 1, rowDimension, 1].First(c => c.Text.ToLower().Contains("totals")).End.Row;
                 dataRange = worksheet.Cells[totalsRow + 3, 1, rowDimension, columnDimension]
-                    .Where(c => c.End.Row % 2 == (totalsRow + 3) % 2).Select(c => c.End.Row).ToArray();
+                    .Where(c => c.End.Row % 2 == (totalsRow + 3) % 2 && c.End.Column == 1).Select(c => c.End.Row).ToArray();
             }
             else
             {

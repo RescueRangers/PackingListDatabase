@@ -12,6 +12,8 @@ namespace Packlists.Model
         public DbSet<Material> Materials { get; set; }
         public DbSet<MaterialWithUsage> MaterialsWithUsage { get; set; }
         public DbSet<ItemWithQty> ItemWithQties { get; set; }
+        public DbSet<MaterialAmount> MaterialAmounts { get; set; }
+        public DbSet<ImportTransport> ImportTransports { get; set; }
 
         public PacklisteContext()
         {
@@ -23,6 +25,8 @@ namespace Packlists.Model
             modelBuilder.Entity<MaterialWithUsage>().HasRequired(m => m.Material);
             modelBuilder.Entity<Item>().HasMany(m => m.Materials).WithOptional().WillCascadeOnDelete(true);
             modelBuilder.Entity<ItemWithQty>().HasRequired(i => i.Item).WithOptional().WillCascadeOnDelete(true);
+            modelBuilder.Entity<MaterialAmount>().HasRequired(m => m.Material).WithOptional().WillCascadeOnDelete(true);
+            modelBuilder.Entity<ImportTransport>().HasMany(m => m.ImportedMaterials).WithOptional().WillCascadeOnDelete(true);
 
             OnModelCreating(modelBuilder);
 
