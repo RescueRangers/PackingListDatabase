@@ -34,16 +34,12 @@ namespace Packlists.ViewModel
 
         private ListCollectionView _packlistView;
 
-        private Day _selectedDay;
-
         private Packliste _selectedPackliste;
 
         private ListCollectionView _itemsView;
 
         private ItemWithQty _selectedItemWithQty;
 
-        private string _newYear;
-        
         private string _searchFilter;
 
         private DateTime _selectedMonth;

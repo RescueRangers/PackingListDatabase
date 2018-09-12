@@ -115,7 +115,12 @@
                                       Margin="5"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                                       ScrollViewer.CanContentScroll="False"
-                                      Grid.Row="0">
+                                      Grid.Row="0"
+                                  SelectedItem="{Binding SelectedMaterialAmount}">
+
+                            <ListView.InputBindings>
+                                <KeyBinding Key="Delete" Command="{Binding RemoveMaterialAmountCommand}" />
+                            </ListView.InputBindings>
 
                             <ListView.View>
                                 <GridView>
@@ -154,7 +159,8 @@
                                      Margin="5"
                                      VerticalAlignment="Center"
                                      MinWidth="75"
-                                     MinHeight="25">
+                                     MinHeight="25"
+                                     HorizontalAlignment="Center">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="KeyDown">
                                         <command:EventToCommand Command="{Binding ImportedMaterialEnterCommand}"
@@ -168,7 +174,9 @@
                                        Background="DarkGray"
                                        MinHeight="25"
                                        MinWidth="20"
-                                       Margin="-5 0 0 0"/>
+                                       Margin="-5 0 5 0"
+                                       Padding="5 0 5 0"
+                                       HorizontalAlignment="Center"/>
                             <Button Content="Add"
                                     Margin="5"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.AddImportedMaterialCommand}"

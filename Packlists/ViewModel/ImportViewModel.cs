@@ -22,11 +22,33 @@ namespace Packlists.ViewModel
         private readonly IDialogService _dialogService;
         private readonly IPrintingService _printing;
 
-        /// <summary>
-        /// The <see cref="SelectedDate" /> property's name.
-        /// </summary>
-        public const string SelectedDatePropertyName = "SelectedDate";
+        private MaterialAmount _selectedMaterialAmount;
 
+        /// <summary>
+        /// Sets and gets the SelectedMaterialAmount property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// This property's value is broadcasted by the MessengerInstance when it changes.
+        /// </summary>
+        public MaterialAmount SelectedMaterialAmount
+        {
+            get
+            {
+                return _selectedMaterialAmount;
+            }
+
+            set
+            {
+                if (_selectedMaterialAmount == value)
+                {
+                    return;
+                }
+
+                var oldValue = _selectedMaterialAmount;
+                _selectedMaterialAmount = value;
+                RaisePropertyChanged(nameof(SelectedMaterialAmount), oldValue, value, true);
+            }
+        }
+        
         private DateTime _selectedDate = DateTime.Now;
 
         /// <summary>
@@ -47,7 +69,7 @@ namespace Packlists.ViewModel
 
                 var oldValue = _selectedDate;
                 _selectedDate = value;
-                RaisePropertyChanged(SelectedDatePropertyName, oldValue, value, true);
+                RaisePropertyChanged(nameof(SelectedDate), oldValue, value, true);
             }
         }
 
@@ -186,7 +208,8 @@ namespace Packlists.ViewModel
         public ICommand ImportedMaterialEnterCommand { get; set; }
         public ICommand AddImportCommand { get; set; }
         public ICommand CloseCommand { get; set; }
-        public ICommand ImportsEnterCommand { get; set; }   
+        public ICommand ImportsEnterCommand { get; set; }
+        public ICommand RemoveMaterialAmountCommand { get; set; }
 
 
         public ImportViewModel(IPrintingService printing, IDialogService dialogService, IDataService dataService)
@@ -220,17 +243,25 @@ namespace Packlists.ViewModel
             AddImportCommand = new RelayCommand(AddImport, CanAddImport);
             CloseCommand = new RelayCommand(Close, true);
             ImportedMaterialEnterCommand = new RelayCommand<Key>(ImportedMaterialEnter, true);
-            ImportsEnterCommand = new RelayCommand<Key>(ImportsEnter, true);
+            ImportsEnterCommand = new RelayCommand<Key>(ImportsEnter);
+            RemoveMaterialAmountCommand = new RelayCommand(RemoveMaterialAmount, () => SelectedMaterialAmount != null);
+        }
+
+        private void RemoveMaterialAmount()
+        {
+            SelectedImport.ImportedMaterials.Remove(SelectedMaterialAmount);
         }
 
         private void ImportsEnter(Key key)
         {
+            if (!CanAddImport()) return;
             if (key == Key.Enter)
                 AddImport();
         }
 
         private void ImportedMaterialEnter(Key key)
         {
+            if (!CanAddMaterial()) return;
             if (key == Key.Enter) 
                 AddImportedMaterial();
         }
