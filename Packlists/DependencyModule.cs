@@ -20,7 +20,7 @@ namespace Packlists
         {
             Bind<IDataService>().To<DataService>().InSingletonScope();
 
-            Bind<IPrintingService>().To<PrintingService>().WhenInjectedInto<MainViewModel>().InSingletonScope();
+            Bind<IPrintingService>().To<PrintingService>().InSingletonScope();
 
             Bind<IDialogService>().To<DialogService>().InSingletonScope().WithConstructorArgument("dialogFactory", _dialogFactory)
                 .WithConstructorArgument("dialogTypeLocator", _namingConvention)
@@ -31,6 +31,7 @@ namespace Packlists
             Bind<MainViewModel>().ToSelf().InSingletonScope();
             Bind<ItemsViewModel>().ToSelf().InTransientScope();
             Bind<MaterialsViewModel>().ToSelf().InTransientScope();
+            Bind<ImportViewModel>().ToSelf().InTransientScope();
         }
     }
 }

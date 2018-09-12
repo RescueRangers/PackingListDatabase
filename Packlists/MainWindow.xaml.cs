@@ -35,6 +35,10 @@ namespace Packlists
                     var materialsView = new MaterialsView();
                     materialsView.ShowDialog();
                     break;
+                case "ShowImportPanel":
+                    var importView = new ImportView();
+                    importView.Show();
+                    break;
                 default:
                     break;
             }

@@ -59,7 +59,8 @@
                   Grid.ColumnSpan="2"
                   Margin="5"
                   SelectedItem="{Binding SelectedItem}"
-                  AutoGenerateColumns="False">
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Item"
                                     Binding="{Binding ItemName}"

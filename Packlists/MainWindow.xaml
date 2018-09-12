@@ -29,7 +29,8 @@
 
     <Grid x:Name="LayoutRoot">
 
-        <ScrollViewer>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"/>
@@ -54,6 +55,7 @@
                       Grid.ColumnSpan="6">
                     <MenuItem Header="Items" Command="{Binding OpenItemsPanelCommand}"/>
                     <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
+                    <MenuItem Header="Import" Command="{Binding OpenImportPanelCommand}"/>
                 </Menu>
 
                 <DataGrid Grid.Column="0"

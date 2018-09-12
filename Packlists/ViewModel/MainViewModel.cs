@@ -124,16 +124,6 @@ namespace Packlists.ViewModel
         }
 
         /// <summary>
-        /// Sets and gets the NewYear property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string NewYear
-        {
-            get => _newYear;
-            set => Set(nameof(NewYear), ref _newYear, value);
-        }
-
-        /// <summary>
         /// Sets and gets the SearchFilter property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// This property's value is broadcast by the MessengerInstance when it changes.
@@ -226,30 +216,7 @@ namespace Packlists.ViewModel
             }
         }
 
-        /// <summary>
-        /// Sets and gets the SelectedDay property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// This property's value is broadcast by the MessengerInstance when it changes.
-        /// </summary>
-        public Day SelectedDay
-        {
-            get => _selectedDay;
-
-            set
-            {
-                if (_selectedDay == value)
-                {
-                    return;
-                }
-
-                var oldValue = _selectedDay;
-                _selectedDay = value;
-                RaisePropertyChanged(nameof(SelectedDay), oldValue, value, true);
-            }
-        }
-
-        
-        /// <summary>
+       /// <summary>
         /// Sets and gets the YearsView property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// This property's value is broadcast by the MessengerInstance when it changes.
@@ -273,7 +240,6 @@ namespace Packlists.ViewModel
 
         #endregion
 
-        public ICommand AddEmptyPacklisteCommand { get; private set; }
         public ICommand AddItemToPacklisteCommand { get; private set; }
         public ICommand OpenItemsPanelCommand { get; set; }
         public ICommand SaveCommand { get; set; }
@@ -284,6 +250,7 @@ namespace Packlists.ViewModel
         public ICommand EditItemCommand { get; set; }
         public ICommand CreateTarmPacklisteCommand { get; set; }
         public ICommand PrintMonthlyCommand { get; set; }
+        public ICommand OpenImportPanelCommand { get; set; }    
 
         
         /// <inheritdoc />
@@ -317,7 +284,6 @@ namespace Packlists.ViewModel
 
         private void LoadCommands()
         {
-            AddEmptyPacklisteCommand = new RelayCommand(AddEmptyPackliste, () => SelectedDay != null);
             AddItemToPacklisteCommand = new RelayCommand(AddItemToPackliste, CanAddItemToPackliste);
             OpenItemsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowItemsPanel"), true);
             OpenMaterialsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMaterialsPanel"), true);
@@ -329,6 +295,7 @@ namespace Packlists.ViewModel
             CreateTarmPacklisteCommand = new RelayCommand(CreateTarmPackliste, true);
             PrintItemTableCommand = new RelayCommand(PrintItemTable, () => SelectedPackliste != null);
             PrintMonthlyCommand = new RelayCommand(PrintMonthlyReport, CanPrintMonthly);
+            OpenImportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowImportPanel"), true);
         }
 
         private bool CanPrintMonthly()
@@ -480,18 +447,6 @@ namespace Packlists.ViewModel
             };
 
             SelectedPackliste.AddItem(itemWithQty);
-        }
-
-        private void AddEmptyPackliste()
-        {
-            if(SelectedDay.Packlists == null) 
-                SelectedDay.Packlists = new ObservableCollection<Packliste>();
-
-            SelectedDay.Packlists.Add(new Packliste
-            {
-                ItemsWithQties = new ObservableCollection<ItemWithQty>(),
-                PacklisteNumber = -1,
-            });
         }
 
         private void AddFilter(DateTime value)

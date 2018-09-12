@@ -45,6 +45,8 @@ namespace Packlists.ViewModel
 
         public MaterialsViewModel Materials => _kernel.Get<MaterialsViewModel>();
 
+        public ImportViewModel Import => _kernel.Get<ImportViewModel>();
+
         //public ProgressDialogViewModel ProgressDialog => _kernel.Get<ProgressDialogViewModel>();
 
 

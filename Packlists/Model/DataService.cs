@@ -13,6 +13,7 @@ namespace Packlists.Model
     {
         private ObservableCollection<Packliste> _packlists;
         private ObservableCollection<Item> _items;
+        private ObservableCollection<ImportTransport> _imports;
 
         private ObservableCollection<Material> _materials;
         //private ObservableCollection<MaterialWithUsage> _materialWithUsage;
@@ -25,6 +26,7 @@ namespace Packlists.Model
             _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties));
             _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
             _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
+            _imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
         }
 
         
@@ -66,15 +68,32 @@ namespace Packlists.Model
             Messenger.Default.Send(new UpdateItemsModelMessage());
         }
 
+        public void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback)
+        {
+            if (_imports == null)
+            {
+                _imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
+            }
+
+            if (_materials == null)
+            {
+                _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
+            }
+
+            callback(_imports, _materials, null);
+        }
+
         public void SaveData()
         {
             var deletedMaterials = _packlisteContext.Materials.ToArray().Except(_materials).ToArray();
             var deletedItems = _packlisteContext.Items.ToArray().Except(_items).ToArray();
             var deletedPacklists = _packlisteContext.Packlistes.ToArray().Except(_packlists).ToArray();
+            var deletedImports = _packlisteContext.ImportTransports.ToArray().Except(_imports).ToArray();
 
             _packlisteContext.Materials.RemoveRange(deletedMaterials);
             _packlisteContext.Items.RemoveRange(deletedItems);
             _packlisteContext.Packlistes.RemoveRange(deletedPacklists);
+            _packlisteContext.ImportTransports.RemoveRange(deletedImports);
 
             var changes = _packlisteContext.SaveChanges();
 
@@ -87,7 +106,7 @@ namespace Packlists.Model
         /// <summary>
         /// Adds an object to the database
         /// </summary>
-        /// <param name="obj">Object can be an Item, Material or a Packliste</param>
+        /// <param name="obj">Object can be an Item, Material, Packliste or Import</param>
         public void Add(object obj)
         {
             if (obj == null) return;
@@ -97,10 +116,11 @@ namespace Packlists.Model
             if (type == typeof(Item))
             {
                 var item = (Item) obj;
+                _packlisteContext.Items.Add(item);
+                _packlisteContext.SaveChanges();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    _packlisteContext.Items.Add(item);
                     _items.Add(item);
                 });
 
@@ -110,6 +130,7 @@ namespace Packlists.Model
             {
                 var material = (Material) obj;
                 _packlisteContext.Materials.Add(material);
+                _packlisteContext.SaveChanges();
                 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -121,10 +142,24 @@ namespace Packlists.Model
                 var packliste = (Packliste) obj;
 
                 _packlisteContext.Packlistes.Add(packliste);
+                _packlisteContext.SaveChanges();
                 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     _packlists.Add(packliste);
+                });
+            }
+
+            if (type == typeof(ImportTransport))
+            {
+                var transport = (ImportTransport) obj;
+
+                _packlisteContext.ImportTransports.Add(transport);
+                _packlisteContext.SaveChanges();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _imports.Add(transport);
                 });
             }
 

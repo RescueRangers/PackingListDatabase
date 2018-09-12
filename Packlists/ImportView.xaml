@@ -4,9 +4,182 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Packlists"
+        xmlns:dependencyProperties="clr-namespace:Packlists.DependencyProperties"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:converters="clr-namespace:Packlists.Converters"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d"
-        Title="ImportView" Height="450" Width="800">
+        Title="ImportView" 
+        Height="500" 
+        Width="720"
+        DataContext="{Binding Import, Source={StaticResource Locator}}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <command:EventToCommand Command="{Binding CloseCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <converters:KeyboardEventArgsToKeyConverter x:Key="KeyEventArgsToKeyConverter" />
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
-        
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Menu Grid.Column="0"
+                      Grid.Row="0"
+                      Grid.ColumnSpan="4">
+                    <MenuItem Header="Items" Command="{Binding OpenItemsPanelCommand}"/>
+                    <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
+                </Menu>
+
+                <DatePicker dependencyProperties:DatePickerCalendar.IsMonthYear="True"
+                            dependencyProperties:DatePickerDateFormat.DateFormat="yyyy-MM"
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            Margin="5 5 5 0"
+                            SelectedDate="{Binding SelectedMonth}" Grid.ColumnSpan="2"/>
+
+                <DataGrid Grid.Column="0"
+                          Grid.ColumnSpan="2"
+                          Grid.Row="2"
+                          Grid.RowSpan="2"
+                          ItemsSource="{Binding Imports}" 
+                          SelectedItem="{Binding SelectedImport}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          Margin="5 5 0 5">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Date" 
+                                            Binding="{Binding ImportDate, StringFormat=d, ConverterCulture=PL-pl}"/>
+
+                        <DataGridTextColumn Header="Sender"
+                                            Binding="{Binding Sender}"/>
+                        
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Grid.Row="4"
+                            Margin="5">
+                    <TextBlock Text="Sender:"/>
+                    <TextBox Text="{Binding Sender}"/>
+                    <TextBlock Text="Date:"/>
+                    <DatePicker SelectedDate="{Binding SelectedDate}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="KeyDown">
+                                <command:EventToCommand Command="{Binding ImportsEnterCommand}"
+                                                        PassEventArgsToCommand="True"
+                                                        EventArgsConverter="{StaticResource KeyEventArgsToKeyConverter}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </DatePicker>
+                    <Button Content="Add"
+                            Command="{Binding AddImportCommand}"/>
+                </StackPanel>
+
+               <GroupBox Grid.Column="2"
+                          Grid.ColumnSpan="2"
+                          Grid.Row="1"
+                          Grid.RowSpan="4" 
+                          Header="Materials">
+                    
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="300"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        
+                        <ListView ItemsSource="{Binding SelectedImport.ImportedMaterials}"
+                                      Margin="5"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      ScrollViewer.CanContentScroll="False"
+                                      Grid.Row="0">
+
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="120"  Header="Material">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Material}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="75" 
+                                                    DisplayMemberBinding="{Binding Amount}" 
+                                                    Header="Amount"/>
+                                    <GridViewColumn Width="Auto" 
+                                                    DisplayMemberBinding="{Binding Material.Unit}"
+                                                    Header="Unit"/>
+                                </GridView>
+                            </ListView.View>
+                           
+                        </ListView>
+                    
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Row="1">
+                            <TextBlock Text="Material:" 
+                                       Margin="5 5"
+                                       VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.Materials}"
+                                      SelectedItem="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedMaterial}"
+                                      Margin="5"
+                                      MinWidth="120"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Text="Amount: "
+                                       Margin="5"
+                                       VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="5"
+                                     VerticalAlignment="Center"
+                                     MinWidth="75"
+                                     MinHeight="25">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="KeyDown">
+                                        <command:EventToCommand Command="{Binding ImportedMaterialEnterCommand}"
+                                                                PassEventArgsToCommand="True"
+                                                                EventArgsConverter="{StaticResource KeyEventArgsToKeyConverter}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBox>
+                            <TextBlock Text="{Binding SelectedMaterial.Unit}"
+                                       VerticalAlignment="Center"
+                                       Background="DarkGray"
+                                       MinHeight="25"
+                                       MinWidth="20"
+                                       Margin="-5 0 0 0"/>
+                            <Button Content="Add"
+                                    Margin="5"
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.AddImportedMaterialCommand}"
+                                    VerticalAlignment="Center"
+                                    Padding="5"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                </GroupBox>
+
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </Window>
