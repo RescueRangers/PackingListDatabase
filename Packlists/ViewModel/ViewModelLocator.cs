@@ -47,6 +47,8 @@ namespace Packlists.ViewModel
 
         public ImportViewModel Import => _kernel.Get<ImportViewModel>();
 
+        public MonthlyUsageViewModel MonthlyReport => _kernel.Get<MonthlyUsageViewModel>();
+
         //public ProgressDialogViewModel ProgressDialog => _kernel.Get<ProgressDialogViewModel>();
 
 

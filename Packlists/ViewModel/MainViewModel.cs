@@ -247,6 +247,7 @@ namespace Packlists.ViewModel
         public ICommand CreateTarmPacklisteCommand { get; set; }
         public ICommand PrintMonthlyCommand { get; set; }
         public ICommand OpenImportPanelCommand { get; set; }    
+        public ICommand OpenReportPanelCommand { get; set; }    
 
         
         /// <inheritdoc />
@@ -292,6 +293,7 @@ namespace Packlists.ViewModel
             PrintItemTableCommand = new RelayCommand(PrintItemTable, () => SelectedPackliste != null);
             PrintMonthlyCommand = new RelayCommand(PrintMonthlyReport, CanPrintMonthly);
             OpenImportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowImportPanel"), true);
+            OpenReportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMonthlyReport"), true);
         }
 
         private bool CanPrintMonthly()

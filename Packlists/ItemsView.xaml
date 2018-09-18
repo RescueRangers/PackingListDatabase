@@ -9,7 +9,8 @@
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         md:DialogServiceViews.IsRegistered="True"
         mc:Ignorable="d"
-        Title="ItemsWithQtiesView" Height="450" Width="800"
+        Title="ItemsWithQtiesView" MinHeight="450" MinWidth="800"
+        SizeToContent="WidthAndHeight"
         DataContext="{Binding Items, Source={StaticResource Locator}}">
     
     <Grid>

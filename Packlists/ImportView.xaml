@@ -10,8 +10,9 @@
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d"
         Title="ImportView" 
-        Height="500" 
-        Width="720"
+        MaxHeight="1000"
+        MaxWidth="1550"
+        SizeToContent="WidthAndHeight"
         DataContext="{Binding Import, Source={StaticResource Locator}}">
 
     <i:Interaction.Triggers>
@@ -42,7 +43,8 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="250"/>
                     <RowDefinition Height="45"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="55"/>
+                    <RowDefinition Height="55"/>
                 </Grid.RowDefinitions>
 
                 <Menu Grid.Column="0"
@@ -75,14 +77,14 @@
 
                         <DataGridTextColumn Header="Sender"
                                             Binding="{Binding Sender}"/>
-                        
+
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Grid.Column="0"
                             Grid.ColumnSpan="2"
                             Grid.Row="4"
-                            Margin="5">
+                            Margin="5" Grid.RowSpan="2">
                     <TextBlock Text="Sender:"/>
                     <TextBox Text="{Binding Sender}"/>
                     <TextBlock Text="Date:"/>
@@ -99,18 +101,18 @@
                             Command="{Binding AddImportCommand}"/>
                 </StackPanel>
 
-               <GroupBox Grid.Column="2"
+                <GroupBox Grid.Column="2"
                           Grid.ColumnSpan="2"
                           Grid.Row="1"
                           Grid.RowSpan="4" 
                           Header="Materials">
-                    
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="300"/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        
+
                         <ListView ItemsSource="{Binding SelectedImport.ImportedMaterials}"
                                       Margin="5"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -132,16 +134,16 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
                                     <GridViewColumn Width="75" 
-                                                    DisplayMemberBinding="{Binding Amount}" 
+                                                    DisplayMemberBinding="{Binding Amount, StringFormat={}{0:N2}}" 
                                                     Header="Amount"/>
                                     <GridViewColumn Width="Auto" 
                                                     DisplayMemberBinding="{Binding Material.Unit}"
                                                     Header="Unit"/>
                                 </GridView>
                             </ListView.View>
-                           
+
                         </ListView>
-                    
+
                         <StackPanel Orientation="Horizontal"
                                     Grid.Row="1">
                             <TextBlock Text="Material:" 
@@ -155,7 +157,7 @@
                             <TextBlock Text="Amount: "
                                        Margin="5"
                                        VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.Quantity, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.Quantity, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}"
                                      Margin="5"
                                      VerticalAlignment="Center"
                                      MinWidth="75"
@@ -184,8 +186,14 @@
                                     Padding="5"/>
                         </StackPanel>
                     </Grid>
-                    
+
                 </GroupBox>
+                
+                <Button Grid.Column="3"
+                        Grid.Row="5"
+                        Margin="5 5 5 5"
+                        Content="Print monthly import report"
+                        Command="{Binding PrintMonthlyReportCommand}"/>
 
             </Grid>
         </ScrollViewer>

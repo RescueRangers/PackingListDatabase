@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using Packlists.Messages;
@@ -14,9 +17,7 @@ namespace Packlists.Model
         private ObservableCollection<Packliste> _packlists;
         private ObservableCollection<Item> _items;
         private ObservableCollection<ImportTransport> _imports;
-
         private ObservableCollection<Material> _materials;
-        //private ObservableCollection<MaterialWithUsage> _materialWithUsage;
         private readonly PacklisteContext _packlisteContext;
 
 
@@ -98,6 +99,54 @@ namespace Packlists.Model
             var changes = _packlisteContext.SaveChanges();
 
             Console.WriteLine(changes);
+
+        }
+
+        public void CreateMonthlyReport(Action<DataTable, Exception> callback, DateTime month)
+        {
+            var days = new List<List<Tuple<Material, float>>>();
+            
+            //var packlists = _packlists.Where(p =>
+            //    (p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month)).ToList();
+
+            //var import = _imports.Where(i => (i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month)).ToList();
+
+
+            for (var i = 1; i <= DateTime.DaysInMonth(month.Year, month.Month); i++)
+            {
+                var packlists = _packlists.Where(p => p.PacklisteDate == new DateTime(month.Year, month.Month, i)).ToList();
+                var imports = _imports.Where(p => p.ImportDate == new DateTime(month.Year, month.Month, i)).ToList();
+
+                var usage = new List<Tuple<Material, float, string>>();
+
+                if (packlists.Any())
+                {
+
+                    foreach (var packliste in packlists)
+                    {
+                        usage.AddRange(packliste.RawUsage.ToList());
+                    }
+
+                    usage = usage.GroupBy(m => m.Item1)
+                        .Select(g => Tuple.Create(g.Key, g.Sum(l => l.Item2), g.First().Item3)).OrderBy(o => o.Item1)
+                        .ToList();
+                }
+
+                if (imports.Any())
+                {
+                    foreach (var importTransport in imports)
+                    {
+                        foreach (var materialImport in importTransport.ImportedMaterials)
+                        {
+                            usage.Add(Tuple.Create(materialImport.Material, materialImport.Amount, materialImport.Material.Unit));
+                        }
+                    }
+                }
+
+               
+
+
+            }
 
         }
 

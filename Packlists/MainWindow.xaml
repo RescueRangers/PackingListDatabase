@@ -11,9 +11,10 @@
         mc:Ignorable="d ignore"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
         md:DialogServiceViews.IsRegistered="True"
-        Height="600"
-        Width="1100"
+        MaxHeight="1000"
+        MaxWidth="1550"
         Title="MVVM Light Application"
+        SizeToContent="WidthAndHeight"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
 
     <Window.Resources>
@@ -56,6 +57,7 @@
                     <MenuItem Header="Items" Command="{Binding OpenItemsPanelCommand}"/>
                     <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
                     <MenuItem Header="Import" Command="{Binding OpenImportPanelCommand}"/>
+                    <MenuItem Header="Monthly usage" Command="{Binding OpenReportPanelCommand}"/>
                 </Menu>
 
                 <DataGrid Grid.Column="0"
@@ -134,7 +136,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Width="75" DisplayMemberBinding="{Binding Quantity}" Header="Quantity"/>
+                                    <GridViewColumn Width="75" DisplayMemberBinding="{Binding Quantity, StringFormat={}{0:N2}}" Header="Quantity"/>
                                 </GridView>
                             </ListView.View>
 
@@ -145,7 +147,7 @@
                                         <TextBlock Text="{Binding Item.ItemName}"
                                                Margin="10 5"
                                                MinWidth="150"/>
-                                        <TextBlock Text="{Binding Quantity}"
+                                        <TextBlock Text="{Binding Quantity, StringFormat={}{0:N2}}"
                                                Margin="10 5"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -200,37 +202,17 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Width="140" DisplayMemberBinding="{Binding Item1}" Header="Material"/>
-                                <GridViewColumn Width="75" DisplayMemberBinding="{Binding Item2}" Header="Usage"/>
+                                <GridViewColumn Width="75" DisplayMemberBinding="{Binding Item2, StringFormat={}{0:N2}}" Header="Usage"/>
                                 <GridViewColumn Width="35" DisplayMemberBinding="{Binding Item3}" Header="Unit"/>
                             </GridView>
                         </ListView.View>
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal"
-                                        Background="{Binding}"
-                                        Width="Auto">
-                                    <TextBlock Text="{Binding Item1}"
-                                           Margin="10 5"
-                                           />
-                                    <TextBlock Text="{Binding Item2}"
-                                           Margin="10 5"
-                                           />
-                                    <TextBlock Text="{Binding Item3}"
-                                           Margin="10 5"
-                                           />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
+                     
                     </ListView>
                         
                     </Grid>
                     
-                    
                 </GroupBox>
-
-                
-
+              
                 <StackPanel Grid.Row="6"
                             Grid.Column="0"
                             Orientation="Horizontal"

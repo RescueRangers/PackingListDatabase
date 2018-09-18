@@ -39,6 +39,10 @@ namespace Packlists
                     var importView = new ImportView();
                     importView.Show();
                     break;
+                case "ShowMonthlyReport":
+                    var reportView = new MonthlyUsageView();
+                    reportView.ShowDialog();
+                    break;
                 default:
                     break;
             }

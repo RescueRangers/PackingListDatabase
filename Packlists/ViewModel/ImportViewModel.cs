@@ -210,6 +210,7 @@ namespace Packlists.ViewModel
         public ICommand CloseCommand { get; set; }
         public ICommand ImportsEnterCommand { get; set; }
         public ICommand RemoveMaterialAmountCommand { get; set; }
+        public ICommand PrintMonthlyReportCommand { get; set; }
 
 
         public ImportViewModel(IPrintingService printing, IDialogService dialogService, IDataService dataService)
@@ -245,6 +246,20 @@ namespace Packlists.ViewModel
             ImportedMaterialEnterCommand = new RelayCommand<Key>(ImportedMaterialEnter, true);
             ImportsEnterCommand = new RelayCommand<Key>(ImportsEnter);
             RemoveMaterialAmountCommand = new RelayCommand(RemoveMaterialAmount, () => SelectedMaterialAmount != null);
+            PrintMonthlyReportCommand = new RelayCommand(PrintMonthlyReport, CanPrintMonthly);
+        }
+
+        private bool CanPrintMonthly()
+        {
+            if(Imports == null) return false;
+            return Imports.Count > 1;
+        }
+
+        private void PrintMonthlyReport()
+        {
+            var imports = Imports.OfType<ImportTransport>().ToList();
+
+            _printing.PrintMonthlyImportReport(imports);
         }
 
         private void RemoveMaterialAmount()
@@ -296,6 +311,7 @@ namespace Packlists.ViewModel
             };
 
             SelectedImport.ImportedMaterials.Add(materialAmount);
+            Quantity = string.Empty;
         }
 
         private bool CanAddMaterial()

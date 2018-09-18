@@ -32,6 +32,7 @@ namespace Packlists
             Bind<ItemsViewModel>().ToSelf().InTransientScope();
             Bind<MaterialsViewModel>().ToSelf().InTransientScope();
             Bind<ImportViewModel>().ToSelf().InTransientScope();
+            Bind<MonthlyUsageViewModel>().ToSelf().InTransientScope();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
 
 namespace Packlists.Model
 {
@@ -10,6 +12,7 @@ namespace Packlists.Model
         void AddItems(IEnumerable<Item> items);
         void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback);
         void SaveData();
+        void CreateMonthlyReport(Action<DataTable, Exception> callback, DateTime month);
         
         /// <summary>
         /// Adds an object to the database

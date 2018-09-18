@@ -147,11 +147,11 @@
     <Compile Include="Model\ImportTransport.cs" />
     <Compile Include="Model\ItemWithQty.cs" />
     <Compile Include="Model\MaterialAmount.cs" />
+    <Compile Include="Model\MonthlyUsageReport.cs" />
     <Compile Include="Model\Printing\IPrintingService.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Material.cs" />
     <Compile Include="Model\MaterialWithUsage.cs" />
-    <Compile Include="Model\Month.cs" />
     <Compile Include="Model\Packliste.cs" />
     <Compile Include="Model\PacklisteContext.cs" />
     <Compile Include="Model\Printing\PrintingService.cs" />
@@ -160,7 +160,9 @@
     <Compile Include="Model\ProgressBar\ProgressDialogOptions.cs" />
     <Compile Include="Model\ProgressBar\ProgressDialogService.cs" />
     <Compile Include="Model\ProgressBar\ProgressReport.cs" />
-    <Compile Include="Model\Year.cs" />
+    <Compile Include="MonthlyUsageView.xaml.cs">
+      <DependentUpon>MonthlyUsageView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
@@ -168,6 +170,7 @@
     <Compile Include="ViewModel\ItemsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MaterialsViewModel.cs" />
+    <Compile Include="ViewModel\MonthlyUsageViewModel.cs" />
     <Compile Include="ViewModel\ProgressDialogViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="ImportView.xaml">
@@ -191,6 +194,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MaterialsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MonthlyUsageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

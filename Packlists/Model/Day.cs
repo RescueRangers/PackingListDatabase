@@ -1,39 +1,50 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 
 namespace Packlists.Model
 {
     public class Day : ObservableObject
     {
-        private int _dayNumber;
+        private ObservableCollection<float> _netMaterialCount;
 
         /// <summary>
-        /// Sets and gets the DayNumber property.
+        /// Sets and gets the NetMaterialCount property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public int DayNumber
+        public ObservableCollection<float> NetMaterialCount
         {
-            get => _dayNumber;
-            set => Set(nameof(DayNumber), ref _dayNumber, value);
+            get
+            {
+                return _netMaterialCount;
+            }
+            set
+            {
+                Set(nameof(NetMaterialCount), ref _netMaterialCount, value);
+            }
         }
 
-        private ObservableCollection<Packliste> _packlists;
+        private DateTime _date;
 
         /// <summary>
-        /// Sets and gets the Packlists property.
+        /// Sets and gets the Date property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<Packliste> Packlists
+        public DateTime Date
         {
-            get => _packlists;
-            set => Set(nameof(Packlists), ref _packlists, value);
+            get
+            {
+                return _date;
+            }
+            set
+            {
+                Set(nameof(Date), ref _date, value);
+            }
         }
-
-        public int DayId { get; set; }
 
         public override string ToString()
         {
-            return DayNumber.ToString();
+            return Date.ToString();
         }
     }
 }
