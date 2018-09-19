@@ -9,6 +9,8 @@
         xmlns:converters="clr-namespace:Packlists.Converters"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d"
+        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+        md:DialogServiceViews.IsRegistered="True"
         Title="ImportView" 
         MaxHeight="1000"
         MaxWidth="1550"

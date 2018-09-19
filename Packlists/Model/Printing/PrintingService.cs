@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -44,10 +45,12 @@ namespace Packlists.Model.Printing
 
         #region MonthlyImports
 
-        public void PrintMonthlyImportReport(ICollection<ImportTransport> import)
+        public Task<string> PrintMonthlyImportReport(ICollection<ImportTransport> import)
         {
             var path = CreateMonthlyImportReport(import);
             Print(path);
+
+            return Task.FromResult("Printing successful");
         }
 
         private static string CreateMonthlyImportReport(ICollection<ImportTransport> imports)
@@ -124,7 +127,7 @@ namespace Packlists.Model.Printing
                     column++;
                 }
 
-                using (var range = worksheet.Cells[1, 1, materials.Count + 2, column])
+                using (var range = worksheet.Cells[1, 1, materials.Count + 2, column-1])
                 {
                     range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -156,7 +159,7 @@ namespace Packlists.Model.Printing
 
         #region MonthlyUsage
 
-        public void PrintMonthlyReport(ICollection<Packliste> packlists)
+        public Task<string> PrintMonthlyReport(ICollection<Packliste> packlists)
         {
             if (packlists == null || packlists.Count <1)
             {
@@ -166,6 +169,8 @@ namespace Packlists.Model.Printing
             var path = CreateMonthlyReport(packlists);
 
             Print(path);
+
+            return Task.FromResult("Printing successful");
         }
 
         private static string CreateMonthlyReport(ICollection<Packliste> packlists)
@@ -245,7 +250,7 @@ namespace Packlists.Model.Printing
 
                 }
 
-                using (var range = worksheet.Cells[1, 1, materials.Count + 2, column])
+                using (var range = worksheet.Cells[1, 1, materials.Count + 2, column-1])
                 {
                     range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -276,12 +281,12 @@ namespace Packlists.Model.Printing
 
         #region ItemTable
 
-        public void PrintItemTable(Packliste packliste)
+        public Task<string> PrintItemTable(Packliste packliste)
         {
             var path = CreateItemTable(packliste);
 
             Print(path);
-
+            return Task.FromResult("Printing successful");
         }
 
         private static string CreateItemTable(Packliste packliste)
@@ -358,11 +363,13 @@ namespace Packlists.Model.Printing
 
         #region Packliste
 
-        public void Print(Dictionary<Tuple<int, int>, object> packlisteData)
+        public Task<string> Print(Dictionary<Tuple<int, int>, object> packlisteData)
         {
             var path = CreateXlsx(packlisteData);
 
             Print(path);
+
+            return Task.FromResult("Printing successful");
         }
 
         private static string CreateXlsx(Dictionary<Tuple<int, int>, object> packlisteData)

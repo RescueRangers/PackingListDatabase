@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,6 +18,7 @@ using Packlists.ExcelImport;
 using Packlists.Messages;
 using Packlists.Model;
 using Packlists.Model.Printing;
+using Packlists.Model.ProgressBar;
 
 namespace Packlists.ViewModel
 {
@@ -31,6 +33,8 @@ namespace Packlists.ViewModel
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
         private readonly IPrintingService _printing;
+        private readonly IProgressDialogService _progressDialog;
+        private List<Packliste> _packlists; 
 
         private ListCollectionView _packlistView;
 
@@ -234,7 +238,7 @@ namespace Packlists.ViewModel
             }
         }
 
-        #endregion
+        #region Commands
 
         public ICommand AddItemToPacklisteCommand { get; private set; }
         public ICommand OpenItemsPanelCommand { get; set; }
@@ -249,17 +253,27 @@ namespace Packlists.ViewModel
         public ICommand OpenImportPanelCommand { get; set; }    
         public ICommand OpenReportPanelCommand { get; set; }    
 
-        
+        #endregion
+
+        #endregion
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IDataService dataService, IPrintingService printing, IDialogService dialogService)
+        public MainViewModel(IDataService dataService, IPrintingService printing, IDialogService dialogService, IProgressDialogService progressDialog)
         {
             LoadCommands();
             _dataService = dataService;
             _printing = printing;
             _dialogService = dialogService;
+            _progressDialog = progressDialog;
+
+            LoadData();
+        }
+
+        private void LoadData()
+        {
             _dataService.GetPacklists(
                 (packlists, items, error) =>
                 {
@@ -279,6 +293,8 @@ namespace Packlists.ViewModel
             SelectedMonth = DateTime.Today;
         }
 
+        #region Commands
+
         private void LoadCommands()
         {
             AddItemToPacklisteCommand = new RelayCommand(AddItemToPackliste, CanAddItemToPackliste);
@@ -296,6 +312,8 @@ namespace Packlists.ViewModel
             OpenReportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMonthlyReport"), true);
         }
 
+        #region PrintMonthlyReport
+
         private bool CanPrintMonthly()
         {
             if(PacklistView == null) return false;
@@ -304,40 +322,79 @@ namespace Packlists.ViewModel
 
         private void PrintMonthlyReport()
         {
-            var packlists = PacklistView.OfType<Packliste>().ToList();
+            _packlists = PacklistView.OfType<Packliste>().ToList();
 
-            _printing.PrintMonthlyReport(packlists);
-        }
-
-        private bool CanAddItemToPackliste()
-        {
-            if (string.IsNullOrWhiteSpace(Quantity)) return false;
-            if (SelectedItem == null) return false;
-
-            var qtyResult = float.TryParse(Quantity, out var qty);
-
-            return qtyResult;
-        }
-
-        private bool CanPrintPackliste()
-        {
-            if (SelectedPackliste?.PacklisteData == null)
+            var options = new ProgressDialogOptions
             {
-                return false;
-            }
-
-            return SelectedPackliste.PacklisteData.Count >= 1;
+                Label = "Current task: ",
+                WindowTitle = "Printing"
+            };
+            _progressDialog.Execute(PrintMonthly, options);
         }
+
+        private async void PrintMonthly(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var progressReport = new ProgressReport
+            {
+                IsIndeterminate = true,
+                CurrentTask = "Printing monthly report"
+            };
+
+            progress.Report(progressReport);
+
+            var printingResult = await _printing.PrintMonthlyReport(_packlists);
+
+            if (!string.IsNullOrWhiteSpace(printingResult))
+            {
+                Application.Current.Dispatcher.Invoke(delegate
+                {
+                    _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                });
+            }
+        }
+
+        #endregion
+        
+        #region PrintItemTable
 
         private void PrintItemTable()
         {
-            var printDialog = new PrintDialog();
-
-            if (printDialog.ShowDialog() == true)
+            var options = new ProgressDialogOptions
             {
-                _printing.PrintItemTable(SelectedPackliste);
+                Label = "Current task: ",
+                WindowTitle = "Printing"
+            };
+            _progressDialog.Execute(PrintItemTableWithProgress, options);
+        }
+
+        private async void PrintItemTableWithProgress(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var progressReport = new ProgressReport
+            {
+                IsIndeterminate = true,
+                CurrentTask = "Printing item table"
+            };
+
+            progress.Report(progressReport);
+
+            var printingResult = await _printing.PrintItemTable(SelectedPackliste);
+
+            if (!string.IsNullOrWhiteSpace(printingResult))
+            {
+                Application.Current.Dispatcher.Invoke(delegate
+                {
+                    _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                });
             }
         }
+
+        #endregion
 
         private void CreateTarmPackliste()
         {
@@ -380,15 +437,53 @@ namespace Packlists.ViewModel
             MessengerInstance.Send<FilterItemsMessage>(new FilterItemsMessage(SelectedItemWithQty.Item.ItemName));
         }
 
+        #region PrintPackliste
+
+        private bool CanPrintPackliste()
+        {
+            if (SelectedPackliste?.PacklisteData == null)
+            {
+                return false;
+            }
+
+            return SelectedPackliste.PacklisteData.Count >= 1;
+        }
+
         private void PrintPackliste()
         {
-            var printDialog = new PrintDialog();
-
-            if (printDialog.ShowDialog() == true)
+            var options = new ProgressDialogOptions
             {
-                _printing.Print(SelectedPackliste.PacklisteData);
+                Label = "Current task: ",
+                WindowTitle = "Printing"
+            };
+            _progressDialog.Execute(PrintPacklisteWithProgress, options);
+        }
+
+        private async void PrintPacklisteWithProgress(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var progressReport = new ProgressReport
+            {
+                IsIndeterminate = true,
+                CurrentTask = "Printing packliste"
+            };
+
+            progress.Report(progressReport);
+
+            var printingResult = await _printing.Print(SelectedPackliste.PacklisteData);
+
+            if (!string.IsNullOrWhiteSpace(printingResult))
+            {
+                Application.Current.Dispatcher.Invoke(delegate
+                {
+                    _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                });
             }
         }
+
+        #endregion
 
         private void ImportPacklisteData()
         {
@@ -436,6 +531,18 @@ namespace Packlists.ViewModel
             MessengerInstance.Send(new NotificationMessage(message));
         }
 
+        #region AddItemToPackliste
+
+        private bool CanAddItemToPackliste()
+        {
+            if (string.IsNullOrWhiteSpace(Quantity)) return false;
+            if (SelectedItem == null) return false;
+
+            var qtyResult = float.TryParse(Quantity, out var qty);
+
+            return qtyResult;
+        }
+
         private void AddItemToPackliste()
         {
             var itemWithQty = new ItemWithQty
@@ -446,6 +553,10 @@ namespace Packlists.ViewModel
 
             SelectedPackliste.AddItem(itemWithQty);
         }
+
+        #endregion
+
+        #endregion
 
         private void AddFilter(DateTime value)
         {

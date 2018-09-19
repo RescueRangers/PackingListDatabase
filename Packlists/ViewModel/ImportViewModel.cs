@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -13,6 +15,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using MvvmDialogs;
 using Packlists.Model;
 using Packlists.Model.Printing;
+using Packlists.Model.ProgressBar;
 
 namespace Packlists.ViewModel
 {
@@ -21,6 +24,8 @@ namespace Packlists.ViewModel
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
         private readonly IPrintingService _printing;
+        private readonly IProgressDialogService _progressDialog;
+        private List<ImportTransport> _importsList;
 
         private MaterialAmount _selectedMaterialAmount;
 
@@ -213,11 +218,12 @@ namespace Packlists.ViewModel
         public ICommand PrintMonthlyReportCommand { get; set; }
 
 
-        public ImportViewModel(IPrintingService printing, IDialogService dialogService, IDataService dataService)
+        public ImportViewModel(IPrintingService printing, IDialogService dialogService, IDataService dataService, IProgressDialogService progressDialog)
         {
             _printing = printing;
             _dialogService = dialogService;
             _dataService = dataService;
+            _progressDialog = progressDialog;
 
             _dataService.GetImports(((transports, materials, exception) =>
             {
@@ -257,9 +263,38 @@ namespace Packlists.ViewModel
 
         private void PrintMonthlyReport()
         {
-            var imports = Imports.OfType<ImportTransport>().ToList();
+            _importsList = Imports.OfType<ImportTransport>().ToList();
 
-            _printing.PrintMonthlyImportReport(imports);
+            var options = new ProgressDialogOptions
+            {
+                Label = "Current task: ",
+                WindowTitle = "Printing"
+            };
+            _progressDialog.Execute(PrintMonthly, options);
+        }
+
+        private async void PrintMonthly(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var progressReport = new ProgressReport
+            {
+                IsIndeterminate = true,
+                CurrentTask = "Printing monthly report"
+            };
+
+            progress.Report(progressReport);
+
+            var printingResult = await _printing.PrintMonthlyImportReport(_importsList);
+
+            if (!string.IsNullOrWhiteSpace(printingResult))
+            {
+                Application.Current.Dispatcher.Invoke(delegate
+                {
+                    _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                });
+            }
         }
 
         private void RemoveMaterialAmount()
