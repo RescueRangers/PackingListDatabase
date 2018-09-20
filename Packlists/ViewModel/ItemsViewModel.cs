@@ -9,7 +9,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using GalaSoft.MvvmLight.Messaging;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
 using Packlists.Messages;

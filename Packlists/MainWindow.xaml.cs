@@ -1,8 +1,5 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Input;
+﻿using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
-using Packlists.Model;
 using Packlists.ViewModel;
 
 namespace Packlists
