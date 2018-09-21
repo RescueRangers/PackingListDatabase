@@ -12,8 +12,9 @@ namespace Packlists.ViewModel
     {
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
-
         private ListCollectionView _materialView;
+
+        #region Properties
 
         /// <summary>
         /// Sets and gets the MaterialView property.
@@ -37,7 +38,10 @@ namespace Packlists.ViewModel
             }
         }
 
+
         public ICommand SaveCommand { get; set; }
+        
+        #endregion
 
         public MaterialsViewModel(IDataService dataService, IDialogService dialogService)
         {

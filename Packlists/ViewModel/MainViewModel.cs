@@ -285,7 +285,6 @@ namespace Packlists.ViewModel
                     _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
                 });
 
-
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteNumber", ListSortDirection.Ascending));
             SelectedMonth = DateTime.Today;

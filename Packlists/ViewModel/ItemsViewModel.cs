@@ -23,18 +23,14 @@ namespace Packlists.ViewModel
         private readonly IDialogService _dialogService;
         private readonly IProgressDialogService _progressDialog;
         private FileInfo _excelFile;
-
         private ListCollectionView _itemsView;
-
         private Item _selectedItem;
-
         private string _searchFilter;
-
         private string _newItemName;
-
         private ListCollectionView _materialsView;
+        private MaterialWithUsage _selectedMaterial;
 
-       private MaterialWithUsage _selectedMaterial;
+        #region Properties
 
         /// <summary>
         /// Sets and gets the SelectedItem property.
@@ -159,6 +155,8 @@ namespace Packlists.ViewModel
             }
         }
 
+        #region Commands
+
         public ICommand AddNewItemCommand { get; private set; }
         public ICommand AddMaterialCommand { get; private set; }
         public ICommand OpenMaterialsPanelCommand { get; private set; } 
@@ -167,6 +165,9 @@ namespace Packlists.ViewModel
         public ICommand ImportItemsCommand { get; private set; }
         public ICommand ClosingCommand { get; set; }
 
+        #endregion
+
+        #endregion
 
         public ItemsViewModel(IDataService dataService, IDialogService dialogService, IProgressDialogService progressDialog)
         {
@@ -184,6 +185,24 @@ namespace Packlists.ViewModel
             ItemsView.Refresh();
         }
 
+        private void LoadData()
+        {
+            _dataService.GetItems((items, materials, exception) =>
+            {
+                if (exception != null)
+                {
+                    _dialogService.ShowMessageBox(this, $"{exception.Message}\r\n{exception.StackTrace}");
+                }
+
+                MaterialsView = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
+                ItemsView = (ListCollectionView)CollectionViewSource.GetDefaultView(items);
+                MaterialsView.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
+
+            });
+        }
+
+        #region Messages
+
         private void FilterMessageReceived(FilterItemsMessage obj)
         {
             SearchFilter = obj.ItemName;
@@ -197,6 +216,10 @@ namespace Packlists.ViewModel
             LoadData();
         }
 
+        #endregion
+
+        #region Commands
+
         private void LoadCommands()
         {
             AddNewItemCommand = new RelayCommand(AddNewItem, () => !string.IsNullOrWhiteSpace(NewItemName));
@@ -205,6 +228,8 @@ namespace Packlists.ViewModel
             RemoveMaterialCommand = new RelayCommand<object>(RemoveMaterial, true);
             ImportItemsCommand = new RelayCommand(ImportItems, true);
         }
+
+        #region Import
 
         private void ImportItems()
         {
@@ -266,24 +291,9 @@ namespace Packlists.ViewModel
                         MessageBoxImage.Information);
                 });
             }
-
         }
 
-        private void LoadData()
-        {
-            _dataService.GetItems((items, materials, exception) =>
-            {
-                if (exception != null)
-                {
-                    _dialogService.ShowMessageBox(this, $"{exception.Message}\r\n{exception.StackTrace}");
-                }
-
-                MaterialsView = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
-                ItemsView = (ListCollectionView)CollectionViewSource.GetDefaultView(items);
-                MaterialsView.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
-
-            });
-        }
+        #endregion
 
         private void RemoveMaterial(object o)
         {
@@ -305,7 +315,6 @@ namespace Packlists.ViewModel
             _progressDialog.Execute(SaveItems, options);
 
             //TODO: Send a message for updating items data, register for the message in Main
-
         }
 
         private void SaveItems(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
@@ -324,9 +333,8 @@ namespace Packlists.ViewModel
             {
                 _dataService.SaveData();
             });
-
-
         }
+
         private void AddMaterial()
         {
             if(SelectedItem.Materials == null)
@@ -340,6 +348,8 @@ namespace Packlists.ViewModel
             ItemsView.AddNewItem(new Item {ItemName = _newItemName});
         }
 
+        #endregion
+
         private void AddFilter(string value)
         {
             _itemsView.Filter = o =>
@@ -351,11 +361,13 @@ namespace Packlists.ViewModel
             };
         }
 
-        //public override void Cleanup()
-        //{
-        //    // Clean up if needed
-        //    base.Cleanup();
-        //}
-        
+        public override void Cleanup()
+        {
+            // Clean up if needed
+            AddFilter(string.Empty);
+            ItemsView.Refresh();
+            base.Cleanup();
+        }
+
     }
 }

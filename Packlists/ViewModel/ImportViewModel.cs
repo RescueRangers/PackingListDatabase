@@ -25,7 +25,17 @@ namespace Packlists.ViewModel
         private readonly IProgressDialogService _progressDialog;
         private List<ImportTransport> _importsList;
 
+        private DateTime _selectedDate = DateTime.Now;
+        private string _sender;
+        private string _quantity;
+        private DateTime _selectedMonth = DateTime.Now;
+        private ImportTransport _selectedImport;
+        private Material _selectedMaterial;
+        private ListCollectionView _imports;
+        private ListCollectionView _materials;
         private MaterialAmount _selectedMaterialAmount;
+        
+        #region Properties
 
         /// <summary>
         /// Sets and gets the SelectedMaterialAmount property.
@@ -52,8 +62,6 @@ namespace Packlists.ViewModel
             }
         }
         
-        private DateTime _selectedDate = DateTime.Now;
-
         /// <summary>
         /// Sets and gets the SelectedDate property.
         /// Changes to that property's value raise the PropertyChanged event. 
@@ -75,8 +83,6 @@ namespace Packlists.ViewModel
                 RaisePropertyChanged(nameof(SelectedDate), oldValue, value, true);
             }
         }
-
-        private string _sender;
 
         /// <summary>
         /// Sets and gets the Sender property.
@@ -100,8 +106,6 @@ namespace Packlists.ViewModel
             }
         }
 
-        private string _quantity;
-
         /// <summary>
         /// Sets and gets the Quantity property.
         /// Changes to that property's value raise the PropertyChanged event. 
@@ -123,8 +127,6 @@ namespace Packlists.ViewModel
                 RaisePropertyChanged(nameof(Quantity), oldValue, value, true);
             }
         }
-
-        private DateTime _selectedMonth = DateTime.Now;
 
         /// <summary>
         /// Sets and gets the SelectedMonth property.
@@ -148,8 +150,6 @@ namespace Packlists.ViewModel
                 RaisePropertyChanged(nameof(SelectedMonth), oldValue, value, true);
             }
         }
-        
-        private ImportTransport _selectedImport;
 
         /// <summary>
         /// Sets and gets the SelectedImport property.
@@ -161,8 +161,6 @@ namespace Packlists.ViewModel
             set => Set(nameof(SelectedImport), ref _selectedImport, value);
         }
 
-        private Material _selectedMaterial;
-
         /// <summary>
         /// Sets and gets the SelectedMaterial property.
         /// Changes to that property's value raise the PropertyChanged event. 
@@ -173,8 +171,6 @@ namespace Packlists.ViewModel
             set => Set(nameof(SelectedMaterial), ref _selectedMaterial, value);
         }
 
-        private ListCollectionView _imports;
-
         /// <summary>
         /// Sets and gets the Imports property.
         /// Changes to that property's value raise the PropertyChanged event. 
@@ -184,8 +180,6 @@ namespace Packlists.ViewModel
             get => _imports;
             set => Set(nameof(Imports), ref _imports, value);
         }
-
-        private ListCollectionView _materials;
 
         /// <summary>
         /// Sets and gets the Materials property.
@@ -207,6 +201,8 @@ namespace Packlists.ViewModel
             }
         }
 
+        #region Commands
+
         public ICommand AddImportedMaterialCommand { get; set; }
         public ICommand ImportedMaterialEnterCommand { get; set; }
         public ICommand AddImportCommand { get; set; }
@@ -215,6 +211,9 @@ namespace Packlists.ViewModel
         public ICommand RemoveMaterialAmountCommand { get; set; }
         public ICommand PrintMonthlyReportCommand { get; set; }
 
+        #endregion
+
+        #endregion
 
         public ImportViewModel(IPrintingService printing, IDialogService dialogService, IDataService dataService, IProgressDialogService progressDialog)
         {
@@ -242,6 +241,8 @@ namespace Packlists.ViewModel
 
         }
 
+        #region Commands
+
         private void LoadCommands()
         {
             AddImportedMaterialCommand = new RelayCommand(AddImportedMaterial, CanAddMaterial);
@@ -252,6 +253,8 @@ namespace Packlists.ViewModel
             RemoveMaterialAmountCommand = new RelayCommand(RemoveMaterialAmount, () => SelectedMaterialAmount != null);
             PrintMonthlyReportCommand = new RelayCommand(PrintMonthlyReport, CanPrintMonthly);
         }
+
+        #region PrintMonthly
 
         private bool CanPrintMonthly()
         {
@@ -294,6 +297,8 @@ namespace Packlists.ViewModel
                 });
             }
         }
+
+        #endregion
 
         private void RemoveMaterialAmount()
         {
@@ -357,6 +362,8 @@ namespace Packlists.ViewModel
 
             return qtyResult;
         }
+
+        #endregion
 
         private void AddFilter(DateTime value)
         {
