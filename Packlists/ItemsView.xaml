@@ -8,9 +8,15 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         md:DialogServiceViews.IsRegistered="True"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="ItemsWithQtiesView" MinHeight="450" MinWidth="600"
-        SizeToContent="Width"
+        xmlns:properties="clr-namespace:Packlists.Properties"
+        WindowStartupLocation="Manual"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=ItemLeft}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=ItemTop}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=ItemHeight}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=ItemWidth}"
+        Title="Items" MinHeight="450" MinWidth="600"
         DataContext="{Binding Items, Source={StaticResource Locator}}">
     
     <Grid>
@@ -25,13 +31,14 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
         
-        <TextBox Margin="5"
-                 Grid.Column="0"
-                 Grid.Row="0"
-                 VerticalAlignment="Center"
-                 Text="{Binding SearchFilter, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.ColumnSpan="2"
-                 Padding="0 5"/>
+        <xctk:AutoSelectTextBox Margin="5"
+                                Grid.Column="0"
+                                Grid.Row="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding SearchFilter, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
+                                Grid.ColumnSpan="2"
+                                Padding="0 5"
+                                AutoSelectBehavior="OnFocus"/>
         
         <DataGrid ItemsSource="{Binding ItemsView}"
                   Grid.Row="1"

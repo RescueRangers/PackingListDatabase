@@ -14,6 +14,7 @@
         Title="ImportView" 
         MaxHeight="1000"
         MaxWidth="1550"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         SizeToContent="WidthAndHeight"
         DataContext="{Binding Import, Source={StaticResource Locator}}">
 
@@ -88,7 +89,8 @@
                             Grid.Row="4"
                             Margin="5" Grid.RowSpan="2">
                     <TextBlock Text="Sender:"/>
-                    <TextBox Text="{Binding Sender}"/>
+                    <xctk:AutoSelectTextBox Text="{Binding Sender}"
+                                            AutoSelectBehavior="OnFocus"/>
                     <TextBlock Text="Date:"/>
                     <DatePicker SelectedDate="{Binding SelectedDate}">
                         <i:Interaction.Triggers>

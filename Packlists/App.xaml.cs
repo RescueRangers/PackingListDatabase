@@ -12,5 +12,6 @@ namespace Packlists
         {
             DispatcherHelper.Initialize();
         }
+
     }
 }

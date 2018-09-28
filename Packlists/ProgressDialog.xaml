@@ -7,7 +7,7 @@
         xmlns:ap="clr-namespace:Packlists.AttachedProperties"
         mc:Ignorable="d"
         ResizeMode="NoResize" 
-        WindowStyle="SingleBorderWindow" 
+        WindowStyle="None" 
         WindowStartupLocation="CenterOwner"
         Title="{Binding WindowTitle}" Height="140" Width="340"
         ap:DialogCloser.DialogResult="{Binding Close}">

@@ -11,10 +11,13 @@
         mc:Ignorable="d ignore"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
         md:DialogServiceViews.IsRegistered="True"
-        MaxHeight="1000"
-        MaxWidth="1550"
-        Title="MVVM Light Application"
-        SizeToContent="WidthAndHeight"
+        xmlns:properties="clr-namespace:Packlists.Properties"
+        WindowStartupLocation="Manual"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=MainLeft}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=MainTop}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=MainHeight}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=MainWidth}"
+        Title="Packliste database"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
 
     <Window.Resources>
@@ -163,7 +166,9 @@
                                       SelectedItem="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.SelectedItem}"
                                       Margin="5"
                                       MinWidth="120"
-                                      VerticalAlignment="Center"/>
+                                      VerticalAlignment="Center"
+                                      IsEditable="True"
+                                      VerticalContentAlignment="Center"/>
                             <TextBlock Text="Qty: "
                                        Margin="5"
                                        VerticalAlignment="Center"/>

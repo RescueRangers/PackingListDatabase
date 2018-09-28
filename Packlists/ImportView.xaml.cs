@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
+using Packlists.Properties;
 
 namespace Packlists
 {
@@ -10,6 +12,12 @@ namespace Packlists
         public ImportView()
         {
             InitializeComponent();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            Settings.Default.Save();
+            base.OnClosing(e);
         }
     }
 }

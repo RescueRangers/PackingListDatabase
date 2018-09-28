@@ -10,6 +10,7 @@ namespace Packlists
         public ProgressDialog()
         {
             InitializeComponent();
+            Owner = Application.Current.MainWindow;
         }
     }
 }

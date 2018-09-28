@@ -6,7 +6,13 @@
         xmlns:ignore="http://www.galasoft.ch/ignore"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="MaterialsView" Height="450" Width="800"
+        xmlns:properties="clr-namespace:Packlists.Properties"
+        WindowStartupLocation="Manual"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialLeft}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialTop}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialHeight}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialWidth}"
+        Title="MaterialsView"
         DataContext="{Binding Materials, Source={StaticResource Locator}}">
     
     <Window.Resources>

@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
+using Packlists.Properties;
 using Packlists.ViewModel;
 
 namespace Packlists
@@ -45,11 +47,10 @@ namespace Packlists
             }
         }
 
-        private void Calendar_DisplayModeChanged(object sender, System.Windows.Controls.CalendarModeChangedEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
-            var calendar = (System.Windows.Controls.Calendar)sender;
-            calendar.DisplayMode = System.Windows.Controls.CalendarMode.Year;
+            Settings.Default.Save();
+            base.OnClosing(e);
         }
-        
     }
 }
