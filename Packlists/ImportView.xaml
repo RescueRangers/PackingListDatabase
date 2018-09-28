@@ -12,10 +12,13 @@
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
         md:DialogServiceViews.IsRegistered="True"
         Title="ImportView" 
-        MaxHeight="1000"
-        MaxWidth="1550"
+        xmlns:properties="clr-namespace:Packlists.Properties"
+        WindowStartupLocation="Manual"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=ImportLeft, Mode=TwoWay}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=ImportTop, Mode=TwoWay}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=ImportHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=ImportWidth, Mode=TwoWay}"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        SizeToContent="WidthAndHeight"
         DataContext="{Binding Import, Source={StaticResource Locator}}">
 
     <i:Interaction.Triggers>

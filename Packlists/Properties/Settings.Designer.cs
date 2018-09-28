@@ -25,7 +25,7 @@ namespace Packlists.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1550")]
+        [global::System.Configuration.DefaultSettingValueAttribute("800")]
         public double MainWidth {
             get {
                 return ((double)(this["MainWidth"]));
@@ -37,7 +37,7 @@ namespace Packlists.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
         public double MainHeight {
             get {
                 return ((double)(this["MainHeight"]));
@@ -164,6 +164,54 @@ namespace Packlists.Properties {
             }
             set {
                 this["MaterialTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public double ImportHeight {
+            get {
+                return ((double)(this["ImportHeight"]));
+            }
+            set {
+                this["ImportHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("450")]
+        public double ImportWidth {
+            get {
+                return ((double)(this["ImportWidth"]));
+            }
+            set {
+                this["ImportWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ImportLeft {
+            get {
+                return ((double)(this["ImportLeft"]));
+            }
+            set {
+                this["ImportLeft"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ImportTop {
+            get {
+                return ((double)(this["ImportTop"]));
+            }
+            set {
+                this["ImportTop"] = value;
             }
         }
     }

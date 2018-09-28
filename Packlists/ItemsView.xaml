@@ -12,10 +12,10 @@
         mc:Ignorable="d"
         xmlns:properties="clr-namespace:Packlists.Properties"
         WindowStartupLocation="Manual"
-        Left="{Binding Source={x:Static properties:Settings.Default}, Path=ItemLeft}"
-        Top="{Binding Source={x:Static properties:Settings.Default}, Path=ItemTop}"
-        Height="{Binding Source={x:Static properties:Settings.Default}, Path=ItemHeight}"
-        Width="{Binding Source={x:Static properties:Settings.Default}, Path=ItemWidth}"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=ItemLeft, Mode=TwoWay}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=ItemTop, Mode=TwoWay}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=ItemHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=ItemWidth, Mode=TwoWay}"
         Title="Items" MinHeight="450" MinWidth="600"
         DataContext="{Binding Items, Source={StaticResource Locator}}">
     

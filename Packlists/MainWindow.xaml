@@ -13,10 +13,10 @@
         md:DialogServiceViews.IsRegistered="True"
         xmlns:properties="clr-namespace:Packlists.Properties"
         WindowStartupLocation="Manual"
-        Left="{Binding Source={x:Static properties:Settings.Default}, Path=MainLeft}"
-        Top="{Binding Source={x:Static properties:Settings.Default}, Path=MainTop}"
-        Height="{Binding Source={x:Static properties:Settings.Default}, Path=MainHeight}"
-        Width="{Binding Source={x:Static properties:Settings.Default}, Path=MainWidth}"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=MainLeft, Mode=TwoWay}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=MainTop, Mode=TwoWay}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=MainHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=MainWidth, Mode=TwoWay}"
         Title="Packliste database"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
 

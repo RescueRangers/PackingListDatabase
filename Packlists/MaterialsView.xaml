@@ -8,10 +8,10 @@
         mc:Ignorable="d"
         xmlns:properties="clr-namespace:Packlists.Properties"
         WindowStartupLocation="Manual"
-        Left="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialLeft}"
-        Top="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialTop}"
-        Height="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialHeight}"
-        Width="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialWidth}"
+        Left="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialLeft, Mode=TwoWay}"
+        Top="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialTop, Mode=TwoWay}"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialWidth, Mode=TwoWay}"
         Title="MaterialsView"
         DataContext="{Binding Materials, Source={StaticResource Locator}}">
     
