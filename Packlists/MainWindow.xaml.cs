@@ -42,6 +42,10 @@ namespace Packlists
                     var reportView = new MonthlyUsageView();
                     reportView.ShowDialog();
                     break;
+                case "ShowCOCs":
+                    var cocsView = new COCsView();
+                    cocsView.Show();
+                    break;
                 default:
                     break;
             }

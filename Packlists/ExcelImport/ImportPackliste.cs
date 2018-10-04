@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using OfficeOpenXml;
 using Packlists.Model;
 
@@ -11,6 +13,81 @@ namespace Packlists.ExcelImport
 {
     public static class ImportPackliste
     {
+        public static Task<(Packliste, string)> FromCOCs(FileInfo excelFile, IDataService dataService)
+        {
+            var cOCs = new List<COC>();
+            var packliste = new Packliste();
+            var cocNumbers = new List<int>();
+            var items = new List<ItemWithQty>();
+            var packlisteItems = new List<ItemWithQty>();
+
+            var dateResult = DateTime.TryParse(excelFile.Name.Substring(0, 10), CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var packDate);
+            if (!dateResult) packDate = DateTime.Now;
+
+            dataService.GetCOCs(((cocs, exception) =>
+            {
+                if (exception != null)
+                {
+                    throw exception;
+                }
+
+                cOCs = cocs.ToList();
+            }));
+
+            dataService.GetItemsWithQty(((itemWithQties, exception) =>
+            {
+                if (exception != null)
+                {
+                    throw exception;
+                }
+
+                items = new List<ItemWithQty>(itemWithQties);
+            }));
+
+            using (var excel = new ExcelPackage(excelFile))
+            {
+                var worksheet = excel.Workbook.Worksheets[1];
+
+                var endRow = worksheet.Dimension.End.Row;
+
+                for (var i = 1; i <= endRow; i++)
+                {
+                    var cocParse = int.TryParse(worksheet.Cells[i, 1].Value.ToString(), out var cocNumber);
+                    if(cocParse == false) continue;
+
+                    var coc = cOCs.SingleOrDefault(c => c.CocNumber == cocNumber);
+                    if (coc == null)
+                    {
+                        cocNumbers.Add(cocNumber);
+                        continue;
+                    }
+
+                    var item = items.SingleOrDefault(s => s.ItemWithQtyId == coc.Item.ItemWithQtyId);
+                    if (item == null) return Task.FromResult((packliste, $"Something went wrong: {coc.Item.Item}, {cocNumber}"));
+
+                    packlisteItems.Add(item);
+                }
+            }
+
+            packliste.PacklisteDate = packDate;
+            packliste.Destination = "Tarm";
+            packliste.ItemsWithQties = new ObservableCollection<ItemWithQty>(packlisteItems);
+            packliste.PacklisteNumber = -1;
+
+            if (cocNumbers.Any())
+            {
+                var message = new StringBuilder("Missing COCs:\n");
+                foreach (var cocNumber in cocNumbers)
+                {
+                    message.AppendLine(cocNumber.ToString());
+                }
+                return Task.FromResult((packliste, message.ToString()));
+            }
+
+            return Task.FromResult((packliste, "Success"));
+        }
+        
         public static void FromExcel(Action<Packliste, Exception> callback, FileInfo excelFile, IDataService dataService)
         {
             var dateResult = DateTime.TryParse(excelFile.Name.Substring(0, 10), CultureInfo.InvariantCulture,
@@ -77,6 +154,7 @@ namespace Packlists.ExcelImport
                     Destination = location
                 };
                 callback(packliste, null);
+                
             }
             
         }

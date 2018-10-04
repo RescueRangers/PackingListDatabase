@@ -78,6 +78,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -124,6 +125,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AttachedProperties\DialogCloser.cs" />
+    <Compile Include="COCsView.xaml.cs">
+      <DependentUpon>COCsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\KeyboardEventArgsToKeyConverter.cs" />
     <Compile Include="Converters\MaterialsToColorConverter.cs" />
     <Compile Include="Converters\PacklistsToColorConverter.cs" />
@@ -131,6 +135,7 @@
     <Compile Include="DependencyProperties\DatePickerCalendar.cs" />
     <Compile Include="DependencyModule.cs" />
     <Compile Include="ExcelImport\CreateFromPackliste.cs" />
+    <Compile Include="ExcelImport\ImportCOCs.cs" />
     <Compile Include="ExcelImport\ImportItems.cs" />
     <Compile Include="ExcelImport\ImportPackliste.cs" />
     <Compile Include="ImportView.xaml.cs">
@@ -160,7 +165,12 @@
     <Compile Include="Migrations\201809111220388_ImportInitial.Designer.cs">
       <DependentUpon>201809111220388_ImportInitial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810021255347_cocs.cs" />
+    <Compile Include="Migrations\201810021255347_cocs.Designer.cs">
+      <DependentUpon>201810021255347_cocs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Model\COC.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\Day.cs" />
     <Compile Include="Model\EditableModelBase.cs" />
@@ -187,6 +197,7 @@
     <Compile Include="ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\COCsViewModel.cs" />
     <Compile Include="ViewModel\ImportViewModel.cs" />
     <Compile Include="ViewModel\ItemsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
@@ -194,6 +205,10 @@
     <Compile Include="ViewModel\MonthlyUsageViewModel.cs" />
     <Compile Include="ViewModel\ProgressDialogViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="COCsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ImportView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -256,6 +271,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809111220388_ImportInitial.resx">
       <DependentUpon>201809111220388_ImportInitial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810021255347_cocs.resx">
+      <DependentUpon>201810021255347_cocs.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

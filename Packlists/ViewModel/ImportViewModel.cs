@@ -376,7 +376,6 @@ namespace Packlists.ViewModel
                               import.ImportDate.Month == value.Month);
                 return result;
             };
-            
         }
     }
 }

@@ -61,6 +61,7 @@
                     <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
                     <MenuItem Header="Import" Command="{Binding OpenImportPanelCommand}"/>
                     <MenuItem Header="Monthly usage" Command="{Binding OpenReportPanelCommand}"/>
+                    <MenuItem Header="COCs" Command="{Binding OpenCocsPanelCommand}"/>
                 </Menu>
 
                 <DataGrid Grid.Column="0"
@@ -240,6 +241,11 @@
 
                     <Button Command="{Binding CreateTarmPacklisteCommand}"
                             Content="Create packliste for tarm"
+                            Margin="5"
+                            Padding="10 0"/>
+
+                    <Button Command="{Binding PacklisteFromCOCsCommand}"
+                            Content="Packliste from COC numbers"
                             Margin="5"
                             Padding="10 0"/>
                 </StackPanel>

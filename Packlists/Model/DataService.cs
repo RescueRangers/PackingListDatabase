@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
+using System.Transactions;
 using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using Packlists.Messages;
@@ -16,6 +17,8 @@ namespace Packlists.Model
         private ObservableCollection<Item> _items;
         private ObservableCollection<ImportTransport> _imports;
         private ObservableCollection<Material> _materials;
+        private ObservableCollection<COC> _cocs;
+        private ObservableCollection<ItemWithQty> _itemsWithQty;
         private readonly PacklisteContext _packlisteContext;
 
 
@@ -26,6 +29,8 @@ namespace Packlists.Model
             _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
             _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
             _imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
+            _cocs = new ObservableCollection<COC>(_packlisteContext.Cocs.Include(i => i.Item));
+            _itemsWithQty = new ObservableCollection<ItemWithQty>(_packlisteContext.ItemWithQties.Include(i => i.Item));
         }
 
         
@@ -80,6 +85,16 @@ namespace Packlists.Model
             }
 
             callback(_imports, _materials, null);
+        }
+
+        public void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback)
+        {
+            if (_itemsWithQty == null || !_itemsWithQty.Any())
+            {
+                _itemsWithQty = new ObservableCollection<ItemWithQty>(_packlisteContext.ItemWithQties);
+            }
+
+            callback(_itemsWithQty, null);
         }
 
         public void SaveData()
@@ -140,10 +155,6 @@ namespace Packlists.Model
                         }
                     }
                 }
-
-               
-
-
             }
 
         }
@@ -170,7 +181,6 @@ namespace Packlists.Model
                 {
                     _items.Add(item);
                 });
-
                 
             }
             if (type == typeof(Material))
@@ -196,7 +206,6 @@ namespace Packlists.Model
                     _packlists.Add(packliste);
                 });
             }
-
             if (type == typeof(ImportTransport))
             {
                 var transport = (ImportTransport) obj;
@@ -209,7 +218,55 @@ namespace Packlists.Model
                     _imports.Add(transport);
                 });
             }
+            if (type == typeof(COC))
+            {
+                var coc = (COC) obj;
 
+                _packlisteContext.Cocs.Add(coc);
+                _packlisteContext.SaveChanges();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _cocs.Add(coc);
+                });
+            }
+
+        }
+
+        public void BulkAdd(object obj)
+        {
+            if (obj == null) return;
+
+            var type = obj.GetType();
+
+            if (type == typeof(List<COC>))
+            {
+                SaveData();
+
+                var cocs = (IEnumerable<COC>) obj;
+
+                _packlisteContext.Configuration.AutoDetectChangesEnabled = false;
+
+                foreach (var coc in cocs)
+                {
+                    _packlisteContext.Cocs.Add(coc);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _cocs.Add(coc);
+                    });
+                }
+                _packlisteContext.Configuration.AutoDetectChangesEnabled = true;
+            }
+        }
+        
+        public void GetCOCs(Action<ICollection<COC>, Exception> callback)
+        {
+            if (_cocs == null)
+            {
+                _cocs = new ObservableCollection<COC>(_packlisteContext.Cocs.Include(i => i.Item));
+            }
+
+            callback(_cocs, null);
         }
 
         public void Dispose()

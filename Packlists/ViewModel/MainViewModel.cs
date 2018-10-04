@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -32,6 +33,7 @@ namespace Packlists.ViewModel
         private readonly IDialogService _dialogService;
         private readonly IPrintingService _printing;
         private readonly IProgressDialogService _progressDialog;
+        private List<FileInfo> _excelFiles;
         private List<Packliste> _packlists; 
 
         private ListCollectionView _packlistView;
@@ -249,7 +251,9 @@ namespace Packlists.ViewModel
         public ICommand CreateTarmPacklisteCommand { get; set; }
         public ICommand PrintMonthlyCommand { get; set; }
         public ICommand OpenImportPanelCommand { get; set; }    
-        public ICommand OpenReportPanelCommand { get; set; }    
+        public ICommand OpenReportPanelCommand { get; set; }
+        public ICommand OpenCocsPanelCommand { get; set; }
+        public ICommand PacklisteFromCOCsCommand { get; set; }
 
         #endregion
 
@@ -307,6 +311,31 @@ namespace Packlists.ViewModel
             PrintMonthlyCommand = new RelayCommand(PrintMonthlyReport, CanPrintMonthly);
             OpenImportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowImportPanel"), true);
             OpenReportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMonthlyReport"), true);
+            OpenCocsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowCOCs"), true);
+            PacklisteFromCOCsCommand = new RelayCommand(PacklisteFromCOCs);
+        }
+
+        private async void PacklisteFromCOCs()
+        {
+            GetExcelFiles();
+
+            if (_excelFiles == null || !_excelFiles.Any()) return;
+
+            foreach (var excelFile in _excelFiles)
+            {
+                var packliste = await ImportPackliste.FromCOCs(excelFile, _dataService);
+
+                if (packliste.Item2 == "Success")
+                {
+                    _dataService.Add(packliste.Item1);
+                }
+                else
+                {
+                    _dialogService.ShowMessageBox(this, packliste.Item2);
+                }
+            }
+
+            
         }
 
         #region PrintMonthlyReport
@@ -482,41 +511,60 @@ namespace Packlists.ViewModel
 
         #endregion
 
+        #region ImportPackingList
+
         private void ImportPacklisteData()
         {
-            FileInfo excelFile;
-            var openFileOptions = new OpenFileDialogSettings
+            GetExcelFiles();
+
+            if (_excelFiles == null) return;
+
+            var options = new ProgressDialogOptions
             {
-                Filter = "Excel files (*.xlsx)|*.xlsx",
-                Title = "Packliste in excel",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                Label = "Current task: ",
+                WindowTitle = "Importing packlists"
             };
-
-            var success =_dialogService.ShowOpenFileDialog(this, openFileOptions);
-
-            if (success == true)
-            {
-                excelFile = new FileInfo(openFileOptions.FileName);
-            }
-            else
-            {
-                return;
-            }
-
-            ImportPackliste.FromExcel((packliste, error) =>
-            {
-                if (error != null)
-                {
-                    _dialogService.ShowMessageBox(this, error.Message, "Error", MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                    return;
-                }
-                
-                _dataService.Add(packliste);
-
-            },excelFile, _dataService);
-
+            _progressDialog.Execute(ImportPacklisteWithProgress, options);
         }
+
+        private void ImportPacklisteWithProgress(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            for (var i = 0; i < _excelFiles.Count; i++)
+            {
+                var progressReport = new ProgressReport
+                {
+                    IsIndeterminate = false,
+                    MaxTaskNumber = _excelFiles.Count -1,
+                    CurrentTaskNumber = i,
+                    CurrentTask = _excelFiles[i].Name
+                };
+
+                progress.Report(progressReport);
+
+                var i1 = i;
+
+                void Action()
+                {
+                    ImportPackliste.FromExcel((packliste, error) =>
+                    {
+                        if (error != null)
+                        {
+                            _dialogService.ShowMessageBox(this, error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        _dataService.Add(packliste);
+                    }, _excelFiles[i1], _dataService);
+                }
+
+                var t1 = Task.Factory.StartNew(Action, cancellationToken);
+                t1.Wait(cancellationToken);
+            }
+        }
+
+        #endregion
 
         private void Save()
         {
@@ -554,6 +602,25 @@ namespace Packlists.ViewModel
         #endregion
 
         #endregion
+
+        private void GetExcelFiles()
+        {
+            _excelFiles = new List<FileInfo>();
+            var openFileOptions = new OpenFileDialogSettings
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx",
+                Title = "Packliste in excel",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Multiselect = true
+            };
+
+            var success = _dialogService.ShowOpenFileDialog(this, openFileOptions);
+
+            if (success == true)
+            {
+                _excelFiles.AddRange(openFileOptions.FileNames.Select(fileName => new FileInfo(fileName)));
+            }
+        }
 
         private void AddFilter(DateTime value)
         {
