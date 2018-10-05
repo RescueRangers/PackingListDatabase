@@ -6,7 +6,7 @@
         xmlns:ignore="http://www.galasoft.ch/ignore"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="MaterialsView" Height="450" Width="800"
+        Title="Monthly reports" Height="450" Width="800"
         DataContext="{Binding MonthlyReport, Source={StaticResource Locator}}">
     
     <Grid>

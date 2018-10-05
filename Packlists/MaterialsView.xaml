@@ -12,7 +12,7 @@
         Top="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialTop, Mode=TwoWay}"
         Height="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialHeight, Mode=TwoWay}"
         Width="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialWidth, Mode=TwoWay}"
-        Title="MaterialsView"
+        Title="Materials"
         DataContext="{Binding Materials, Source={StaticResource Locator}}">
     
     <Window.Resources>
