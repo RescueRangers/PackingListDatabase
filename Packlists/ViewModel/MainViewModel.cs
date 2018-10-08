@@ -477,38 +477,9 @@ namespace Packlists.ViewModel
 
         private void PrintPackliste()
         {
-            var options = new ProgressDialogOptions
-            {
-                Label = "Current task: ",
-                WindowTitle = "Printing"
-            };
-            _progressDialog.Execute(PrintPacklisteWithProgress, options);
+            _printing.Print(SelectedPackliste.PacklisteData);
         }
-
-        private async void PrintPacklisteWithProgress(CancellationToken cancellationToken, IProgress<ProgressReport> progress)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var progressReport = new ProgressReport
-            {
-                IsIndeterminate = true,
-                CurrentTask = "Printing packliste"
-            };
-
-            progress.Report(progressReport);
-
-            var printingResult = await _printing.Print(SelectedPackliste.PacklisteData);
-
-            if (!string.IsNullOrWhiteSpace(printingResult))
-            {
-                Application.Current.Dispatcher.Invoke(delegate
-                {
-                    _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                });
-            }
-        }
-
+        
         #endregion
 
         #region ImportPackingList

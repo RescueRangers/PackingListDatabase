@@ -4,16 +4,20 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
+using MigraDoc.DocumentObjectModel;
+using MigraDoc.Rendering;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Excel = Microsoft.Office.Interop.Excel;
+using PdfDocument = Spire.Pdf.PdfDocument;
 
 namespace Packlists.Model.Printing
 {
     public class PrintingService : IPrintingService
     {
-        private static void Print(string path)
+        private static void PrintXls(string path)
         {
             var app = new Excel.Application();
 
@@ -43,12 +47,26 @@ namespace Packlists.Model.Printing
             }
         }
 
+        private static void PrintPdf(string path)
+        {
+            try
+            {
+                var doc = new PdfDocument();
+                doc.LoadFromFile(path);
+                doc.PrintDocument.Print();
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
         #region MonthlyImports
 
         public Task<string> PrintMonthlyImportReport(ICollection<ImportTransport> import)
         {
             var path = CreateMonthlyImportReport(import);
-            Print(path);
+            PrintXls(path);
 
             return Task.FromResult("Printing successful");
         }
@@ -168,7 +186,7 @@ namespace Packlists.Model.Printing
 
             var path = CreateMonthlyReport(packlists);
 
-            Print(path);
+            PrintXls(path);
 
             return Task.FromResult("Printing successful");
         }
@@ -285,7 +303,7 @@ namespace Packlists.Model.Printing
         {
             var path = CreateItemTable(packliste);
 
-            Print(path);
+            PrintXls(path);
             return Task.FromResult("Printing successful");
         }
 
@@ -365,47 +383,144 @@ namespace Packlists.Model.Printing
 
         public Task<string> Print(Dictionary<Tuple<int, int>, object> packlisteData)
         {
-            var path = CreateXlsx(packlisteData);
+            var path = CreatePdf(packlisteData);
 
-            Print(path);
+            PrintPdf(path);
 
             return Task.FromResult("Printing successful");
         }
 
-        private static string CreateXlsx(Dictionary<Tuple<int, int>, object> packlisteData)
+        private static string CreatePdf(Dictionary<Tuple<int, int>, object> packlisteData)
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.xlsx";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.pdf";
 
-            using (var excel = new ExcelPackage(new FileInfo(path)))
+            var document = new Document();
+            var page = document.AddSection();
+            page.PageSetup.LeftMargin = 25;
+            page.PageSetup.RightMargin = 25;
+            
+            var headParagraph = page.AddParagraph();
+            headParagraph.Format.SpaceAfter = 18;
+            var table = page.AddTable();
+
+            var column = table.AddColumn("2.5cm");
+            column.Format.Alignment = ParagraphAlignment.Left;
+            column = table.AddColumn("7.8cm");
+            column.Format.Alignment = ParagraphAlignment.Left;
+            column = table.AddColumn("3.8cm");
+            column.Format.Alignment = ParagraphAlignment.Left;
+            column = table.AddColumn("1.5cm");
+            column.Format.Alignment = ParagraphAlignment.Left;
+            column = table.AddColumn("1.5cm");
+            column.Format.Alignment = ParagraphAlignment.Left;
+            column = table.AddColumn("1.5cm");
+            column.Format.Alignment = ParagraphAlignment.Left;
+
+            var lineCount = packlisteData.Last().Key.Item1;
+            var headContent = new StringBuilder();
+
+            //First line is the line where items list start
+            for (var i = 1; i <= packlisteData.First().Key.Item1-1; i++)
             {
-                var worksheet = excel.Workbook.Worksheets.Add("Sheet 1");
+                var iLine = packlisteData.Where(l => l.Key.Item1 == i).ToList();
 
-                var headerRow = packlisteData.ElementAt(0).Key.Item1;
-
-                foreach (var data in packlisteData)
+                if (!iLine.Any())
                 {
-                    worksheet.Cells[data.Key.Item1, data.Key.Item2].Value = data.Value;
-                    if (data.Value is DateTime)
-                    {
-                        worksheet.Cells[data.Key.Item1, data.Key.Item2].Style.Numberformat.Format = "yyyy-mm-dd";
-                        worksheet.Cells[data.Key.Item1, data.Key.Item2].AutoFitColumns();
-                    }
+                    iLine = new List<KeyValuePair<Tuple<int, int>, object>>{new KeyValuePair<Tuple<int, int>, object>(Tuple.Create(1,1), Environment.NewLine)};
                 }
-                
-                worksheet.PrinterSettings.RepeatRows = new ExcelAddress("$1:$" + headerRow);
 
-                worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
-                worksheet.PrinterSettings.Orientation = eOrientation.Portrait;
-                worksheet.PrinterSettings.HorizontalCentered = true;
-                worksheet.PrinterSettings.FitToPage = true;
-                worksheet.PrinterSettings.FitToWidth = 1;
-                worksheet.PrinterSettings.FitToHeight = 0;
+                var line = string.Empty;
 
-                excel.Save();
+                for (var j = 0; j < iLine.Count(); j++)
+                {
+                    var newLine = iLine[j].Value.ToString();
+
+                    if (iLine.Count == 1)
+                    {
+                        line += newLine.PadLeft(newLine.Length + iLine[j].Key.Item2, '\t');
+                        break;
+                    }
+                    line += newLine;
+
+                    if(j+1 == iLine.Count) continue;
+
+                    var placementDifference = iLine[j + 1].Key.Item2 - iLine[j].Key.Item2;
+
+                    line = line.PadRight(line.Length + placementDifference, '\t');
+                }
+
+                headContent.AppendLine(line);
             }
+
+
+            for (var i = packlisteData.First().Key.Item1; i <= lineCount; i++)
+            {
+                var iLine = packlisteData.Where(l => l.Key.Item1 == i).ToList();
+
+                if (!iLine.Any())
+                {
+                    continue;
+                }
+
+                var row = table.AddRow();
+                row.Format.Alignment = ParagraphAlignment.Left;
+                row.Format.Font = new Font("Courier New", 8);
+                row.Cells[0].AddParagraph(iLine[0].Value.ToString());
+                row.Cells[1].AddParagraph(iLine[1].Value.ToString());
+                row.Cells[2].AddParagraph(iLine[2].Value.ToString());
+                row.Cells[3].AddParagraph(iLine[3].Value.ToString());
+                row.Cells[4].AddParagraph(iLine[4].Value.ToString());
+                row.Cells[5].AddParagraph(iLine[5].Value.ToString());
+                
+            }
+
+            
+            var headFont = new Font("Courier New", 9);
+
+            headParagraph.AddFormattedText(headContent.ToString(), headFont);
+            
+            var pdfRenderer = new PdfDocumentRenderer {Document = document};
+            pdfRenderer.RenderDocument();
+
+            pdfRenderer.PdfDocument.Save(path);
 
             return path;
         }
+
+        //private static string CreateXlsx(Dictionary<Tuple<int, int>, object> packlisteData)
+        //{
+        //    var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.xlsx";
+
+        //    using (var excel = new ExcelPackage(new FileInfo(path)))
+        //    {
+        //        var worksheet = excel.Workbook.Worksheets.Add("Sheet 1");
+
+        //        var headerRow = packlisteData.ElementAt(0).Key.Item1;
+
+        //        foreach (var data in packlisteData)
+        //        {
+        //            worksheet.Cells[data.Key.Item1, data.Key.Item2].Value = data.Value;
+        //            if (data.Value is DateTime)
+        //            {
+        //                worksheet.Cells[data.Key.Item1, data.Key.Item2].Style.Numberformat.Format = "yyyy-mm-dd";
+        //                worksheet.Cells[data.Key.Item1, data.Key.Item2].AutoFitColumns();
+        //            }
+        //        }
+                
+        //        worksheet.PrinterSettings.RepeatRows = new ExcelAddress("$1:$" + headerRow);
+
+        //        worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
+        //        worksheet.PrinterSettings.Orientation = eOrientation.Portrait;
+        //        worksheet.PrinterSettings.HorizontalCentered = true;
+        //        worksheet.PrinterSettings.FitToPage = true;
+        //        worksheet.PrinterSettings.FitToWidth = 1;
+        //        worksheet.PrinterSettings.FitToHeight = 0;
+
+        //        excel.Save();
+        //    }
+
+        //    return path;
+        //}
 
         #endregion
         
