@@ -111,7 +111,6 @@ namespace Packlists.ExcelImport
 
                         qty = 0;
                         cocs.Add(coc);
-                        //dataService.Add(coc);
                 }
 
                     dataService.BulkAdd(cocs);
@@ -133,9 +132,6 @@ namespace Packlists.ExcelImport
             //    throw;
             //    Task.FromResult(result: Malformed excel file + Environment.NewLine exception.Message);
             //}
-
-
-            return  Task.FromResult("Success");
         }
     }
 }
