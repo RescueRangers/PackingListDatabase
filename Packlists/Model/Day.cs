@@ -6,7 +6,7 @@ namespace Packlists.Model
 {
     public class Day : ObservableObject
     {
-        private ObservableCollection<float> _netMaterialCount;
+        private ObservableCollection<float> _netMaterialCount = new ObservableCollection<float>();
 
         /// <summary>
         /// Sets and gets the NetMaterialCount property.

@@ -1,4 +1,6 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using GalaSoft.MvvmLight;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 
 namespace Packlists.Model
 {
@@ -17,6 +19,7 @@ namespace Packlists.Model
         }
 
         private Material _material;
+        private bool _isSelected;
 
         /// <summary>
         /// Sets and gets the Material property.
@@ -26,6 +29,12 @@ namespace Packlists.Model
         {
             get => _material;
             set => Set(nameof(Material), ref _material, value);
+        }
+
+        [NotMapped]public bool IsSelected
+        {
+            get => _isSelected;
+            set => Set(ref _isSelected, value);
         }
 
         public int MaterialAmountId { get; set; }

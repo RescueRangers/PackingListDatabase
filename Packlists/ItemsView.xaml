@@ -76,7 +76,14 @@
             
             <ListView.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding RemoveMaterialCommand}" />
+                <KeyBinding Key="OemPlus" Command="{Binding AddMaterialCommand}"/>
             </ListView.InputBindings>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="IsSelected" Value="{Binding SelectedMaterial.IsSelected}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -87,10 +94,11 @@
                                   SelectedItem="{Binding Material}"/>
                         <TextBlock Text="Usage: "/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding Usage}"
-                                     MinWidth="25" 
-                                     BorderThickness="1 1 0 1"
-                                     x:Name="Usage"/>
+                            <xctk:AutoSelectTextBox Text="{Binding Amount}"
+                                                    MinWidth="25" 
+                                                    BorderThickness="1 1 0 1"
+                                                    x:Name="Usage"
+                                                    AutoSelectBehavior="OnFocus"/>
                             <Border BorderThickness="0 1 1 1"
                                     BorderBrush="DarkGray"
                                     Padding="4 0 4 0"

@@ -254,6 +254,7 @@ namespace Packlists.ViewModel
         public ICommand OpenReportPanelCommand { get; set; }
         public ICommand OpenCocsPanelCommand { get; set; }
         public ICommand PacklisteFromCOCsCommand { get; set; }
+        public ICommand RecalculateUsageCommand { get; set; }
 
         #endregion
 
@@ -313,6 +314,10 @@ namespace Packlists.ViewModel
             OpenReportPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowMonthlyReport"), true);
             OpenCocsPanelCommand = new RelayCommand<MainViewModel>((mc) => OpenItemsPanel("ShowCOCs"), true);
             PacklisteFromCOCsCommand = new RelayCommand(PacklisteFromCOCs);
+            RecalculateUsageCommand = new RelayCommand(() =>
+            {
+                SelectedPackliste.RecalculateUsage();
+            }, () => SelectedPackliste != null);
         }
 
         private async void PacklisteFromCOCs()

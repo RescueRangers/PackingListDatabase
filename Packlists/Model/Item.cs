@@ -16,13 +16,13 @@ namespace Packlists.Model
             set => Set(nameof(ItemName), ref _itemName, value);
         }
 
-        private ObservableCollection<MaterialWithUsage> _materials;
+        private ObservableCollection<MaterialAmount> _materials;
 
         /// <summary>
         /// Sets and gets the Materials property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<MaterialWithUsage> Materials
+        public ObservableCollection<MaterialAmount> Materials
         {
             get => _materials;
             set => Set(nameof(Materials), ref _materials, value);

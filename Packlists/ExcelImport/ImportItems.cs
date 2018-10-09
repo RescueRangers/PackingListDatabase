@@ -58,7 +58,7 @@ namespace Packlists.ExcelImport
                     var item = new Item
                     {
                         ItemName = worksheet.Cells[1, i].Text.Trim(Environment.NewLine.ToCharArray()),
-                        Materials = new ObservableCollection<MaterialWithUsage>()
+                        Materials = new ObservableCollection<MaterialAmount>()
                     };
 
                     var lastRow = worksheet.Cells.Last(c => c.Start.Column == i).End.Row;
@@ -69,14 +69,14 @@ namespace Packlists.ExcelImport
                             string.Equals(m.MaterialName, worksheet.Cells[j, i].Text.Trim(Environment.NewLine.ToCharArray()),
                                 StringComparison.OrdinalIgnoreCase));
 
-                        MaterialWithUsage newMaterialWithUsage;
+                        MaterialAmount newMaterialWithUsage;
 
                         if (material != null)
                         {
-                            newMaterialWithUsage = new MaterialWithUsage
+                            newMaterialWithUsage = new MaterialAmount
                             {
                                 Material = material,
-                                Usage = float.Parse(worksheet.Cells[j, i+1].Text)
+                                Amount = float.Parse(worksheet.Cells[j, i+1].Text)
                             };
                         }
                         else
@@ -85,10 +85,10 @@ namespace Packlists.ExcelImport
                             existingMaterials.Add(newMaterial);
                             dataService.Add(newMaterial);
 
-                            newMaterialWithUsage = new MaterialWithUsage
+                            newMaterialWithUsage = new MaterialAmount
                             {
                                 Material = newMaterial,
-                                Usage = float.Parse(worksheet.Cells[j, i+1].Text)
+                                Amount = float.Parse(worksheet.Cells[j, i+1].Text)
                             };
                             addedMaterialCount++;
                             addedMaterials.Add(newMaterial);

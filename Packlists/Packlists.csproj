@@ -190,6 +190,14 @@
     <Compile Include="Migrations\201810021255347_cocs.Designer.cs">
       <DependentUpon>201810021255347_cocs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810090810319_MaterialAmount.cs" />
+    <Compile Include="Migrations\201810090810319_MaterialAmount.Designer.cs">
+      <DependentUpon>201810090810319_MaterialAmount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810090900312_empty.cs" />
+    <Compile Include="Migrations\201810090900312_empty.Designer.cs">
+      <DependentUpon>201810090900312_empty.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\COC.cs" />
     <Compile Include="Model\DataService.cs" />
@@ -203,7 +211,6 @@
     <Compile Include="Model\Printing\IPrintingService.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Material.cs" />
-    <Compile Include="Model\MaterialWithUsage.cs" />
     <Compile Include="Model\Packliste.cs" />
     <Compile Include="Model\PacklisteContext.cs" />
     <Compile Include="Model\Printing\PrintingService.cs" />
@@ -295,6 +302,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810021255347_cocs.resx">
       <DependentUpon>201810021255347_cocs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810090810319_MaterialAmount.resx">
+      <DependentUpon>201810090810319_MaterialAmount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810090900312_empty.resx">
+      <DependentUpon>201810090900312_empty.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

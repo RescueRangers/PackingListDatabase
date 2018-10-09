@@ -28,7 +28,7 @@ namespace Packlists.ViewModel
         private string _searchFilter;
         private string _newItemName;
         private ListCollectionView _materialsView;
-        private MaterialWithUsage _selectedMaterial;
+        private MaterialAmount _selectedMaterial;
 
         #region Properties
 
@@ -36,7 +36,7 @@ namespace Packlists.ViewModel
         /// Sets and gets the SelectedItem property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public MaterialWithUsage SelectedMaterial
+        public MaterialAmount SelectedMaterial
         {
             get => _selectedMaterial;
             set => Set(nameof(SelectedMaterial), ref _selectedMaterial, value);
@@ -299,7 +299,7 @@ namespace Packlists.ViewModel
         {
             if (o != null)
             {
-                SelectedItem.Materials.Remove((MaterialWithUsage) o);
+                SelectedItem.Materials.Remove((MaterialAmount) o);
             }
             SelectedItem.Materials.Remove(SelectedMaterial);
         }
@@ -338,9 +338,12 @@ namespace Packlists.ViewModel
         private void AddMaterial()
         {
             if(SelectedItem.Materials == null)
-                SelectedItem.Materials = new ObservableCollection<MaterialWithUsage>();
+                SelectedItem.Materials = new ObservableCollection<MaterialAmount>();
+            var material = new MaterialAmount();
 
-            SelectedItem.Materials.Add(new MaterialWithUsage());
+            SelectedItem.Materials.Add(material);
+            SelectedMaterial = material;
+            SelectedMaterial.IsSelected = true;
         }
 
         private void AddNewItem()

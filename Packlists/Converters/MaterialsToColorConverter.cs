@@ -10,7 +10,7 @@ namespace Packlists.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var materials = (IList<MaterialWithUsage>) value;
+            var materials = (IList<MaterialAmount>) value;
 
             if (materials == null || materials.Count == 0)
             {

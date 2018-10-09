@@ -74,6 +74,7 @@ namespace Packlists.ExcelImport
             packliste.Destination = "Tarm";
             packliste.ItemsWithQties = new ObservableCollection<ItemWithQty>(packlisteItems);
             packliste.PacklisteNumber = -1;
+            packliste.RawUsage = new ObservableCollection<MaterialAmount>(CalculateUsage(packlisteItems));
 
             if (cocNumbers.Any())
             {
@@ -142,6 +143,8 @@ namespace Packlists.ExcelImport
 
                 var packlisteItems = (List<ItemWithQty>) GetItems(items, packlisteData, dataService);
 
+                var rawUsage = CalculateUsage(packlisteItems);
+
                 var results = packlisteItems.GroupBy(item => item.Item).Select(g =>
                     new ItemWithQty {Item = g.First().Item, Quantity = g.Sum(i => i.Quantity)}).ToList();
 
@@ -151,12 +154,39 @@ namespace Packlists.ExcelImport
                     ItemsWithQties = new ObservableCollection<ItemWithQty>(results),
                     PacklisteNumber = packlisteNumber,
                     PacklisteDate = packDate,
-                    Destination = location
+                    Destination = location,
+                    RawUsage = new ObservableCollection<MaterialAmount>(rawUsage)
                 };
                 callback(packliste, null);
                 
             }
             
+        }
+
+        private static List<MaterialAmount> CalculateUsage(List<ItemWithQty> itemsWithQties)
+        {
+            var rawUsage = new List<MaterialAmount>();
+
+            if (itemsWithQties == null || itemsWithQties.Any() == false)
+            {
+                return new List<MaterialAmount>();
+            }
+
+            foreach (var itemWithQty in itemsWithQties)
+            {
+                var qty = itemWithQty.Quantity;
+
+                if (itemWithQty.Item.Materials == null) continue;
+
+                foreach (var materialWithUsage in itemWithQty.Item.Materials)
+                {
+                    rawUsage.Add(new MaterialAmount
+                        {Material = materialWithUsage.Material, Amount = qty * materialWithUsage.Amount});
+                }
+            }
+            var results = rawUsage.GroupBy(m => m.Material).Select(g => new MaterialAmount{Material = g.Key, Amount = g.Sum(l => l.Amount)}).OrderBy(o => o.Material).ToList();
+
+            return results;
         }
 
         private static IEnumerable<ItemWithQty> GetItems(ICollection<Item> items, Dictionary<Tuple<int, int>, object> packlisteData, IDataService dataService)

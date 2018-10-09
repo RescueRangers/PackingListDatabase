@@ -229,7 +229,7 @@ namespace Packlists.Model.Printing
                 worksheet.Cells[2, 2].Style.Font.Bold = true;
                 worksheet.Column(2).AutoFit(7.14);
 
-                var materials = packlists.SelectMany(s => s.RawUsage).GroupBy(m => m.Item1)
+                var materials = packlists.SelectMany(s => s.RawUsage).GroupBy(m => m.Material)
                     .Select(g => g.Key).OrderBy(o => o.MaterialName)
                     .ToList();
 
@@ -250,17 +250,17 @@ namespace Packlists.Model.Printing
                     worksheet.Cells[1, column, 2, column].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Cells[1, column, 2, column].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-                    var rawUsage = packlists.Where(p => p.PacklisteDate == packliste.PacklisteDate).SelectMany(s => s.RawUsage).GroupBy(m => m.Item1)
-                        .Select(g => Tuple.Create(g.Key, g.Sum(l => l.Item2), g.First().Item3)).OrderBy(o => o.Item1)
+                    var rawUsage = packlists.Where(p => p.PacklisteDate == packliste.PacklisteDate).SelectMany(s => s.RawUsage).GroupBy(m => m.Material)
+                        .Select(g => new MaterialAmount{Material = g.Key, Amount = g.Sum(l => l.Amount)}).OrderBy(o => o.Material)
                         .ToList();
 
                     foreach (var usage in rawUsage)
                     {
                         var materialRow =
-                            worksheet.Cells.SingleOrDefault(c => string.Equals(c.Text, usage.Item1.MaterialName)).End
+                            worksheet.Cells.SingleOrDefault(c => string.Equals(c.Text, usage.Material.MaterialName)).End
                                 .Row;
 
-                        worksheet.Cells[materialRow, column].Value = usage.Item2;
+                        worksheet.Cells[materialRow, column].Value = usage.Amount;
                         worksheet.Cells[materialRow, column].Style.Numberformat.Format = "0.00";
                     }
 

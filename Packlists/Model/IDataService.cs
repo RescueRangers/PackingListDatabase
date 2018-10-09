@@ -8,7 +8,7 @@ namespace Packlists.Model
     {
         void GetPacklists(Action<ICollection<Packliste>, ICollection<Item>, Exception> callback);
         void GetItems(Action<ICollection<Item>, ICollection<Material>, Exception> callback);
-        void AddItems(IEnumerable<Item> items);
+        //void AddItems(IEnumerable<Item> items);
         void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback);
         void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback);
         void SaveData();

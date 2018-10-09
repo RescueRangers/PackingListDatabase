@@ -7,6 +7,7 @@ using System.Linq;
 using System.Transactions;
 using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
+using OfficeOpenXml.FormulaParsing.Utilities;
 using Packlists.Messages;
 
 namespace Packlists.Model
@@ -25,7 +26,7 @@ namespace Packlists.Model
         public DataService()
         {
             _packlisteContext = new PacklisteContext();
-            _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties));
+            _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties).Include(r => r.RawUsage));
             _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
             _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
             _imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
@@ -64,13 +65,13 @@ namespace Packlists.Model
             callback(_items, _materials, null);
         }
 
-        public void AddItems(IEnumerable<Item> items)
-        {
-            _packlisteContext.BulkInsert(items, options => options.IncludeGraph = true);
-            _items = new ObservableCollection<Item>(_packlisteContext.Items.Include("Materials.Material"));
-            _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
-            Messenger.Default.Send(new UpdateItemsModelMessage());
-        }
+        //public void AddItems(IEnumerable<Item> items)
+        //{
+        //    _packlisteContext.BulkInsert(items, options => options.IncludeGraph = true);
+        //    _items = new ObservableCollection<Item>(_packlisteContext.Items.Include("Materials.Material"));
+        //    _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
+        //    Messenger.Default.Send(new UpdateItemsModelMessage());
+        //}
 
         public void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback)
         {
@@ -117,13 +118,27 @@ namespace Packlists.Model
 
         public void CreateMonthlyReport(Action<DataTable, Exception> callback, DateTime month)
         {
-            var days = new List<List<Tuple<Material, float>>>();
+            var days = GetDaysInMonth(month);
+
             
             //var packlists = _packlists.Where(p =>
             //    (p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month)).ToList();
 
             //var import = _imports.Where(i => (i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month)).ToList();
 
+            for (var i = 0; i < days.Count; i++)
+            {
+                var day = days[i].Date;
+                var netMaterials = new List<float>();
+
+                var imports = _imports.Where(im => im.ImportDate == day).SelectMany(s => s.ImportedMaterials);
+                var exports = _packlists.Where(pac => pac.PacklisteDate == day).SelectMany(s => s.ItemsWithQties.SelectMany(itm => itm.Item.Materials));
+
+                foreach (var material in _materials)
+                {
+                    
+                }
+            }
 
             for (var i = 1; i <= DateTime.DaysInMonth(month.Year, month.Month); i++)
             {
@@ -135,10 +150,10 @@ namespace Packlists.Model
                 if (packlists.Any())
                 {
 
-                    foreach (var packliste in packlists)
-                    {
-                        usage.AddRange(packliste.RawUsage.ToList());
-                    }
+                    //foreach (var packliste in packlists)
+                    //{
+                    //    usage.AddRange(packliste.RawUsage.ToList());
+                    //}
 
                     usage = usage.GroupBy(m => m.Item1)
                         .Select(g => Tuple.Create(g.Key, g.Sum(l => l.Item2), g.First().Item3)).OrderBy(o => o.Item1)
@@ -157,6 +172,18 @@ namespace Packlists.Model
                 }
             }
 
+        }
+
+        private List<Day> GetDaysInMonth(DateTime month)
+        {
+            var days = new List<Day>();
+
+            for (var i = 1; i <= DateTime.DaysInMonth(month.Year, month.Month); i++)
+            {
+                days.Add(new Day{Date = new DateTime(month.Year, month.Month, i)});
+            }
+
+            return days;
         }
 
 
@@ -253,6 +280,25 @@ namespace Packlists.Model
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         _cocs.Add(coc);
+                    });
+                }
+                _packlisteContext.Configuration.AutoDetectChangesEnabled = true;
+            }
+
+            if (type == typeof(List<Item>))
+            {
+                SaveData();
+
+                var items = (IEnumerable<Item>) obj;
+
+                _packlisteContext.Configuration.AutoDetectChangesEnabled = false;
+
+                foreach (var coc in items)
+                {
+                    _packlisteContext.Items.Add(coc);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _items.Add(coc);
                     });
                 }
                 _packlisteContext.Configuration.AutoDetectChangesEnabled = true;
