@@ -55,7 +55,7 @@
 
                 <Menu Grid.Column="0"
                       Grid.Row="0"
-                      Grid.ColumnSpan="4">
+                      Grid.ColumnSpan="5">
                     <MenuItem Header="Items" Command="{Binding OpenItemsPanelCommand}"/>
                     <MenuItem Header="Materials" Command="{Binding OpenMaterialsPanelCommand}"/>
                 </Menu>

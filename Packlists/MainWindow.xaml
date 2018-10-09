@@ -48,7 +48,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="250"/>
-                    <RowDefinition Height="45"/>
+                    <RowDefinition/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="60"/>
                     <RowDefinition Height="60"/>
@@ -113,8 +113,8 @@
                     
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="300"/>
-                            <RowDefinition/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="60"/>
                         </Grid.RowDefinitions>
                         
                         <ListView ItemsSource="{Binding SelectedPackliste.ItemsWithQties}"
@@ -193,29 +193,21 @@
                           Grid.RowSpan="5"
                           Header="Material usage">
                     
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="300"/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                    
-                        <ListView ItemsSource="{Binding SelectedPackliste.RawUsage}"
-                                  Margin="5"
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                  ScrollViewer.CanContentScroll="False"
-                                  Grid.Row="0">
+                    <ListView ItemsSource="{Binding SelectedPackliste.RawUsage}"
+                                Margin="5"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                ScrollViewer.CanContentScroll="False"
+                                Grid.Row="0">
 
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="140" DisplayMemberBinding="{Binding Item1}" Header="Material"/>
-                                <GridViewColumn Width="75" DisplayMemberBinding="{Binding Item2, StringFormat={}{0:N2}}" Header="Usage"/>
-                                <GridViewColumn Width="35" DisplayMemberBinding="{Binding Item3}" Header="Unit"/>
-                            </GridView>
-                        </ListView.View>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="140" DisplayMemberBinding="{Binding Item1}" Header="Material"/>
+                            <GridViewColumn Width="75" DisplayMemberBinding="{Binding Item2, StringFormat={}{0:N2}}" Header="Usage"/>
+                            <GridViewColumn Width="35" DisplayMemberBinding="{Binding Item3}" Header="Unit"/>
+                        </GridView>
+                    </ListView.View>
                      
                     </ListView>
-                        
-                    </Grid>
                     
                 </GroupBox>
               
