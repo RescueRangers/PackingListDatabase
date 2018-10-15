@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Transactions;
 using System.Windows;
+using System.Windows.Data;
 using GalaSoft.MvvmLight.Messaging;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using Packlists.Messages;
@@ -39,7 +40,7 @@ namespace Packlists.Model
         {
             if (_packlists == null)
             {
-                _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties));
+                _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties).Include(r => r.RawUsage));
             }
 
             if (_items == null)
@@ -64,14 +65,6 @@ namespace Packlists.Model
 
             callback(_items, _materials, null);
         }
-
-        //public void AddItems(IEnumerable<Item> items)
-        //{
-        //    _packlisteContext.BulkInsert(items, options => options.IncludeGraph = true);
-        //    _items = new ObservableCollection<Item>(_packlisteContext.Items.Include("Materials.Material"));
-        //    _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
-        //    Messenger.Default.Send(new UpdateItemsModelMessage());
-        //}
 
         public void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback)
         {
@@ -116,62 +109,98 @@ namespace Packlists.Model
 
         }
 
-        public void CreateMonthlyReport(Action<DataTable, Exception> callback, DateTime month)
+        public void CreateMonthlyReport(Action<ListCollectionView, Exception> callback, DateTime month)
         {
             var days = GetDaysInMonth(month);
-
             
-            //var packlists = _packlists.Where(p =>
-            //    (p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month)).ToList();
-
-            //var import = _imports.Where(i => (i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month)).ToList();
-
-            for (var i = 0; i < days.Count; i++)
+            foreach (var t in days)
             {
-                var day = days[i].Date;
-                var netMaterials = new List<float>();
+                var day = t.Date;
 
-                var imports = _imports.Where(im => im.ImportDate == day).SelectMany(s => s.ImportedMaterials);
-                var exports = _packlists.Where(pac => pac.PacklisteDate == day).SelectMany(s => s.ItemsWithQties.SelectMany(itm => itm.Item.Materials));
+                var imports = _imports.Where(im => im.ImportDate == day).SelectMany(s => s.ImportedMaterials)
+                    .GroupBy(g => g.Material).Select(g => new MaterialAmount
+                        {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
+                var exports = _packlists.Where(pac => pac.PacklisteDate == day)
+                    .SelectMany(s => s.ItemsWithQties.SelectMany(itm => itm.Item.Materials)).GroupBy(g => g.Material)
+                    .Select(g => new MaterialAmount
+                        {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
 
-                foreach (var material in _materials)
+                for (var j = 0; j < _materials.Count; j++)
                 {
-                    
-                }
-            }
+                    var material = _materials[j];
+                    var importedMaterial = imports.SingleOrDefault(s => s.Material == material);
+                    var exportedMaterial = exports.SingleOrDefault(s => s.Material == material);
 
-            for (var i = 1; i <= DateTime.DaysInMonth(month.Year, month.Month); i++)
-            {
-                var packlists = _packlists.Where(p => p.PacklisteDate == new DateTime(month.Year, month.Month, i)).ToList();
-                var imports = _imports.Where(p => p.ImportDate == new DateTime(month.Year, month.Month, i)).ToList();
+                    t.NetMaterialCount.Add(importedMaterial ?? new MaterialAmount {Material = material, Amount = 0});
 
-                var usage = new List<Tuple<Material, float, string>>();
-
-                if (packlists.Any())
-                {
-
-                    //foreach (var packliste in packlists)
-                    //{
-                    //    usage.AddRange(packliste.RawUsage.ToList());
-                    //}
-
-                    usage = usage.GroupBy(m => m.Item1)
-                        .Select(g => Tuple.Create(g.Key, g.Sum(l => l.Item2), g.First().Item3)).OrderBy(o => o.Item1)
-                        .ToList();
-                }
-
-                if (imports.Any())
-                {
-                    foreach (var importTransport in imports)
+                    if (exportedMaterial != null)
                     {
-                        foreach (var materialImport in importTransport.ImportedMaterials)
-                        {
-                            usage.Add(Tuple.Create(materialImport.Material, materialImport.Amount, materialImport.Material.Unit));
-                        }
+                        t.NetMaterialCount[j].Amount -= exportedMaterial.Amount;
                     }
                 }
             }
 
+            for (var i = 1; i < days.Count; i++)
+            {
+                var day = days[i];
+                var previousDay = days[i - 1];
+
+                for (var index = 0; index < day.NetMaterialCount.Count; index++)
+                {
+                    day.NetMaterialCount[index].Amount += previousDay.NetMaterialCount[index].Amount;
+                }
+            }
+
+
+            var result = new DataTable($"{month:yyyy-MM-dd}");
+            var column = new DataColumn("Materials")
+                {DataType = typeof(string), Unique = true, AutoIncrement = false, ReadOnly = true};
+            result.Columns.Add(column);
+            column = new DataColumn("Unit")
+            {
+                DataType = typeof(string),
+                Unique = false,
+                AutoIncrement = false,
+                ReadOnly = true
+            };
+            result.Columns.Add(column);
+
+            foreach (var day in days)
+            {
+                column = new DataColumn($"{day.Date:yyyy-MM-dd}")
+                {
+                    DataType = typeof(float),
+                    Unique = false,
+                    AutoIncrement = false,
+                    ReadOnly = true
+                };
+                result.Columns.Add(column);
+            }
+
+            foreach (var material in _materials)
+            {
+                var row = result.NewRow();
+                row["Materials"] = material.MaterialName;
+                row["Unit"] = material.Unit;
+                
+                foreach (var day in days)
+                {
+                    row[$"{day.Date:yyyy-MM-dd}"] = day.NetMaterialCount.Single(s => s.Material == material).Amount;
+                }
+
+                var rows = row.ItemArray.Where(o => o is float).Cast<float>().Where(fl => fl.Equals(0)).ToList();
+
+                var count = rows.Count;
+
+                if (count == result.Columns.Count - 2) continue;
+
+                result.Rows.Add(row);
+            }
+
+            var tempListview = new ListCollectionView(result.DefaultView);
+
+
+            callback(tempListview, null);
         }
 
         private List<Day> GetDaysInMonth(DateTime month)

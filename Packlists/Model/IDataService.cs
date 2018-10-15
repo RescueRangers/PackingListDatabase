@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Windows.Data;
 
 namespace Packlists.Model
 {
@@ -8,11 +9,10 @@ namespace Packlists.Model
     {
         void GetPacklists(Action<ICollection<Packliste>, ICollection<Item>, Exception> callback);
         void GetItems(Action<ICollection<Item>, ICollection<Material>, Exception> callback);
-        //void AddItems(IEnumerable<Item> items);
         void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback);
         void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback);
         void SaveData();
-        void CreateMonthlyReport(Action<DataTable, Exception> callback, DateTime month);
+        void CreateMonthlyReport(Action<ListCollectionView, Exception> callback, DateTime month);
         
         /// <summary>
         /// Adds an object to the database

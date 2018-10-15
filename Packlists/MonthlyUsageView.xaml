@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+        xmlns:converters="clr-namespace:Packlists.Converters"
         mc:Ignorable="d"
         Title="Monthly reports" Height="450" Width="800"
         DataContext="{Binding MonthlyReport, Source={StaticResource Locator}}">
@@ -12,22 +13,19 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
-        
-        <DockPanel LastChildFill="True">
-            
-            <DataGrid ItemsSource="{Binding Report.DefaultView}"
-                      AutoGenerateColumns="True"
-                      AutoGeneratingColumn="Dg_OnAutoGeneratingColumn"
-                      IsReadOnly="True"/>
-                        
-        </DockPanel>
-        
-            
-        <Button Content="Save changes"
-                Command="{Binding SaveCommand}"
-                Grid.Row="1"/>
 
+
+
+        <DataGrid ItemsSource="{Binding Report, IsAsync=True}"
+                  AutoGenerateColumns="True"
+                  AutoGeneratingColumn="Dg_OnAutoGeneratingColumn"
+                  IsReadOnly="True"
+                  EnableColumnVirtualization="True"
+                  EnableRowVirtualization="True"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  MaxWidth="2500"
+                  MaxHeight="1500"/>
     </Grid>
 </Window>

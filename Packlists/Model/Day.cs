@@ -6,22 +6,16 @@ namespace Packlists.Model
 {
     public class Day : ObservableObject
     {
-        private ObservableCollection<float> _netMaterialCount = new ObservableCollection<float>();
+        private ObservableCollection<MaterialAmount> _netMaterialCount = new ObservableCollection<MaterialAmount>();
 
         /// <summary>
         /// Sets and gets the NetMaterialCount property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<float> NetMaterialCount
+        public ObservableCollection<MaterialAmount> NetMaterialCount
         {
-            get
-            {
-                return _netMaterialCount;
-            }
-            set
-            {
-                Set(nameof(NetMaterialCount), ref _netMaterialCount, value);
-            }
+            get => _netMaterialCount;
+            set => Set(nameof(NetMaterialCount), ref _netMaterialCount, value);
         }
 
         private DateTime _date;
@@ -32,14 +26,8 @@ namespace Packlists.Model
         /// </summary>
         public DateTime Date
         {
-            get
-            {
-                return _date;
-            }
-            set
-            {
-                Set(nameof(Date), ref _date, value);
-            }
+            get => _date;
+            set => Set(nameof(Date), ref _date, value);
         }
 
         public override string ToString()
