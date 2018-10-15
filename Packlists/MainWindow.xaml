@@ -90,6 +90,9 @@
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Recalculate usage" Command="{Binding RecalculateUsageCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Print packliste" Command="{Binding PrintPacklisteCommand}"/>
+                            <MenuItem Header="Print item table" Command="{Binding PrintItemTableCommand}"/>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Windows;
+using System.Windows.Data;
 using GalaSoft.MvvmLight;
 using MvvmDialogs;
 using Packlists.Model;
@@ -14,22 +15,16 @@ namespace Packlists.ViewModel
         private readonly IDialogService _dialogService;
         private readonly IPrintingService _printing;
 
-        private DataTable _report;
+        private ListCollectionView _report;
 
         /// <summary>
         /// Sets and gets the Report property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public DataTable Report
+        public ListCollectionView Report
         {
-            get
-            {
-                return _report;
-            }
-            set
-            {
-                Set(nameof(Report), ref _report, value);
-            }
+            get => _report;
+            set => Set(nameof(Report), ref _report, value);
         }
 
 
@@ -48,11 +43,9 @@ namespace Packlists.ViewModel
                 }
 
                 Report = report;
-            }, DateTime.Now);
-
+            }, new DateTime(2018,9,1));
 
         }
-
 
     }
 }

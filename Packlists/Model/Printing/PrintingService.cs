@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -301,10 +302,78 @@ namespace Packlists.Model.Printing
 
         public Task<string> PrintItemTable(Packliste packliste)
         {
-            var path = CreateItemTable(packliste);
+            var path = CreatePdfItemTable(packliste);
 
-            PrintXls(path);
+            OpenPdf(path);
+
+            //PrintPdf(path);
             return Task.FromResult("Printing successful");
+        }
+
+        private static void OpenPdf(string path)
+        {
+            using (var process = new Process())
+            {
+                var startInfo = new ProcessStartInfo(path);
+                process.StartInfo = startInfo;
+                process.Start();
+            }
+        }
+
+        private static string CreatePdfItemTable(Packliste packliste)
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.pdf";
+
+            var document = new Document();
+            var page = document.AddSection();
+            page.PageSetup.LeftMargin = 45;
+            page.PageSetup.RightMargin = 45;
+            page.PageSetup.PageFormat = PageFormat.A4;
+
+            var font = new Font("Arial", 22)
+            {
+                Bold = true
+            };
+            
+            var headParagraph = page.AddParagraph();
+            headParagraph.Format.SpaceAfter = 12;
+            headParagraph.AddFormattedText($"{packliste.PacklisteDate:yyyy-MM-dd} \t\tMiddle parts shipment", font);
+            var table = page.AddTable();
+            table.Borders.Width = 0.5;
+            table.BottomPadding = 2;
+            table.TopPadding = 2;
+
+            var column = table.AddColumn("8.5cm");
+            column.Format.Alignment = ParagraphAlignment.Center;
+            column = table.AddColumn("6cm");
+            column.Format.Alignment = ParagraphAlignment.Center;
+
+            font.Size = 18;
+            font.Bold = true;
+
+            var row = table.AddRow();
+            row.Format.Alignment = ParagraphAlignment.Center;
+            row.Format.Font = font.Clone();
+            row.Cells[0].AddParagraph("Item number");
+            row.Cells[1].AddParagraph("Quantity");
+
+            font.Size = 16;
+            font.Bold = false;
+
+            foreach (var data in packliste.ItemsWithQties)
+            {
+                row = table.AddRow();
+                row.Format.Alignment = ParagraphAlignment.Center;
+                row.Format.Font = font.Clone();
+                row.Cells[0].AddParagraph(data.Item.ItemName);
+                row.Cells[1].AddParagraph($"{data.Quantity:N}");
+            }
+
+            var renderer = new PdfDocumentRenderer {Document = document};
+            renderer.RenderDocument();
+            renderer.Save(path);
+
+            return path;
         }
 
         private static string CreateItemTable(Packliste packliste)
@@ -471,9 +540,7 @@ namespace Packlists.Model.Printing
                 row.Cells[3].AddParagraph(iLine[3].Value.ToString());
                 row.Cells[4].AddParagraph(iLine[4].Value.ToString());
                 row.Cells[5].AddParagraph(iLine[5].Value.ToString());
-                
             }
-
             
             var headFont = new Font("Courier New", 9);
 

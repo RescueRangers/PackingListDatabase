@@ -348,7 +348,11 @@ namespace Packlists.ViewModel
 
         private void AddNewItem()
         {
-            ItemsView.AddNewItem(new Item {ItemName = _newItemName});
+            var newItem = new Item {ItemName = _newItemName};
+            ItemsView.AddNewItem(newItem);
+            ItemsView.CommitNew();
+            _dataService.Add(newItem);
+            _dataService.SaveData();
         }
 
         #endregion
