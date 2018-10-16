@@ -304,9 +304,9 @@ namespace Packlists.Model.Printing
         {
             var path = CreatePdfItemTable(packliste);
 
-            OpenPdf(path);
+            //OpenPdf(path);
 
-            //PrintPdf(path);
+            PrintPdf(path);
             return Task.FromResult("Printing successful");
         }
 

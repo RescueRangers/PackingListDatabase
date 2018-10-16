@@ -198,6 +198,14 @@
     <Compile Include="Migrations\201810090900312_empty.Designer.cs">
       <DependentUpon>201810090900312_empty.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810160613448_monthlyReports.cs" />
+    <Compile Include="Migrations\201810160613448_monthlyReports.Designer.cs">
+      <DependentUpon>201810160613448_monthlyReports.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810160627482_monthlyReports_materials.cs" />
+    <Compile Include="Migrations\201810160627482_monthlyReports_materials.Designer.cs">
+      <DependentUpon>201810160627482_monthlyReports_materials.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\COC.cs" />
     <Compile Include="Model\DataService.cs" />
@@ -308,6 +316,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810090900312_empty.resx">
       <DependentUpon>201810090900312_empty.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810160613448_monthlyReports.resx">
+      <DependentUpon>201810160613448_monthlyReports.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810160627482_monthlyReports_materials.resx">
+      <DependentUpon>201810160627482_monthlyReports_materials.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Packlists.Model
 {
     public interface IDataService
     {
-        void GetPacklists(Action<ICollection<Packliste>, ICollection<Item>, Exception> callback);
+        void GetPacklists(Action<ICollection<Packliste>, Exception> callback, DateTime month);
+        void GetItems(Action<ICollection<Item>> callback);
         void GetItems(Action<ICollection<Item>, ICollection<Material>, Exception> callback);
-        void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback);
+        void GetImports(Action<ICollection<ImportTransport>, Exception> callback, DateTime month);
         void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback);
+        void GetMaterials(Action<ICollection<Material>> callback);
         void SaveData();
-        void CreateMonthlyReport(Action<ListCollectionView, Exception> callback, DateTime month);
+        void CreateMonthlyReport(Action<MonthlyUsageReport, Exception> callback, DateTime month);
         
         /// <summary>
         /// Adds an object to the database
@@ -22,6 +25,6 @@ namespace Packlists.Model
         void BulkAdd(object obj);
 
 
-        void GetCOCs(Action<ICollection<COC>, Exception> callback);
+        void GetCOCs(Action<ICollection<COC>, Exception> callback, DateTime month);
     }
 }

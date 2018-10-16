@@ -40,11 +40,11 @@ namespace Packlists.ViewModel
                 }
 
                 AddFilter(value);
-                _cocs.Refresh();
 
                 var oldValue = _selectedMonth;
                 _selectedMonth = value;
                 RaisePropertyChanged(nameof(SelectedMonth), oldValue, value, true);
+                LoadMonthlyData();
             }
         }
 
@@ -62,7 +62,7 @@ namespace Packlists.ViewModel
             _dialogService = dialogService;
             _progressDialog = progressDialog;
             ImportCOCsCommand = new RelayCommand(ImportCOCs);
-            LoadData();
+            LoadMonthlyData();
         }
 
         private void ImportCOCs()
@@ -116,7 +116,7 @@ namespace Packlists.ViewModel
             _dialogService.ShowMessageBox(this, result, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void LoadData()
+        private void LoadMonthlyData()
         {
             _dataService.GetCOCs(((cocs, exception) =>
             {
@@ -127,7 +127,7 @@ namespace Packlists.ViewModel
                 _cocs = (ListCollectionView)CollectionViewSource.GetDefaultView(cocs);
                 _cocs.SortDescriptions.Add(new SortDescription("CocNumber", ListSortDirection.Ascending));
                 _cocs.Refresh();
-            }));
+            }), SelectedMonth);
         }
 
         private void AddFilter(DateTime value)
@@ -141,6 +141,7 @@ namespace Packlists.ViewModel
                               coc.InventoryDate.Month == value.Month);
                 return result;
             };
+            _cocs.Refresh();
         }
     }
 }

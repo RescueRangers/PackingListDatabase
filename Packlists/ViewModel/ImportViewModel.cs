@@ -143,13 +143,15 @@ namespace Packlists.ViewModel
                 }
 
                 AddFilter(value);
-                _imports.Refresh();
 
                 var oldValue = _selectedMonth;
                 _selectedMonth = value;
+                LoadMonthlyData();
                 RaisePropertyChanged(nameof(SelectedMonth), oldValue, value, true);
             }
         }
+
+        
 
         /// <summary>
         /// Sets and gets the SelectedImport property.
@@ -222,17 +224,9 @@ namespace Packlists.ViewModel
             _dataService = dataService;
             _progressDialog = progressDialog;
 
-            _dataService.GetImports(((transports, materials, exception) =>
+            _dataService.GetMaterials(((materials) =>
             {
-                if (exception != null)
-                {
-                    //TODO: Report any errors here
-                }
-
-                _imports = (ListCollectionView)CollectionViewSource.GetDefaultView(transports);
                 _materials = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
-
-                _imports.SortDescriptions.Add(new SortDescription("ImportDate", ListSortDirection.Ascending));
                 _materials.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
 
             }));
@@ -365,8 +359,25 @@ namespace Packlists.ViewModel
 
         #endregion
 
+        private void LoadMonthlyData()
+        {
+            _dataService.GetImports(((transports, exception) =>
+            {
+                if (exception != null)
+                {
+                    //TODO: Report any errors here
+                }
+
+                _imports = (ListCollectionView)CollectionViewSource.GetDefaultView(transports);
+                _imports.SortDescriptions.Add(new SortDescription("ImportDate", ListSortDirection.Ascending));
+
+            }), _selectedMonth);
+        }
+
         private void AddFilter(DateTime value)
         {
+            if (_imports == null) return;
+
             _imports.Filter = o =>
             {
                 //if (string.IsNullOrWhiteSpace(_searchFilter)) return true;
@@ -376,6 +387,7 @@ namespace Packlists.ViewModel
                               import.ImportDate.Month == value.Month);
                 return result;
             };
+            _imports.Refresh();
         }
     }
 }

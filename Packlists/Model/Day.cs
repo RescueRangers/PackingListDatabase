@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using GalaSoft.MvvmLight;
 
 namespace Packlists.Model
 {
     public class Day : ObservableObject
     {
-        private ObservableCollection<MaterialAmount> _netMaterialCount = new ObservableCollection<MaterialAmount>();
+        private List<MaterialAmount> _netMaterialCount = new List<MaterialAmount>();
 
-        /// <summary>
-        /// Sets and gets the NetMaterialCount property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public ObservableCollection<MaterialAmount> NetMaterialCount
+        public List<MaterialAmount> NetMaterialCount
         {
             get => _netMaterialCount;
             set => Set(nameof(NetMaterialCount), ref _netMaterialCount, value);
@@ -20,15 +19,14 @@ namespace Packlists.Model
 
         private DateTime _date;
 
-        /// <summary>
-        /// Sets and gets the Date property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
+        [Required]
         public DateTime Date
         {
             get => _date;
             set => Set(nameof(Date), ref _date, value);
         }
+
+        public int DayId { get; set; }
 
         public override string ToString()
         {

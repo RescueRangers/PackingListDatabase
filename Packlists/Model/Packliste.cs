@@ -106,6 +106,7 @@ namespace Packlists.Model
 
         public void AddItem(ItemWithQty item)
         {
+            if(ItemsWithQties == null) ItemsWithQties = new ObservableCollection<ItemWithQty>();
             ItemsWithQties.Add(item);
             RawUsage = CalculateUsage();
         }

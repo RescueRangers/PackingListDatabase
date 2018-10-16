@@ -33,7 +33,7 @@ namespace Packlists.ExcelImport
                 }
 
                 cOCs = cocs.ToList();
-            }));
+            }), packDate);
 
             dataService.GetItemsWithQty(((itemWithQties, exception) =>
             {

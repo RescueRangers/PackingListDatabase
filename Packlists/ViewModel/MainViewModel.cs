@@ -46,7 +46,7 @@ namespace Packlists.ViewModel
 
         private string _searchFilter;
 
-        private DateTime _selectedMonth;
+        private DateTime _selectedMonth = DateTime.Today;
 
         private Item _selectedItem;
 
@@ -115,11 +115,11 @@ namespace Packlists.ViewModel
                 }
 
                 AddFilter(value);
-                _packlistView.Refresh();
 
                 var oldValue = _selectedMonth;
                 _selectedMonth = value;
                 RaisePropertyChanged(nameof(SelectedMonth), oldValue, value, true);
+                LoadMonthlyData();
             }
         }
 
@@ -272,13 +272,22 @@ namespace Packlists.ViewModel
             _dialogService = dialogService;
             _progressDialog = progressDialog;
 
-            LoadData();
+            _dataService.GetItems((items) =>
+            {
+                _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
+            });
+
+            LoadMonthlyData();
         }
 
-        private void LoadData()
+        private void LoadMonthlyData()
         {
+            var existingPacklistsCount = _packlistView?.OfType<Packliste>().Count(p => p.PacklisteDate.Year == SelectedMonth.Year && p.PacklisteDate.Month == SelectedMonth.Month);
+
+            if (existingPacklistsCount != null && existingPacklistsCount > 0) return;
+
             _dataService.GetPacklists(
-                (packlists, items, error) =>
+                (packlists, error) =>
                 {
                     if (error != null)
                     {
@@ -287,12 +296,10 @@ namespace Packlists.ViewModel
                     }
 
                     _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
-                    _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
-                });
+                }, SelectedMonth);
 
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteNumber", ListSortDirection.Ascending));
-            SelectedMonth = DateTime.Today;
         }
 
         #region Commands
@@ -609,7 +616,7 @@ namespace Packlists.ViewModel
                               packliste.PacklisteDate.Month == value.Month);
                 return result;
             };
-            
+            _packlistView.Refresh();
         }
 
         ////public override void Cleanup()

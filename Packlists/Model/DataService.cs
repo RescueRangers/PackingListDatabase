@@ -15,11 +15,11 @@ namespace Packlists.Model
 {
     public sealed class DataService : IDataService, IDisposable
     {
-        private ObservableCollection<Packliste> _packlists;
+        //private ObservableCollection<Packliste> _packlists;
         private ObservableCollection<Item> _items;
-        private ObservableCollection<ImportTransport> _imports;
+        //private ObservableCollection<ImportTransport> _imports;
         private ObservableCollection<Material> _materials;
-        private ObservableCollection<COC> _cocs;
+        //private ObservableCollection<COC> _cocs;
         private ObservableCollection<ItemWithQty> _itemsWithQty;
         private readonly PacklisteContext _packlisteContext;
 
@@ -27,28 +27,30 @@ namespace Packlists.Model
         public DataService()
         {
             _packlisteContext = new PacklisteContext();
-            _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties).Include(r => r.RawUsage));
+            //_packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties).Include(r => r.RawUsage));
             _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
             _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
-            _imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
-            _cocs = new ObservableCollection<COC>(_packlisteContext.Cocs.Include(i => i.Item));
+            //_imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
+            //_cocs = new ObservableCollection<COC>(_packlisteContext.Cocs.Include(i => i.Item));
             _itemsWithQty = new ObservableCollection<ItemWithQty>(_packlisteContext.ItemWithQties.Include(i => i.Item));
         }
 
         
-        public void GetPacklists(Action<ICollection<Packliste>, ICollection<Item>, Exception> callback)
+        public void GetPacklists(Action<ICollection<Packliste>, Exception> callback, DateTime month)
         {
-            if (_packlists == null)
-            {
-                _packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties).Include(r => r.RawUsage));
-            }
+            _packlisteContext.Packlistes.Where(p => p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month).Include(i => i.ItemsWithQties).Include(r => r.RawUsage).Load();
 
+            callback(_packlisteContext.Packlistes.Local, null);
+        }
+
+        public void GetItems(Action<ICollection<Item>> callback)
+        {
             if (_items == null)
             {
                 _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
             }
 
-            callback(_packlists, _items, null);
+            callback(_items);
         }
 
         public void GetItems(Action<ICollection<Item>, ICollection<Material>, Exception> callback)
@@ -66,19 +68,15 @@ namespace Packlists.Model
             callback(_items, _materials, null);
         }
 
-        public void GetImports(Action<ICollection<ImportTransport>, ICollection<Material>, Exception> callback)
+        public void GetImports(Action<ICollection<ImportTransport>, Exception> callback, DateTime month)
         {
-            if (_imports == null)
-            {
-                _imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
-            }
+            //var imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Where(i =>
+            //    i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Include(m => m.ImportedMaterials).ToList());
 
-            if (_materials == null)
-            {
-                _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
-            }
+            _packlisteContext.ImportTransports.Where(i =>
+                i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Include(m => m.ImportedMaterials).Load();
 
-            callback(_imports, _materials, null);
+            callback(_packlisteContext.ImportTransports.Local, null);
         }
 
         public void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback)
@@ -91,17 +89,22 @@ namespace Packlists.Model
             callback(_itemsWithQty, null);
         }
 
+        public void GetMaterials(Action<ICollection<Material>> callback)
+        {
+            callback(_materials);
+        }
+
         public void SaveData()
         {
             var deletedMaterials = _packlisteContext.Materials.ToArray().Except(_materials).ToArray();
             var deletedItems = _packlisteContext.Items.ToArray().Except(_items).ToArray();
-            var deletedPacklists = _packlisteContext.Packlistes.ToArray().Except(_packlists).ToArray();
-            var deletedImports = _packlisteContext.ImportTransports.ToArray().Except(_imports).ToArray();
+            //var deletedPacklists = _packlisteContext.Packlistes.ToArray().Except(_packlists).ToArray();
+            //var deletedImports = _packlisteContext.ImportTransports.ToArray().Except(_imports).ToArray();
 
             _packlisteContext.Materials.RemoveRange(deletedMaterials);
             _packlisteContext.Items.RemoveRange(deletedItems);
-            _packlisteContext.Packlistes.RemoveRange(deletedPacklists);
-            _packlisteContext.ImportTransports.RemoveRange(deletedImports);
+            //_packlisteContext.Packlistes.RemoveRange(deletedPacklists);
+            //_packlisteContext.ImportTransports.RemoveRange(deletedImports);
 
             var changes = _packlisteContext.SaveChanges();
 
@@ -109,110 +112,16 @@ namespace Packlists.Model
 
         }
 
-        public void CreateMonthlyReport(Action<ListCollectionView, Exception> callback, DateTime month)
+        public void CreateMonthlyReport(Action<MonthlyUsageReport, Exception> callback, DateTime month)
         {
-            var days = GetDaysInMonth(month);
-            
-            foreach (var t in days)
-            {
-                var day = t.Date;
+            var imports = _packlisteContext.ImportTransports.Where(i =>
+                i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Include(m => m.ImportedMaterials).ToList();
+            var packlists = _packlisteContext.Packlistes.Where(i =>
+                i.PacklisteDate.Year == month.Year && i.PacklisteDate.Month == month.Month).Include(i => i.ItemsWithQties).Include(r => r.RawUsage).ToList();
 
-                var imports = _imports.Where(im => im.ImportDate == day).SelectMany(s => s.ImportedMaterials)
-                    .GroupBy(g => g.Material).Select(g => new MaterialAmount
-                        {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
-                var exports = _packlists.Where(pac => pac.PacklisteDate == day)
-                    .SelectMany(s => s.ItemsWithQties.SelectMany(itm => itm.Item.Materials)).GroupBy(g => g.Material)
-                    .Select(g => new MaterialAmount
-                        {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
+            var report = new MonthlyUsageReport(month, imports, packlists, _materials.ToList());
 
-                for (var j = 0; j < _materials.Count; j++)
-                {
-                    var material = _materials[j];
-                    var importedMaterial = imports.SingleOrDefault(s => s.Material == material);
-                    var exportedMaterial = exports.SingleOrDefault(s => s.Material == material);
-
-                    t.NetMaterialCount.Add(importedMaterial ?? new MaterialAmount {Material = material, Amount = 0});
-
-                    if (exportedMaterial != null)
-                    {
-                        t.NetMaterialCount[j].Amount -= exportedMaterial.Amount;
-                    }
-                }
-            }
-
-            for (var i = 1; i < days.Count; i++)
-            {
-                var day = days[i];
-                var previousDay = days[i - 1];
-
-                for (var index = 0; index < day.NetMaterialCount.Count; index++)
-                {
-                    day.NetMaterialCount[index].Amount += previousDay.NetMaterialCount[index].Amount;
-                }
-            }
-
-
-            var result = new DataTable($"{month:yyyy-MM-dd}");
-            var column = new DataColumn("Materials")
-                {DataType = typeof(string), Unique = true, AutoIncrement = false, ReadOnly = true};
-            result.Columns.Add(column);
-            column = new DataColumn("Unit")
-            {
-                DataType = typeof(string),
-                Unique = false,
-                AutoIncrement = false,
-                ReadOnly = true
-            };
-            result.Columns.Add(column);
-
-            foreach (var day in days)
-            {
-                column = new DataColumn($"{day.Date:yyyy-MM-dd}")
-                {
-                    DataType = typeof(float),
-                    Unique = false,
-                    AutoIncrement = false,
-                    ReadOnly = true
-                };
-                result.Columns.Add(column);
-            }
-
-            foreach (var material in _materials)
-            {
-                var row = result.NewRow();
-                row["Materials"] = material.MaterialName;
-                row["Unit"] = material.Unit;
-                
-                foreach (var day in days)
-                {
-                    row[$"{day.Date:yyyy-MM-dd}"] = day.NetMaterialCount.Single(s => s.Material == material).Amount;
-                }
-
-                var rows = row.ItemArray.Where(o => o is float).Cast<float>().Where(fl => fl.Equals(0)).ToList();
-
-                var count = rows.Count;
-
-                if (count == result.Columns.Count - 2) continue;
-
-                result.Rows.Add(row);
-            }
-
-            var tempListview = new ListCollectionView(result.DefaultView);
-
-
-            callback(tempListview, null);
-        }
-
-        private List<Day> GetDaysInMonth(DateTime month)
-        {
-            var days = new List<Day>();
-
-            for (var i = 1; i <= DateTime.DaysInMonth(month.Year, month.Month); i++)
-            {
-                days.Add(new Day{Date = new DateTime(month.Year, month.Month, i)});
-            }
-
-            return days;
+            callback(report, null);
         }
 
 
@@ -257,10 +166,10 @@ namespace Packlists.Model
                 _packlisteContext.Packlistes.Add(packliste);
                 _packlisteContext.SaveChanges();
                 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    _packlists.Add(packliste);
-                });
+                //Application.Current.Dispatcher.Invoke(() =>
+                //{
+                //    _packlists.Add(packliste);
+                //});
             }
             if (type == typeof(ImportTransport))
             {
@@ -269,10 +178,10 @@ namespace Packlists.Model
                 _packlisteContext.ImportTransports.Add(transport);
                 _packlisteContext.SaveChanges();
 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    _imports.Add(transport);
-                });
+                //Application.Current.Dispatcher.Invoke(() =>
+                //{
+                //    _imports.Add(transport);
+                //});
             }
             if (type == typeof(COC))
             {
@@ -281,10 +190,10 @@ namespace Packlists.Model
                 _packlisteContext.Cocs.Add(coc);
                 _packlisteContext.SaveChanges();
 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    _cocs.Add(coc);
-                });
+                //Application.Current.Dispatcher.Invoke(() =>
+                //{
+                //    _cocs.Add(coc);
+                //});
             }
 
         }
@@ -306,10 +215,10 @@ namespace Packlists.Model
                 foreach (var coc in cocs)
                 {
                     _packlisteContext.Cocs.Add(coc);
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        _cocs.Add(coc);
-                    });
+                    //Application.Current.Dispatcher.Invoke(() =>
+                    //{
+                    //    _cocs.Add(coc);
+                    //});
                 }
                 _packlisteContext.Configuration.AutoDetectChangesEnabled = true;
             }
@@ -334,14 +243,12 @@ namespace Packlists.Model
             }
         }
         
-        public void GetCOCs(Action<ICollection<COC>, Exception> callback)
+        public void GetCOCs(Action<ICollection<COC>, Exception> callback, DateTime month)
         {
-            if (_cocs == null)
-            {
-                _cocs = new ObservableCollection<COC>(_packlisteContext.Cocs.Include(i => i.Item));
-            }
+            _packlisteContext.Cocs.Where(i =>
+                i.InventoryDate.Year == month.Year && i.InventoryDate.Month == month.Month).Include(i => i.Item).Load();
 
-            callback(_cocs, null);
+            callback(_packlisteContext.Cocs.Local, null);
         }
 
         public void Dispose()
