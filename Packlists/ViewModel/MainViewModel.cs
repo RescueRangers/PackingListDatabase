@@ -34,7 +34,7 @@ namespace Packlists.ViewModel
         private readonly IPrintingService _printing;
         private readonly IProgressDialogService _progressDialog;
         private List<FileInfo> _excelFiles;
-        private List<Packliste> _packlists; 
+        private List<Packliste> _packlists = new List<Packliste>(); 
 
         private ListCollectionView _packlistView;
 
@@ -392,6 +392,7 @@ namespace Packlists.ViewModel
                         MessageBoxImage.Information);
                 });
             }
+            _packlists.Clear();
         }
 
         #endregion
@@ -420,16 +421,8 @@ namespace Packlists.ViewModel
 
             progress.Report(progressReport);
 
-            var printingResult = await _printing.PrintItemTable(SelectedPackliste);
+            await _printing.PrintItemTable(SelectedPackliste);
 
-            if (!string.IsNullOrWhiteSpace(printingResult))
-            {
-                Application.Current.Dispatcher.Invoke(delegate
-                {
-                    _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                });
-            }
         }
 
         #endregion
@@ -538,13 +531,26 @@ namespace Packlists.ViewModel
                             return;
                         }
 
-                        _dataService.Add(packliste);
+                        _packlists.Add(packliste);
+                        //_dataService.Add(packliste);
                     }, _excelFiles[i1], _dataService);
                 }
 
                 var t1 = Task.Factory.StartNew(Action, cancellationToken);
                 t1.Wait(cancellationToken);
             }
+
+            var progressReport2 = new ProgressReport
+            {
+                IsIndeterminate = true,
+                CurrentTask = "Saving changes"
+            };
+
+            progress.Report(progressReport2);
+
+            _dataService.BulkAdd(_packlists);
+
+            _packlists.Clear();
         }
 
         #endregion

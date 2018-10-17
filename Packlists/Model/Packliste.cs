@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Newtonsoft.Json;
-using Packlists.Converters;
 
 namespace Packlists.Model
 {
@@ -71,30 +68,7 @@ namespace Packlists.Model
             set => Set(nameof(ItemsWithQties), ref _itemsWithQties, value);
         }
 
-        private Dictionary<Tuple<int, int>,object> _packlisteData;
-
-        /// <summary>
-        /// Sets and gets the PacklisteData property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [NotMapped]public Dictionary<Tuple<int, int>,object> PacklisteData
-        {
-            get => _packlisteData;
-            set => Set(nameof(PacklisteData), ref _packlisteData, value);
-        }
-        
-        /// <summary>
-        /// Json serialized packlist.
-        /// </summary>
-        public string PacklisteDataAsJson
-        {
-            get => JsonConvert.SerializeObject(PacklisteData);
-            set
-            {
-                if(value != null)
-                    PacklisteData = JsonConvert.DeserializeObject<Dictionary<Tuple<int, int>, object>>(value, new ValueTupleConverter());
-            } 
-        }
+        public ICollection<PacklisteData> PacklisteData { get; set; }
 
         public int PacklisteId { get; set; }
 

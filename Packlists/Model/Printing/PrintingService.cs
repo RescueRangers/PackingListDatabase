@@ -450,7 +450,7 @@ namespace Packlists.Model.Printing
 
         #region Packliste
 
-        public Task<string> Print(Dictionary<Tuple<int, int>, object> packlisteData)
+        public Task<string> Print(ICollection<PacklisteData> packlisteData)
         {
             var path = CreatePdf(packlisteData);
 
@@ -459,7 +459,7 @@ namespace Packlists.Model.Printing
             return Task.FromResult("Printing successful");
         }
 
-        private static string CreatePdf(Dictionary<Tuple<int, int>, object> packlisteData)
+        private static string CreatePdf(ICollection<PacklisteData> packlisteData)
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.pdf";
 
@@ -485,35 +485,36 @@ namespace Packlists.Model.Printing
             column = table.AddColumn("1.5cm");
             column.Format.Alignment = ParagraphAlignment.Left;
 
-            var lineCount = packlisteData.Last().Key.Item1;
+            var lineCount = packlisteData.Last().RowNumber;
             var headContent = new StringBuilder();
 
             //First line is the line where items list start
-            for (var i = 1; i <= packlisteData.First().Key.Item1-1; i++)
+            for (var i = 1; i <= packlisteData.First().RowNumber-1; i++)
             {
-                var iLine = packlisteData.Where(l => l.Key.Item1 == i).ToList();
+                var iLine = packlisteData.Where(l => l.RowNumber == i).ToList();
 
                 if (!iLine.Any())
                 {
-                    iLine = new List<KeyValuePair<Tuple<int, int>, object>>{new KeyValuePair<Tuple<int, int>, object>(Tuple.Create(1,1), Environment.NewLine)};
+                    headContent.AppendLine();
+                    continue;
                 }
 
                 var line = string.Empty;
 
                 for (var j = 0; j < iLine.Count(); j++)
                 {
-                    var newLine = iLine[j].Value.ToString();
+                    var newLine = iLine[j].Data;
 
                     if (iLine.Count == 1)
                     {
-                        line += newLine.PadLeft(newLine.Length + iLine[j].Key.Item2, '\t');
+                        line += newLine.PadLeft(newLine.Length + iLine[j].ColumnNumber, '\t');
                         break;
                     }
                     line += newLine;
 
                     if(j+1 == iLine.Count) continue;
 
-                    var placementDifference = iLine[j + 1].Key.Item2 - iLine[j].Key.Item2;
+                    var placementDifference = iLine[j + 1].ColumnNumber - iLine[j].ColumnNumber;
 
                     line = line.PadRight(line.Length + placementDifference, '\t');
                 }
@@ -521,10 +522,9 @@ namespace Packlists.Model.Printing
                 headContent.AppendLine(line);
             }
 
-
-            for (var i = packlisteData.First().Key.Item1; i <= lineCount; i++)
+            for (var i = packlisteData.First().RowNumber; i <= lineCount; i++)
             {
-                var iLine = packlisteData.Where(l => l.Key.Item1 == i).ToList();
+                var iLine = packlisteData.Where(l => l.RowNumber == i).ToList();
 
                 if (!iLine.Any())
                 {
@@ -534,12 +534,12 @@ namespace Packlists.Model.Printing
                 var row = table.AddRow();
                 row.Format.Alignment = ParagraphAlignment.Left;
                 row.Format.Font = new Font("Courier New", 8);
-                row.Cells[0].AddParagraph(iLine[0].Value.ToString());
-                row.Cells[1].AddParagraph(iLine[1].Value.ToString());
-                row.Cells[2].AddParagraph(iLine[2].Value.ToString());
-                row.Cells[3].AddParagraph(iLine[3].Value.ToString());
-                row.Cells[4].AddParagraph(iLine[4].Value.ToString());
-                row.Cells[5].AddParagraph(iLine[5].Value.ToString());
+                row.Cells[0].AddParagraph(iLine[0].Data);
+                row.Cells[1].AddParagraph(iLine[1].Data);
+                row.Cells[2].AddParagraph(iLine[2].Data);
+                row.Cells[3].AddParagraph(iLine[3].Data);
+                row.Cells[4].AddParagraph(iLine[4].Data);
+                row.Cells[5].AddParagraph(iLine[5].Data);
             }
             
             var headFont = new Font("Courier New", 9);

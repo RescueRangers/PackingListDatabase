@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Transactions;
 using System.Windows;
-using System.Windows.Data;
-using GalaSoft.MvvmLight.Messaging;
-using OfficeOpenXml.FormulaParsing.Utilities;
-using Packlists.Messages;
 
 namespace Packlists.Model
 {
@@ -27,18 +21,23 @@ namespace Packlists.Model
         public DataService()
         {
             _packlisteContext = new PacklisteContext();
-            //_packlists = new ObservableCollection<Packliste>(_packlisteContext.Packlistes.Include(i => i.ItemsWithQties).Include(r => r.RawUsage));
-            _items = new ObservableCollection<Item>(_packlisteContext.Items.Include(m => m.Materials));
-            _materials = new ObservableCollection<Material>(_packlisteContext.Materials);
-            //_imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Include(m => m.ImportedMaterials));
-            //_cocs = new ObservableCollection<COC>(_packlisteContext.Cocs.Include(i => i.Item));
-            _itemsWithQty = new ObservableCollection<ItemWithQty>(_packlisteContext.ItemWithQties.Include(i => i.Item));
+            _packlisteContext.Items.Load();
+            _packlisteContext.Materials.Load();
+            _packlisteContext.ItemWithQties.Load();
+            _packlisteContext.MaterialAmounts.Load();
+            _items = _packlisteContext.Items.Local;
+            _materials = _packlisteContext.Materials.Local;
+            _itemsWithQty = _packlisteContext.ItemWithQties.Local;
         }
 
         
         public void GetPacklists(Action<ICollection<Packliste>, Exception> callback, DateTime month)
         {
-            _packlisteContext.Packlistes.Where(p => p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month).Include(i => i.ItemsWithQties).Include(r => r.RawUsage).Load();
+            _packlisteContext.Packlistes
+                .Where(p => p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month)
+                .Load();
+            _packlisteContext.PacklisteDatas.Where(p =>
+                p.Packliste.PacklisteDate.Year == month.Year && p.Packliste.PacklisteDate.Month == month.Month).Load();
 
             callback(_packlisteContext.Packlistes.Local, null);
         }
@@ -70,11 +69,8 @@ namespace Packlists.Model
 
         public void GetImports(Action<ICollection<ImportTransport>, Exception> callback, DateTime month)
         {
-            //var imports = new ObservableCollection<ImportTransport>(_packlisteContext.ImportTransports.Where(i =>
-            //    i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Include(m => m.ImportedMaterials).ToList());
-
             _packlisteContext.ImportTransports.Where(i =>
-                i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Include(m => m.ImportedMaterials).Load();
+                i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Load();
 
             callback(_packlisteContext.ImportTransports.Local, null);
         }
@@ -139,12 +135,11 @@ namespace Packlists.Model
             if (type == typeof(Item))
             {
                 var item = (Item) obj;
-                _packlisteContext.Items.Add(item);
                 _packlisteContext.SaveChanges();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    _items.Add(item);
+                    _packlisteContext.Items.Add(item);
                 });
                 
             }
@@ -163,7 +158,10 @@ namespace Packlists.Model
             {
                 var packliste = (Packliste) obj;
 
-                _packlisteContext.Packlistes.Add(packliste);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _packlisteContext.Packlistes.Add(packliste);
+                });
                 _packlisteContext.SaveChanges();
                 
                 //Application.Current.Dispatcher.Invoke(() =>
@@ -210,17 +208,7 @@ namespace Packlists.Model
 
                 var cocs = (IEnumerable<COC>) obj;
 
-                _packlisteContext.Configuration.AutoDetectChangesEnabled = false;
-
-                foreach (var coc in cocs)
-                {
-                    _packlisteContext.Cocs.Add(coc);
-                    //Application.Current.Dispatcher.Invoke(() =>
-                    //{
-                    //    _cocs.Add(coc);
-                    //});
-                }
-                _packlisteContext.Configuration.AutoDetectChangesEnabled = true;
+                Application.Current.Dispatcher.Invoke(() => _packlisteContext.Cocs.AddRange(cocs));
             }
 
             if (type == typeof(List<Item>))
@@ -229,17 +217,15 @@ namespace Packlists.Model
 
                 var items = (IEnumerable<Item>) obj;
 
-                _packlisteContext.Configuration.AutoDetectChangesEnabled = false;
+                Application.Current.Dispatcher.Invoke(() => _packlisteContext.Items.AddRange(items));
+            }
 
-                foreach (var coc in items)
-                {
-                    _packlisteContext.Items.Add(coc);
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        _items.Add(coc);
-                    });
-                }
-                _packlisteContext.Configuration.AutoDetectChangesEnabled = true;
+            if (type == typeof(List<Packliste>))
+            {
+                SaveData();
+                var packlists = (IList<Packliste>) obj;
+                Application.Current.Dispatcher.Invoke(() => { _packlisteContext.Packlistes.AddRange(packlists); });
+                SaveData();
             }
         }
         

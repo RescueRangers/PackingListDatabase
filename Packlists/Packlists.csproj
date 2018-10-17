@@ -72,11 +72,8 @@
     <Reference Include="MigraDoc.RtfRendering, Version=1.50.4845.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <HintPath>..\packages\PDFsharp-MigraDoc.1.50.4845-RC2a\lib\net20\MigraDoc.RtfRendering.dll</HintPath>
     </Reference>
-    <Reference Include="MvvmDialogs, Version=5.1.0.0, Culture=neutral, PublicKeyToken=3d3b9708589bc73e, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmDialogs.5.1.0\lib\net45\MvvmDialogs.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="MvvmDialogs, Version=5.2.0.0, Culture=neutral, PublicKeyToken=3d3b9708589bc73e, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmDialogs.5.2.0\lib\net45\MvvmDialogs.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
@@ -136,9 +133,6 @@
     <Reference Include="Xceed.Wpf.Toolkit, Version=3.4.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.3.4.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Z.EntityFramework.Extensions, Version=3.15.17.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Extensions.3.15.17\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -152,7 +146,6 @@
     <Compile Include="Converters\KeyboardEventArgsToKeyConverter.cs" />
     <Compile Include="Converters\MaterialsToColorConverter.cs" />
     <Compile Include="Converters\PacklistsToColorConverter.cs" />
-    <Compile Include="Converters\ValueTupleConverter.cs" />
     <Compile Include="DependencyProperties\DatePickerCalendar.cs" />
     <Compile Include="DependencyModule.cs" />
     <Compile Include="ExcelImport\CreateFromPackliste.cs" />
@@ -206,6 +199,10 @@
     <Compile Include="Migrations\201810160627482_monthlyReports_materials.Designer.cs">
       <DependentUpon>201810160627482_monthlyReports_materials.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810170542458_PacklisteData.cs" />
+    <Compile Include="Migrations\201810170542458_PacklisteData.Designer.cs">
+      <DependentUpon>201810170542458_PacklisteData.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\COC.cs" />
     <Compile Include="Model\DataService.cs" />
@@ -216,6 +213,7 @@
     <Compile Include="Model\ItemWithQty.cs" />
     <Compile Include="Model\MaterialAmount.cs" />
     <Compile Include="Model\MonthlyUsageReport.cs" />
+    <Compile Include="Model\PacklisteData.cs" />
     <Compile Include="Model\Printing\IPrintingService.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Material.cs" />
@@ -322,6 +320,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810160627482_monthlyReports_materials.resx">
       <DependentUpon>201810160627482_monthlyReports_materials.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810170542458_PacklisteData.resx">
+      <DependentUpon>201810170542458_PacklisteData.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

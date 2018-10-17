@@ -16,11 +16,14 @@ namespace Packlists.Model
         public DbSet<COC> Cocs { get; set; }
         public DbSet<MaterialAmount> MaterialAmounts { get; set; }
         public DbSet<MonthlyUsageReport> MonthlyUsageReports { get; set; }
+        public DbSet<PacklisteData> PacklisteDatas { get; set; }
 
         public PacklisteContext()
         {
             var modelBuilder = new DbModelBuilder();
             modelBuilder.Entity<Packliste>().HasMany(i => i.ItemsWithQties).WithRequired().WillCascadeOnDelete(false);
+            modelBuilder.Entity<Packliste>().HasMany(i => i.PacklisteData).WithOptional().WillCascadeOnDelete(true);
+            modelBuilder.Entity<Packliste>().HasMany(i => i.RawUsage).WithOptional().WillCascadeOnDelete(true);
             modelBuilder.Entity<Item>().HasMany(m => m.Materials).WithOptional().WillCascadeOnDelete(true);
             modelBuilder.Entity<ItemWithQty>().HasRequired(i => i.Item).WithRequiredDependent().WillCascadeOnDelete(true);
             modelBuilder.Entity<MaterialAmount>().HasRequired(m => m.Material).WithOptional().WillCascadeOnDelete(true);
