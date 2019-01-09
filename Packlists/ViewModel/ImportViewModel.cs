@@ -342,6 +342,9 @@ namespace Packlists.ViewModel
                 Amount = float.Parse(Quantity, CultureInfo.InvariantCulture)
             };
 
+            if(SelectedImport.ImportedMaterials == null)
+                SelectedImport.ImportedMaterials = new ObservableCollection<MaterialAmount>();
+
             SelectedImport.ImportedMaterials.Add(materialAmount);
             Quantity = string.Empty;
         }
