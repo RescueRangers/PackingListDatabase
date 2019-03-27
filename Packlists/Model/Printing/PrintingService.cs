@@ -470,6 +470,12 @@ namespace Packlists.Model.Printing
             
             var headParagraph = page.AddParagraph();
             headParagraph.Format.SpaceAfter = 18;
+
+            headParagraph.Format.TabStops.AddTabStop(20);
+            headParagraph.Format.TabStops.AddTabStop(170);
+            headParagraph.Format.TabStops.AddTabStop(250);
+            
+            
             var table = page.AddTable();
 
             var column = table.AddColumn("2.5cm");
@@ -499,27 +505,46 @@ namespace Packlists.Model.Printing
                     continue;
                 }
 
-                var line = string.Empty;
-
                 for (var j = 0; j < iLine.Count(); j++)
                 {
-                    var newLine = iLine[j].Data;
+                    var rowData = iLine[j];
 
-                    if (iLine.Count == 1)
+                    var isDate = DateTime.TryParse(rowData.Data, out var result);
+
+                    var newLine = isDate ? result.ToShortDateString() : rowData.Data;
+
+                    switch (rowData.ColumnNumber)
                     {
-                        line += newLine.PadLeft(newLine.Length + iLine[j].ColumnNumber, '\t');
-                        break;
+                        case 2:
+                            headParagraph.AddTab();
+                            headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
+                            break;
+                        case 5:
+                            headParagraph.AddTab();
+                            headParagraph.AddTab();
+                            headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
+                            break;
+                        default:
+                        {
+                            if (rowData.ColumnNumber > 5)
+                            {
+                                headParagraph.AddTab();
+                                headParagraph.AddTab();
+                                headParagraph.AddTab();
+                                headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
+                            }
+                            else
+                            {
+                                headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
+                            }
+
+                            break;
+                        }
                     }
-                    line += newLine;
 
-                    if(j+1 == iLine.Count) continue;
-
-                    var placementDifference = iLine[j + 1].ColumnNumber - iLine[j].ColumnNumber;
-
-                    line = line.PadRight(line.Length + placementDifference, '\t');
+                    if (j + 1 == iLine.Count) headParagraph.AddChar('\n');
                 }
 
-                headContent.AppendLine(line);
             }
 
             for (var i = packlisteData.First().RowNumber; i <= lineCount; i++)
@@ -542,10 +567,6 @@ namespace Packlists.Model.Printing
                 row.Cells[5].AddParagraph(iLine[5].Data);
             }
             
-            var headFont = new Font("Courier New", 9);
-
-            headParagraph.AddFormattedText(headContent.ToString(), headFont);
-            
             var pdfRenderer = new PdfDocumentRenderer {Document = document};
             pdfRenderer.RenderDocument();
 
@@ -553,41 +574,6 @@ namespace Packlists.Model.Printing
 
             return path;
         }
-
-        //private static string CreateXlsx(Dictionary<Tuple<int, int>, object> packlisteData)
-        //{
-        //    var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.xlsx";
-
-        //    using (var excel = new ExcelPackage(new FileInfo(path)))
-        //    {
-        //        var worksheet = excel.Workbook.Worksheets.Add("Sheet 1");
-
-        //        var headerRow = packlisteData.ElementAt(0).Key.Item1;
-
-        //        foreach (var data in packlisteData)
-        //        {
-        //            worksheet.Cells[data.Key.Item1, data.Key.Item2].Value = data.Value;
-        //            if (data.Value is DateTime)
-        //            {
-        //                worksheet.Cells[data.Key.Item1, data.Key.Item2].Style.Numberformat.Format = "yyyy-mm-dd";
-        //                worksheet.Cells[data.Key.Item1, data.Key.Item2].AutoFitColumns();
-        //            }
-        //        }
-                
-        //        worksheet.PrinterSettings.RepeatRows = new ExcelAddress("$1:$" + headerRow);
-
-        //        worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
-        //        worksheet.PrinterSettings.Orientation = eOrientation.Portrait;
-        //        worksheet.PrinterSettings.HorizontalCentered = true;
-        //        worksheet.PrinterSettings.FitToPage = true;
-        //        worksheet.PrinterSettings.FitToWidth = 1;
-        //        worksheet.PrinterSettings.FitToHeight = 0;
-
-        //        excel.Save();
-        //    }
-
-        //    return path;
-        //}
 
         #endregion
         
