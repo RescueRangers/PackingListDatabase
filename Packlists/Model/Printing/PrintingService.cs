@@ -465,16 +465,22 @@ namespace Packlists.Model.Printing
 
             var document = new Document();
             var page = document.AddSection();
-            page.PageSetup.LeftMargin = 25;
-            page.PageSetup.RightMargin = 25;
-            
+            page.PageSetup.LeftMargin = 40;
+            //page.PageSetup.RightMargin = 40;
+
+            var titleParagraph = page.AddParagraph();
+            titleParagraph.Format.Alignment = ParagraphAlignment.Center;
+            titleParagraph.Format.Font = new Font("Courier New", 12);
+            titleParagraph.Format.SpaceAfter = 6;
+            titleParagraph.Format.Font.Bold = true;
+
             var headParagraph = page.AddParagraph();
             headParagraph.Format.SpaceAfter = 18;
-
-            headParagraph.Format.TabStops.AddTabStop(20);
-            headParagraph.Format.TabStops.AddTabStop(170);
+            headParagraph.Format.Font = new Font("Courier New", 9);
+            headParagraph.Format.TabStops.ClearAll();
+            headParagraph.Format.TabStops.AddTabStop(30);
             headParagraph.Format.TabStops.AddTabStop(250);
-            
+            headParagraph.Format.TabStops.AddTabStop(300);
             
             var table = page.AddTable();
 
@@ -493,6 +499,7 @@ namespace Packlists.Model.Printing
 
             var lineCount = packlisteData.Last().RowNumber;
             var headContent = new StringBuilder();
+            var headerFont = new Font();
 
             //First line is the line where items list start
             for (var i = 1; i <= packlisteData.First().RowNumber-1; i++)
@@ -517,29 +524,27 @@ namespace Packlists.Model.Printing
                     {
                         case 2:
                             headParagraph.AddTab();
-                            headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
+                            headParagraph.AddText(newLine);
                             break;
                         case 5:
+                            titleParagraph.AddText(newLine);
+                            break;
+                        case 11:
+                            if(j == 0)
+                                headParagraph.AddTab();
                             headParagraph.AddTab();
                             headParagraph.AddTab();
-                            headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
+                            headParagraph.AddText(newLine);
+                            break;
+                        case 13:
+                            headParagraph.AddTab();
+                            headParagraph.AddTab();
+                            headParagraph.AddTab();
+                            headParagraph.AddText(newLine);
                             break;
                         default:
-                        {
-                            if (rowData.ColumnNumber > 5)
-                            {
-                                headParagraph.AddTab();
-                                headParagraph.AddTab();
-                                headParagraph.AddTab();
-                                headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
-                            }
-                            else
-                            {
-                                headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
-                            }
-
+                            headParagraph.AddFormattedText(newLine, new Font("Courier New", 9));
                             break;
-                        }
                     }
 
                     if (j + 1 == iLine.Count) headParagraph.AddChar('\n');
