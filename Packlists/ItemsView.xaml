@@ -91,7 +91,9 @@
                     <StackPanel>
                         <TextBlock Text="Material: "/>
                         <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.MaterialsView}"
-                                  SelectedItem="{Binding Material}"/>
+                                  SelectedItem="{Binding Material}"
+                                  IsTextSearchEnabled="True"
+                                  IsEditable="True"/>
                         <TextBlock Text="Usage: "/>
                         <StackPanel Orientation="Horizontal">
                             <xctk:AutoSelectTextBox Text="{Binding Amount}"
