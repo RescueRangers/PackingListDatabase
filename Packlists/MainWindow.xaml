@@ -67,7 +67,7 @@
                         <MenuItem Header="Print packliste" Command="{Binding PrintPacklisteCommand}"/>
                         <MenuItem Header="Print item table" Command="{Binding PrintItemTableCommand}"/>
                         <Separator/>
-                        <MenuItem Header="Print monthly report" Command="{Binding PrintMonthlyCommand}"/>
+                        <MenuItem Header="Print missing packing list numbers" Command="{Binding PrintMissingPacklistNumbersCommand}"/>
                     </MenuItem>
                     <MenuItem Header="Create packliste">
                         <MenuItem Header="Import packliste" Command="{Binding ImportPacklisteCommand}"/>

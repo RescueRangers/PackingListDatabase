@@ -10,5 +10,6 @@ namespace Packlists.Model.Printing
         Task<string> PrintItemTable(Packliste packliste);
         Task<string> PrintMonthlyReport(ICollection<Packliste> packlists);
         Task<string> PrintMonthlyImportReport(ICollection<ImportTransport> import);
+        Task<string> PrintListOfNumbers(IEnumerable<int> numbers);
     }
 }

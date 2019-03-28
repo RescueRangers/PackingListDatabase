@@ -72,6 +72,8 @@ namespace Packlists.Model.Printing
             return Task.FromResult("Printing successful");
         }
 
+       
+
         private static string CreateMonthlyImportReport(ICollection<ImportTransport> imports)
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Month_import_temp.xlsx";
@@ -581,6 +583,32 @@ namespace Packlists.Model.Printing
         }
 
         #endregion
+
+        public Task<string> PrintListOfNumbers(IEnumerable<int> numbers)
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.pdf";
+
+            var document = new Document();
+            var page = document.AddSection();
+            page.PageSetup.LeftMargin = 40;
+
+            var paragraph = page.AddParagraph();
+            paragraph.Format.Font = new Font("Courier New", 11);
+
+            foreach (var number in numbers)
+            {
+                paragraph.AddText(number + Environment.NewLine);
+            }
+            
+            var pdfRenderer = new PdfDocumentRenderer {Document = document};
+            pdfRenderer.RenderDocument();
+
+            pdfRenderer.PdfDocument.Save(path);
+
+            PrintPdf(path);
+
+            return Task.FromResult("Printing successful");
+        }
         
     }
 }

@@ -255,6 +255,7 @@ namespace Packlists.ViewModel
         public ICommand OpenCocsPanelCommand { get; set; }
         public ICommand PacklisteFromCOCsCommand { get; set; }
         public ICommand RecalculateUsageCommand { get; set; }
+        public ICommand PrintMissingPacklistNumbersCommand { get; set; }
 
         #endregion
 
@@ -325,6 +326,19 @@ namespace Packlists.ViewModel
             {
                 SelectedPackliste.RecalculateUsage();
             }, () => SelectedPackliste != null);
+            PrintMissingPacklistNumbersCommand = new RelayCommand(PrintingMissingPacklistNumbers, true);
+        }
+
+        private void PrintingMissingPacklistNumbers()
+        {
+            _packlists = PacklistView.OfType<Packliste>().ToList();
+            var packlistNumbers = _packlists
+                .Where(p => p.PacklisteDate.Year == SelectedMonth.Year && p.PacklisteDate.Month == SelectedMonth.Month)
+                .Select(p => p.PacklisteNumber).ToList();
+
+            var missingNumbers = Enumerable.Range(packlistNumbers.Min(), packlistNumbers.Max() - packlistNumbers.Min()).Except(packlistNumbers);
+
+            _printing.PrintListOfNumbers(missingNumbers);
         }
 
         private async void PacklisteFromCOCs()
