@@ -44,6 +44,8 @@ namespace Packlists.Model
         private MonthlyUsageReport()
         {}
 
+        
+
         public MonthlyUsageReport(DateTime month, List<ImportTransport> imports, List<Packliste> exports, List<Material> materials, MonthlyUsageReport previousReport = null)
         {
             Materials = materials;

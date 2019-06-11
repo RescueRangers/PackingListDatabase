@@ -38,5 +38,7 @@ namespace Packlists.Model
         }
 
         public int MaterialAmountId { get; set; }
+
+
     }
 }

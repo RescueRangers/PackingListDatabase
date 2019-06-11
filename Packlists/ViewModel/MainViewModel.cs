@@ -141,7 +141,6 @@ namespace Packlists.ViewModel
 
                 //AddFilter(value);
                 //_packlistView.Refresh();
-               
 
                 var oldValue = _searchFilter;
                 _searchFilter = value;

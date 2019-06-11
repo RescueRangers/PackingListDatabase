@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace Packlists.Model
@@ -9,9 +10,11 @@ namespace Packlists.Model
     public interface IDataService
     {
         void GetPacklists(Action<ICollection<Packliste>, Exception> callback, DateTime month);
+        Task<List<Packliste>> GetPacklistsWithoutData(DateTime month);
         void GetItems(Action<ICollection<Item>> callback);
         void GetItems(Action<ICollection<Item>, ICollection<Material>, Exception> callback);
         void GetImports(Action<ICollection<ImportTransport>, Exception> callback, DateTime month);
+        Task<List<ImportTransport>> GetImports(DateTime month);
         void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback);
         void GetMaterials(Action<ICollection<Material>> callback);
         void SaveData();

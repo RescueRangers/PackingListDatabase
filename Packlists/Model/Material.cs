@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace Packlists.Model
 {
@@ -46,13 +47,21 @@ namespace Packlists.Model
         {
             if (obj is Material that)
             {
-                return string.Compare(MaterialName, that.MaterialName, StringComparison.Ordinal);
+                return string.Compare(MaterialName, that.MaterialName, StringComparison.InvariantCultureIgnoreCase);
             }
 
             return -1;
+        }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Material material &&
+                   MaterialName == material.MaterialName;
+        }
+
+        public override int GetHashCode()
+        {
+            return MaterialId.GetHashCode() + MaterialName.GetHashCode();
         }
     }
-
-
 }

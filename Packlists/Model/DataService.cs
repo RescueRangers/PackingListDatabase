@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Spire.Pdf.Exporting.XPS.Schema;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Packlists.Model
@@ -42,6 +45,12 @@ namespace Packlists.Model
             callback(_packlisteContext.Packlistes.Local, null);
         }
 
+        public async Task<List<Packliste>> GetPacklistsWithoutData(DateTime month)
+        {
+            return await _packlisteContext.Packlistes
+            .Where(p => p.PacklisteDate.Year == month.Year && p.PacklisteDate.Month == month.Month).Include(p => p.RawUsage.Select(s => s.Material)).AsNoTracking().ToListAsync();
+        }
+
         public void GetItems(Action<ICollection<Item>> callback)
         {
             if (_items == null)
@@ -73,6 +82,12 @@ namespace Packlists.Model
                 i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Load();
 
             callback(_packlisteContext.ImportTransports.Local, null);
+        }
+
+        public async Task<List<ImportTransport>> GetImports(DateTime month)
+        {
+            return await _packlisteContext.ImportTransports.Where(i =>
+                i.ImportDate.Year == month.Year && i.ImportDate.Month == month.Month).Include(i => i.ImportedMaterials.Select(s => s.Material)).AsNoTracking().ToListAsync();
         }
 
         public void GetItemsWithQty(Action<ICollection<ItemWithQty>, Exception> callback)
