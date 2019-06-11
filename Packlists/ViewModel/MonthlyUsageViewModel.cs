@@ -4,26 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using OfficeOpenXml;
-using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MvvmDialogs;
 using Packlists.Model;
 using Packlists.Model.Printing;
-using Spire.Pdf.Exporting.XPS.Schema;
 using System.IO;
-using OfficeOpenXml.Style;
-using System.Globalization;
-using PdfSharp.Pdf.Content.Objects;
-using OfficeOpenXml.ConditionalFormatting;
-using MigraDoc.DocumentObjectModel.Tables;
 using System.Diagnostics;
-using Packlists.Model.ProgressBar;
-using System.Threading;
-using System.Security.Cryptography.Xml;
 using MvvmDialogs.FrameworkDialogs.MessageBox;
-using System.Threading.Tasks;
 
 namespace Packlists.ViewModel
 {
@@ -32,8 +21,6 @@ namespace Packlists.ViewModel
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
         private readonly IPrintingService _printing;
-        private readonly IProgressDialogService _progressDialog;
-        private readonly MonthlyUsageViewModel _this;
 
         private float[,] _report;
         private MonthlyUsageReport _monthlyUsageReport;
@@ -100,7 +87,7 @@ namespace Packlists.ViewModel
         }
 
 
-        public MonthlyUsageViewModel(IDataService dataService, IDialogService dialogService, IPrintingService printing, IProgressDialogService progressDialog)
+        public MonthlyUsageViewModel(IDataService dataService, IDialogService dialogService, IPrintingService printing)
         {
             _dataService = dataService;
             _dialogService = dialogService;
@@ -109,9 +96,7 @@ namespace Packlists.ViewModel
             ExportToExcel = new RelayCommand(ToExcel);
             Generate = new RelayCommand(GenerateMonthlyReport);
 
-            _this = this;
             _month = DateTime.UtcNow;
-            _progressDialog = progressDialog;
         }
 
         private void ToExcel()
@@ -171,7 +156,7 @@ namespace Packlists.ViewModel
             }
             catch (Exception ex)
             {
-                _dialogService.ShowMessageBox(_this, new MessageBoxSettings
+                _dialogService.ShowMessageBox(this, new MessageBoxSettings
                 {
                     Button = MessageBoxButton.OK,
                     Caption = "Error while creating the report.",
