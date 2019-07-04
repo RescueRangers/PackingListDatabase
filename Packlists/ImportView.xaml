@@ -59,8 +59,14 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="5">
-                    <MenuItem Command="{Binding OpenItemsPanelCommand}" Header="Items" />
-                    <MenuItem Command="{Binding OpenMaterialsPanelCommand}" Header="Materials" />
+                    <MenuItem Header="Window">
+                        <MenuItem Command="{Binding OpenItemsPanelCommand}" Header="Items" />
+                        <MenuItem Command="{Binding OpenMaterialsPanelCommand}" Header="Materials" />
+                    </MenuItem>
+                    <MenuItem Header="Print">
+                        <MenuItem Command="{Binding PrintMonthlyReportCommand}" Header="Print monthly report" />
+                    </MenuItem>
+
                 </Menu>
 
                 <DatePicker

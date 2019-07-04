@@ -203,6 +203,25 @@ namespace Packlists.Model.Printing
 
         private string CreateMonthlyReport(ICollection<Packliste> packlists)
         {
+            var nullMaterials = packlists.Where(s => s.RawUsage.Any(m => m.Material == null));
+            if (nullMaterials.Any())
+            {
+                var error = $"There were errors during printing:{Environment.NewLine}";
+                foreach (var item in nullMaterials)
+                {
+                    if (item.PacklisteNumber == -1)
+                    {
+                        error += $"Empty material usage in packliste to Tarm from {item.PacklisteDate}{Environment.NewLine}";
+                    }
+                    else
+                    {
+                        error += $"Empty material usage in packliste number {item.PacklisteNumber}{Environment.NewLine}";
+                    }
+                }
+
+                throw new Exception(error);
+            }
+
             var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Month_temp.xlsx";
 
             var file = new FileInfo(path);
@@ -241,25 +260,6 @@ namespace Packlists.Model.Printing
                 var materials = packlists.SelectMany(s => s.RawUsage).GroupBy(m => m.Material)
                     .Select(g => g.Key)
                     .ToList();
-                var nullMaterials = packlists.Where(s => s.RawUsage.Any(m => m.Material == null));
-
-                if (nullMaterials != null)
-                {
-                    var error = $"There were errors during printing:{Environment.NewLine}";
-                    foreach (var item in nullMaterials)
-                    {
-                        if (item.PacklisteNumber == -1)
-                        {
-                            error += $"Empty material usage in packliste to Tarm from {item.PacklisteDate}{Environment.NewLine}";
-                        }
-                        else
-                        {
-                            error += $"Empty material usage in packliste number {item.PacklisteNumber}{Environment.NewLine}";
-                        }
-                    }
-
-                    throw new Exception(error);
-                }
 
                 worksheet.Cells[3, 1].LoadFromCollection(materials.Select(m => m.MaterialName));
                 worksheet.Cells[3, 2].LoadFromCollection(materials.Select(m => m.Unit));
@@ -293,7 +293,6 @@ namespace Packlists.Model.Printing
                     }
 
                     column++;
-
                 }
 
                 using (var range = worksheet.Cells[1, 1, materials.Count + 2, column-1])
