@@ -187,14 +187,21 @@ namespace Packlists.Model.Printing
                 throw new ArgumentException(@"Packlist collection was null or empty", nameof(packlists));
             }
 
-            var path = CreateMonthlyReport(packlists);
+            try
+            {
+                var path = CreateMonthlyReport(packlists);
 
-            PrintXls(path);
+                PrintXls(path);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(ex.Message);
+            }
 
             return Task.FromResult("Printing successful");
         }
 
-        private static string CreateMonthlyReport(ICollection<Packliste> packlists)
+        private string CreateMonthlyReport(ICollection<Packliste> packlists)
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Month_temp.xlsx";
 
@@ -213,7 +220,6 @@ namespace Packlists.Model.Printing
                 worksheet.Row(1).Height = 30;
                 worksheet.Cells[1, 1].Value = packlists.ElementAt(0).PacklisteDate.Year;
                 worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-
                 
                 worksheet.Cells[1, 2].Value =
                     CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(packlists.ElementAt(0).PacklisteDate
@@ -233,8 +239,27 @@ namespace Packlists.Model.Printing
                 worksheet.Column(2).AutoFit(7.14);
 
                 var materials = packlists.SelectMany(s => s.RawUsage).GroupBy(m => m.Material)
-                    .Select(g => g.Key).OrderBy(o => o.MaterialName)
+                    .Select(g => g.Key)
                     .ToList();
+                var nullMaterials = packlists.Where(s => s.RawUsage.Any(m => m.Material == null));
+
+                if (nullMaterials != null)
+                {
+                    var error = $"There were errors during printing:{Environment.NewLine}";
+                    foreach (var item in nullMaterials)
+                    {
+                        if (item.PacklisteNumber == -1)
+                        {
+                            error += $"Empty material usage in packliste to Tarm from {item.PacklisteDate}{Environment.NewLine}";
+                        }
+                        else
+                        {
+                            error += $"Empty material usage in packliste number {item.PacklisteNumber}{Environment.NewLine}";
+                        }
+                    }
+
+                    throw new Exception(error);
+                }
 
                 worksheet.Cells[3, 1].LoadFromCollection(materials.Select(m => m.MaterialName));
                 worksheet.Cells[3, 2].LoadFromCollection(materials.Select(m => m.Unit));

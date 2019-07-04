@@ -18,6 +18,7 @@ using Packlists.Messages;
 using Packlists.Model;
 using Packlists.Model.Printing;
 using Packlists.Model.ProgressBar;
+using Spire.Pdf.Exporting.XPS.Schema;
 
 namespace Packlists.ViewModel
 {
@@ -51,7 +52,7 @@ namespace Packlists.ViewModel
         private Item _selectedItem;
 
         private string _quantity;
-        
+
         #region Properties
 
         /// <summary>
@@ -255,6 +256,7 @@ namespace Packlists.ViewModel
         public ICommand PacklisteFromCOCsCommand { get; set; }
         public ICommand RecalculateUsageCommand { get; set; }
         public ICommand PrintMissingPacklistNumbersCommand { get; set; }
+        public ICommand RefreshItemsCommand { get; set; }
 
         #endregion
 
@@ -326,6 +328,24 @@ namespace Packlists.ViewModel
                 SelectedPackliste.RecalculateUsage();
             }, () => SelectedPackliste != null);
             PrintMissingPacklistNumbersCommand = new RelayCommand(PrintingMissingPacklistNumbers, true);
+            RefreshItemsCommand = new RelayCommand(Refresh, true);
+        }
+
+        private void Refresh()
+        {
+            _dataService.GetPacklists(
+                (packlists, error) =>
+                {
+                    if (error != null)
+                    {
+                        //TODO: Report error here
+                        return;
+                    }
+                    _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
+                }, SelectedMonth);
+
+            PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
+            PacklistView.SortDescriptions.Add(new SortDescription("PacklisteNumber", ListSortDirection.Ascending));
         }
 
         private void PrintingMissingPacklistNumbers()
@@ -333,7 +353,7 @@ namespace Packlists.ViewModel
             _packlists = PacklistView.OfType<Packliste>().ToList();
             var packlistNumbers = _packlists
                 .Where(p => p.PacklisteDate.Year == SelectedMonth.Year && p.PacklisteDate.Month == SelectedMonth.Month)
-                .Select(p => p.PacklisteNumber).ToList();
+                .Select(p => p.PacklisteNumber).Except(new List<int>{1, -1, 0 });
 
             var missingNumbers = Enumerable.Range(packlistNumbers.Min(), packlistNumbers.Max() - packlistNumbers.Min()).Except(packlistNumbers);
 
@@ -397,12 +417,12 @@ namespace Packlists.ViewModel
 
             var printingResult = await _printing.PrintMonthlyReport(_packlists);
 
-            if (!string.IsNullOrWhiteSpace(printingResult))
+            if (printingResult != "Printing successful")
             {
                 Application.Current.Dispatcher.Invoke(delegate
                 {
                     _dialogService.ShowMessageBox(this, printingResult, "Printing", MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                        MessageBoxImage.Error);
                 });
             }
             _packlists.Clear();
@@ -477,6 +497,7 @@ namespace Packlists.ViewModel
 
         private void EditItem()
         {
+            if (SelectedItemWithQty == null) return;
             MessengerInstance.Send(new NotificationMessage("ShowItemsPanel"));
             MessengerInstance.Send<FilterItemsMessage>(new FilterItemsMessage(SelectedItemWithQty.Item.ItemName));
         }
