@@ -69,6 +69,7 @@
                         <MenuItem Command="{Binding PrintItemTableCommand}" Header="Print item table" />
                         <Separator />
                         <MenuItem Command="{Binding PrintMissingPacklistNumbersCommand}" Header="Print missing packing list numbers" />
+                        <MenuItem Command="{Binding PrintMonthlyCommand}" Header="Print monthly usage report" />
                     </MenuItem>
                     <MenuItem Header="Create packliste">
                         <MenuItem Command="{Binding ImportPacklisteCommand}" Header="Import packliste" />
@@ -115,15 +116,26 @@
                     Command="{Binding SaveCommand}"
                     Content="Save changes" />
 
-                <DatePicker
+                <StackPanel
                     Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Margin="5,5,5,0"
-                    dp:DatePickerCalendar.IsMonthYear="True"
-                    dp:DatePickerDateFormat.DateFormat="yyyy-MM"
-                    SelectedDate="{Binding SelectedMonth}" />
-
+                    Orientation="Horizontal">
+                    <DatePicker
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        MinWidth="180"
+                        dp:DatePickerCalendar.IsMonthYear="True"
+                        dp:DatePickerDateFormat.DateFormat="yyyy-MM"
+                        SelectedDate="{Binding SelectedMonth}" />
+                    <Button
+                        Margin="5,0"
+                        Padding="5,0"
+                        Command="{Binding RefreshItemsCommand}"
+                        Content="Refresh" />
+                </StackPanel>
                 <GroupBox
                     Grid.Row="1"
                     Grid.RowSpan="5"

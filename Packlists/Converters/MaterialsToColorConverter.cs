@@ -17,9 +17,12 @@ namespace Packlists.Converters
                 return "Red";
             }
 
+            foreach (var item in materials)
+            {
+                if(item.Material == null) return "Red";
+            }
+
             return "Transparent";
-
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
