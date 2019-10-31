@@ -239,7 +239,7 @@ namespace Packlists.Model.Printing
                 worksheet.Row(1).Height = 30;
                 worksheet.Cells[1, 1].Value = packlists.ElementAt(0).PacklisteDate.Year;
                 worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                
+
                 worksheet.Cells[1, 2].Value =
                     CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(packlists.ElementAt(0).PacklisteDate
                         .Month);

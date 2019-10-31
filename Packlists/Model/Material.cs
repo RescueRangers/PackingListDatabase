@@ -61,6 +61,10 @@ namespace Packlists.Model
 
         public override int GetHashCode()
         {
+            if (MaterialId == 0)
+            {
+                return 0;
+            }
             return MaterialId.GetHashCode() + MaterialName.GetHashCode();
         }
     }
