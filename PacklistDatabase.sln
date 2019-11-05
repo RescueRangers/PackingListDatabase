@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packlists", "Packlists\Pack
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItemNumberPrep", "ItemNumberPrep\ItemNumberPrep.csproj", "{3FBFD19E-D3A7-44CA-8AA2-473117EACDF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packilists.DataAccess", "Packilists.DataAccess\Packilists.DataAccess.csproj", "{B6E4D8AA-3C29-432F-BDB2-CAFBED2BB39F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packilists.Shared", "Packilists.DataAccess\Packilists.Shared.csproj", "{B6E4D8AA-3C29-432F-BDB2-CAFBED2BB39F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

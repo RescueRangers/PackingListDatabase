@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Packilists.DataAccess.Data
+namespace Packilists.Shared.Data
 {
     public class Packliste
     {

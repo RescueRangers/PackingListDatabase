@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 
-namespace Packilists.DataAccess.Data
+namespace Packilists.Shared.Data
 {
     public class ImportTransport
     {

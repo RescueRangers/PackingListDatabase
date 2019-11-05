@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Packilists.DataAccess.Data
+namespace Packilists.Shared.Data
 {
     public class Day
     {

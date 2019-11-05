@@ -1,5 +1,4 @@
-﻿
-namespace Packilists.DataAccess.Data
+﻿namespace Packilists.Shared.Data
 {
     public class ItemWithQty
     {

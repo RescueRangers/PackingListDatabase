@@ -575,14 +575,13 @@ namespace Packlists.Model.Printing
 
                     if (j + 1 == iLine.Count) headParagraph.AddChar('\n');
                 }
-
             }
 
             for (var i = packlisteData.First().RowNumber; i <= lineCount; i++)
             {
                 var iLine = packlisteData.Where(l => l.RowNumber == i).ToList();
 
-                if (!iLine.Any())
+                if (iLine.Count == 0 || iLine.Count < 6)
                 {
                     continue;
                 }
@@ -597,7 +596,7 @@ namespace Packlists.Model.Printing
                 row.Cells[4].AddParagraph(iLine[4].Data);
                 row.Cells[5].AddParagraph(iLine[5].Data);
             }
-            
+
             var pdfRenderer = new PdfDocumentRenderer {Document = document};
             pdfRenderer.RenderDocument();
 
