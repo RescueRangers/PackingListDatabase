@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Packilists.Shared.Data
 {
@@ -14,7 +15,7 @@ namespace Packilists.Shared.Data
         /// Sets and gets the Materials property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<MaterialAmount> Materials { get; set; }
+        public List<MaterialAmount> Materials { get; set; }
 
         public int ItemId { get; set; }
 
