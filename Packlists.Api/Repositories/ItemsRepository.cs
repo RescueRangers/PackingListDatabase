@@ -66,28 +66,34 @@ SELECT A.[ItemId]
             return list.FirstOrDefault();
         }
 
-        public async Task Insert(Item item)
+        public async Task<bool> Insert(Item item)
         {
             using var db = Connection;
             const string sql = @"INSERT INTO [Items] (ItemName) VALUES (@ItemName)";
 
-            await db.ExecuteAsync(sql, new { ItemName = item.ItemName });
+            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName });
+
+            return result != 0;
         }
 
-        public async Task Update(Item item)
+        public async Task<bool> Update(Item item)
         {
             using var db = Connection;
             const string sql = @"UPDATE [Items] SET ItemName = @ItemName WHERE ItemId = @ItemId";
 
-            await db.ExecuteAsync(sql, new { ItemName = item.ItemName, ItemId = item.ItemId });
+            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName, ItemId = item.ItemId });
+
+            return result != 0;
         }
 
-        public async Task Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             using var db = Connection;
             const string sql = @"DELETE FROM [Items] WHERE ItemId = @ItemId";
 
-            await db.ExecuteAsync(sql, new { ItemId = id });
+            var result = await db.ExecuteAsync(sql, new { ItemId = id });
+
+            return result != 0;
         }
     }
 }

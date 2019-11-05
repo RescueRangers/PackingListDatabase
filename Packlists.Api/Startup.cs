@@ -30,7 +30,7 @@ namespace Packlists.Api
         {
             services.AddControllers();
             services.AddMvcCore().AddApiExplorer();
-            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" }));
+            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Packing lists API", Version = "v1" }));
 
             services.AddTransient<IItemsRepository, ItemsRepository>();
             services.AddTransient<IMaterialsRepository, MaterialsRepository>();

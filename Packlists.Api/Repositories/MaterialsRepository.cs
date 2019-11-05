@@ -32,34 +32,40 @@ namespace Packlists.Api.Repositories
             return await db.QueryFirstOrDefaultAsync<Material>(sql, new { MaterialId = id }).ConfigureAwait(false);
         }
 
-        public async Task Insert(Material material)
+        public async Task<bool> Insert(Material material)
         {
             // Insert
             using var db = Connection;
             const string sql = @"INSERT INTO [Materials] (Unit, MaterialName) VALUES (@Unit, @MaterialName)";
 
-            await db.ExecuteAsync(sql, new { Unit = material.Unit, MaterialName = material.MaterialName }).ConfigureAwait(false);
+            var result = await db.ExecuteAsync(sql, new { Unit = material.Unit, MaterialName = material.MaterialName }).ConfigureAwait(false);
+
+            return result != 0;
         }
 
-        public async Task Update(Material material)
+        public async Task<bool> Update(int id, Material material)
         {
             // Update
             using (var db = Connection)
             {
                 const string sql = @"UPDATE [Materials] SET Unit = @Unit, MaterialName = @MaterialName WHERE MaterialId = @MaterialId";
 
-                await db.ExecuteAsync(sql, new { Unit = material.Unit, MaterialName = material.MaterialName, MaterialId = material.MaterialId }).ConfigureAwait(false);
+                var result = await db.ExecuteAsync(sql, new { Unit = material.Unit, MaterialName = material.MaterialName, MaterialId = id }).ConfigureAwait(false);
+
+                return result != 0;
             }
         }
 
-        public async Task Delete(Material material)
+        public async Task<bool> Delete(int id)
         {
             // Delete
             using (var db = Connection)
             {
                 const string sql = @"DELETE FROM [Materials] WHERE MaterialId = @MaterialId";
 
-                await db.ExecuteAsync(sql, new { material.Unit }).ConfigureAwait(false);
+                var result = await db.ExecuteAsync(sql, new { MaterialId = id }).ConfigureAwait(false);
+
+                return result != 0;
             }
         }
     }

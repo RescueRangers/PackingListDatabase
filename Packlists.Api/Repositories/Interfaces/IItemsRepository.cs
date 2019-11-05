@@ -6,10 +6,10 @@ namespace Packlists.Api.Repositories.Interfaces
 {
     public interface IItemsRepository
     {
-        Task Delete(int id);
+        Task<bool> Delete(int id);
         Task<IEnumerable<Item>> Get();
         Task<Item> GetById(int id);
-        Task Insert(Item item);
-        Task Update(Item item);
+        Task<bool> Insert(Item item);
+        Task<bool> Update(Item item);
     }
 }

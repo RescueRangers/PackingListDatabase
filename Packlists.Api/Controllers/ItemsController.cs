@@ -41,24 +41,29 @@ namespace Packlists.Api.Controllers
 
         // POST: api/Items
         [HttpPost]
-        public async Task Post([FromBody] Item item)
+        public async Task<IActionResult> Post([FromBody] Item item)
         {
-            await _repository.Insert(item);
+            var result = await _repository.Insert(item);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 
         // PUT: api/Items/5
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] Item item)
         {
-            await _repository.Update(item);
-            return NoContent();
+            var result = await _repository.Update(item);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _repository.Delete(id);
+            var result = await _repository.Delete(id);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
     }
 }

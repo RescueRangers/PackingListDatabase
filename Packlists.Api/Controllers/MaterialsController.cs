@@ -27,32 +27,43 @@ namespace Packlists.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<Material>> Get()
         {
-            return await _repository.Get();
+            return await _repository.Get().ConfigureAwait(false);
         }
 
         // GET: api/Materials/5
         [HttpGet("{id}")]
-        public async Task<Material> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return await _repository.GetById(id);
+            var material = await _repository.GetById(id).ConfigureAwait(false);
+
+            return material == null ? NotFound() : (IActionResult) Ok(material);
         }
 
         // POST: api/Materials
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] Material material)
         {
+            var result = await _repository.Insert(material).ConfigureAwait(false);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 
         // PUT: api/Materials/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] Material material)
         {
+            var result = await _repository.Update(id, material).ConfigureAwait(false);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var result = await _repository.Delete(id).ConfigureAwait(false);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
     }
 }
