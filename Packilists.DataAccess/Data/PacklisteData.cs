@@ -11,7 +11,6 @@ namespace Packilists.Shared.Data
         public int RowNumber { get; set; }
         public int ColumnNumber { get; set; }
         public string Data { get; set; }
-        public virtual Packliste Packliste { get; set; }
         public int PacklisteDataId { get; set; }
     }
 }
