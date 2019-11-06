@@ -12,45 +12,43 @@ namespace Packlists.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ItemsController : ControllerBase
+    public class ImportsController : ControllerBase
     {
-        private readonly IItemsRepository _repository;
-        private readonly ILogger<ItemsController> _logger;
+        private readonly IImportsRepository _repository;
+        private readonly ILogger<ImportsController> _logger;
 
-        public ItemsController(IItemsRepository repository, ILogger<ItemsController> logger)
+        public ImportsController(IImportsRepository repository)
         {
             _repository = repository;
-            _logger = logger;
         }
 
-        // GET: api/Items
+        // GET: api/Imports
         [HttpGet]
-        public async Task<IEnumerable<Item>> Get()
+        public async Task<IEnumerable<ImportTransport>> Get()
         {
-            return await _repository.Get();
+            return await _repository.Get().ConfigureAwait(false);
         }
 
-        // GET: api/Items/5
+        // GET: api/Imports/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<ImportTransport> Get(int id)
         {
-            var item = await _repository.GetById(id).ConfigureAwait(false);
-            return item == null ? NotFound() : (IActionResult)Ok(item);
+            return await _repository.GetById(id).ConfigureAwait(false);
         }
 
-        // POST: api/Items
+        // POST: api/Imports
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Item item)
+        public async Task<IActionResult> Post([FromBody] ImportTransport import)
         {
-            var result = await _repository.Insert(item).ConfigureAwait(false);
+            var result = await _repository.Insert(import).ConfigureAwait(false);
             return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 
-        // PUT: api/Items/5
+        // PUT: api/Imports/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Item item)
+        public async Task<IActionResult> Put(int id, [FromBody] ImportTransport import)
         {
-            var result = await _repository.Update(id, item).ConfigureAwait(false);
+            var result = await _repository.Update(id, import).ConfigureAwait(false);
             return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 

@@ -76,12 +76,12 @@ SELECT A.[ItemId]
             return result != 0;
         }
 
-        public async Task<bool> Update(Item item)
+        public async Task<bool> Update(int id, Item item)
         {
             using var db = Connection;
             const string sql = @"UPDATE [Items] SET ItemName = @ItemName WHERE ItemId = @ItemId";
 
-            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName, ItemId = item.ItemId });
+            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName, ItemId = id });
 
             return result != 0;
         }

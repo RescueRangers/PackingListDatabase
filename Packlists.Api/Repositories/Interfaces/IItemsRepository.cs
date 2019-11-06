@@ -10,6 +10,6 @@ namespace Packlists.Api.Repositories.Interfaces
         Task<IEnumerable<Item>> Get();
         Task<Item> GetById(int id);
         Task<bool> Insert(Item item);
-        Task<bool> Update(Item item);
+        Task<bool> Update(int id, Item item);
     }
 }
