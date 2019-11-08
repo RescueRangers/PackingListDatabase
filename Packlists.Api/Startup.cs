@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Packlists.Api.Repositories;
 using Packlists.Api.Repositories.Interfaces;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace Packlists.Api
 {
@@ -29,7 +30,8 @@ namespace Packlists.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddMvcCore().AddApiExplorer();
+            services.AddMvcCore().AddApiExplorer().AddNewtonsoftJson();
+            services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" }));
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Packing lists API", Version = "v1" }));
 
             services.AddTransient<IItemsRepository, ItemsRepository>();
@@ -45,10 +47,12 @@ namespace Packlists.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseBlazorDebugging();
             }
 
             app.UseHttpsRedirection();
 
+            app.UseClientSideBlazorFiles<WebUi.Startup>();
             app.UseRouting();
 
             app.UseAuthorization();
@@ -63,6 +67,7 @@ namespace Packlists.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallbackToClientSideBlazor<WebUi.Startup>("index.html");
             });
         }
     }

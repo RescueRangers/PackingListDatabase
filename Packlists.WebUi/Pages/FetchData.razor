@@ -1,0 +1,71 @@
+﻿@page "/cocs"
+@using Packilists.Shared.Data
+@inject HttpClient Http
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (_cocs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MatTable Class="mat-elevation-z5" Items="@_cocs" LoadInitialData="true" Striped="true" FilterByColumnName="CocNumber" DebounceMilliseconds="15" PageSize="50">
+        <MatTableHeader>
+            <th>COC Number</th>
+            <th>Inventory date</th>
+            <th>Item name</th>
+            <th>Quantity</th>
+        </MatTableHeader>
+        <MatTableRow Context="CocRow">
+            <td>@CocRow.CocNumber</td>
+            <td>@CocRow.InventoryDate.ToShortDateString()</td>
+            <td>@CocRow.ItemName</td>
+            <td>@CocRow.Quantity</td>
+        </MatTableRow>
+    </MatTable>
+
+    @*<table class="table">
+        <thead>
+            <tr>
+                <th>COC Number</th>
+                <th>Inventory date</th>
+                <th>Item name</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var coc in _cocs)
+            {
+                <tr>
+                    <td>@coc.CocNumber</td>
+                    <td>@coc.InventoryDate</td>
+                    <td>@coc.ItemName</td>
+                    <td>@coc.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
+}
+
+@code {
+    COC[] _cocs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cocs = await Http.GetJsonAsync<COC[]>("api/cocs");
+    }
+
+    public class WeatherForecast
+    {
+        public DateTime Date { get; set; }
+
+        public int TemperatureC { get; set; }
+
+        public string Summary { get; set; }
+
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}

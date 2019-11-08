@@ -37,6 +37,14 @@ namespace Packlists.Api.Controllers
         {
             return await _repository.GetById(id).ConfigureAwait(false);
         }
+
+        // GET: api/PackingLists/ByDate/2019-09-09
+        [HttpGet("ByDate/{date}")]
+        public async Task<IEnumerable<Packliste>> GetByMonth(DateTime date)
+        {
+            return await _repository.GetByMonth(date).ConfigureAwait(false);
+        }
+
         // GET: api/PackingLists/PacklisteData/5
         [HttpGet("PacklisteData/{packListeId}")]
         public async Task<IEnumerable<PacklisteData>> GetPacklisteData(int packListeId)
