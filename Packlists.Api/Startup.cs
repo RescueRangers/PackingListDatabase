@@ -39,6 +39,7 @@ namespace Packlists.Api
             services.AddTransient<IImportsRepository, ImportsRepository>();
             services.AddTransient<IPackingListsRepository, PackingListsRepository>();
             services.AddTransient<ICocRepository, CocRepository>();
+            services.AddTransient<ITestingRepository, TestingRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -201,112 +203,33 @@ SELECT A.[PacklisteId]
 
         public async Task<IEnumerable<Packliste>> GetByMonth(DateTime month)
         {
-            var startDate = $"{month.ToString("yyyyMM")}01";
-            var endDate = $"{month.ToString("yyyyMM")}{DateTime.DaysInMonth(month.Year, month.Month)}";
+            var startDate = $"{month.ToString("yyyyMM", CultureInfo.InvariantCulture)}01";
+            var endDate = $"{month.ToString("yyyyMM", CultureInfo.InvariantCulture)}{DateTime.DaysInMonth(month.Year, month.Month)}";
 
-            // Select
             using (var db = Connection)
             {
-                const string sql = @"
-SELECT A.[PacklisteId]
-      ,A.[PacklisteDate]
-      ,A.[PacklisteNumber]
-      ,A.[Destination]
-	  ,B.ItemWithQtyId
-	  ,B.Item_ItemId
-	  ,B.Quantity
-	  ,C.ItemId
-	  ,C.ItemName
-	  ,D.MaterialAmountId
-	  ,D.Amount
-	  ,E.MaterialId
-	  ,E.MaterialName
-	  ,E.Unit
-      ,F.MaterialAmountId
-      ,F.Amount
-      ,G.MaterialId
-	  ,G.MaterialName
-	  ,G.Unit
-  FROM [dbo].[Packlistes] A
-  Left Outer JOIN dbo.ItemWithQties B on B.Packliste_PacklisteId = A.PacklisteId
-  Left Outer JOIN dbo.Items C on C.ItemId = B.Item_ItemId
-  Left Outer JOIN MaterialAmounts D on D.Packliste_PacklisteId = A.PacklisteId
-  Left Outer JOIN Materials E on E.MaterialId = D.Material_MaterialId
-  Left Outer JOIN MaterialAmounts F on F.Item_ItemId = C.ItemId
-  Left Outer JOIN Materials G on G.MaterialId = F.Material_MaterialId
-  WHERE A.PacklisteDate >= @StartDate and A.PacklisteDate <= @EndDate";
+                var packlists = await db.QueryAsync<Packliste>("SELECT * FROM Packlistes WHERE PacklisteDate >= @StartDate and PacklisteDate <= @EndDate", new { startDate, endDate }).ConfigureAwait(false);
+                var packlisteIds = packlists.Select(x => x.PacklisteId).ToList();
 
-                var packlisteLookup = new Dictionary<int, Packliste>();
-                var itemWithQtyLookup = new Dictionary<int, ItemWithQty>();
-                var materialAmountLookup = new Dictionary<int, MaterialAmount>();
-                var itemMaterialAmountLookup = new Dictionary<int, MaterialAmount>();
+                var itemsWithQty = await db.QueryAsync<ItemWithQty>("SELECT * FROM ItemsWithQty_View WHERE PacklisteId in @IDs", new { IDs = packlisteIds }).ConfigureAwait(false);
+                var itemIds = itemsWithQty.Select(x => x.ItemId).ToList();
 
-                var ret = await db.QueryAsync<Packliste, ItemWithQty, Item, MaterialAmount, Material, MaterialAmount, Material, Packliste>(sql, (packliste, itemWithQty, item, materialAmount, material, itemMaterialAmount, itemMaterial) =>
+                var materials = await db.QueryAsync<MaterialAmount>("SELECT * FROM MaterialAmount_View WHERE ItemId in @IDs", new { IDs = itemIds }).ConfigureAwait(false);
+
+                var rawUsage = await db.QueryAsync<MaterialAmount>("SELECT * FROM MaterialAmount_View WHERE PacklisteId in @IDs", new { IDs = packlisteIds }).ConfigureAwait(false);
+
+                foreach (var item in itemsWithQty)
                 {
-                    Packliste packlisteEntry;
-                    if (!packlisteLookup.TryGetValue(packliste.PacklisteId, out packlisteEntry))
-                    {
-                        packlisteEntry = packliste;
-                        packlisteEntry.ItemsWithQties = new List<ItemWithQty>();
-                        packlisteEntry.RawUsage = new List<MaterialAmount>();
-                        packlisteEntry.PacklisteData = new List<PacklisteData>();
-                        packlisteLookup.Add(packlisteEntry.PacklisteId, packlisteEntry);
-                    }
+                    item.Materials = materials.Where(x => x.ItemId == item.ItemId).ToList();
+                }
 
-                    if (itemWithQty != null && !itemWithQtyLookup.TryGetValue(itemWithQty.ItemWithQtyId, out ItemWithQty itemWithQtyEntry))
-                    {
-                        itemWithQtyEntry = itemWithQty;
-                        if (itemWithQtyEntry.Item == null)
-                        {
-                            itemWithQtyEntry.Item = item;
-                            itemWithQtyEntry.Item.Materials = new List<MaterialAmount>();
-                        }
-                        packlisteEntry.ItemsWithQties.Add(itemWithQtyEntry);
+                foreach (var packingList in packlists)
+                {
+                    packingList.ItemsWithQties = itemsWithQty.Where(x => x.PacklisteId == packingList.PacklisteId).ToList();
+                    packingList.RawUsage = rawUsage.Where(x => x.PacklisteId == packingList.PacklisteId).ToList();
+                }
 
-                        itemWithQtyLookup.Add(itemWithQty.ItemWithQtyId, itemWithQtyEntry);
-                    }
-                    else
-                    {
-                        return packlisteEntry;
-                    }
-
-                    if (itemMaterialAmount != null && !itemMaterialAmountLookup.TryGetValue(itemMaterialAmount.MaterialAmountId, out var itemMaterialAmountEntry))
-                    {
-                        itemMaterialAmountEntry = itemMaterialAmount;
-                        if (itemMaterialAmountEntry.Material == null)
-                        {
-                            itemMaterialAmountEntry.Material = itemMaterial;
-                        }
-                        itemMaterialAmountLookup.Add(itemMaterialAmountEntry.MaterialAmountId, itemMaterialAmountEntry);
-                        itemWithQtyEntry.Item.Materials.Add(itemMaterialAmountEntry);
-                    }
-                    else if(itemMaterialAmount != null)
-                    {
-                        if (itemMaterialAmount.Material == null)
-                        {
-                            itemMaterialAmount.Material = itemMaterial;
-                        }
-                        itemWithQtyEntry.Item.Materials.Add(itemMaterialAmount);
-                    }
-
-                    if (materialAmount != null && !materialAmountLookup.TryGetValue(materialAmount.MaterialAmountId, out MaterialAmount materialAmountEntry))
-                    {
-                        materialAmountEntry = materialAmount;
-                        if (materialAmountEntry.Material == null)
-                        {
-                            materialAmountEntry.Material = material;
-                        }
-                        packlisteEntry.RawUsage.Add(materialAmountEntry);
-
-                        materialAmountLookup.Add(materialAmount.MaterialAmountId, materialAmountEntry);
-                    }
-
-                    return packlisteEntry;
-                },
-                new { StartDate = startDate, EndDate = endDate },
-                splitOn: "PacklisteId, ItemWithQtyId, ItemId, MaterialAmountId, MaterialId, MaterialAmountId, MaterialId").ConfigureAwait(false);
-
-                return ret.Distinct();
+                return packlists;
             }
         }
 
@@ -315,7 +238,7 @@ SELECT A.[PacklisteId]
             // Select
             using (var db = Connection)
             {
-                const string sql = @"SELECT PacklisteDataId ,ColumnNumber ,RowNumber ,Data FROM [PacklisteDatas] WHERE Packliste_PacklisteId = @Packliste_PacklisteId";
+                const string sql = "SELECT PacklisteDataId ,ColumnNumber ,RowNumber ,Data FROM [PacklisteDatas] WHERE Packliste_PacklisteId = @Packliste_PacklisteId";
 
                 return await db.QueryAsync<PacklisteData>(sql, new { Packliste_PacklisteId = id }).ConfigureAwait(false);
             }
@@ -326,7 +249,7 @@ SELECT A.[PacklisteId]
             // Insert
             using (var db = Connection)
             {
-                var sql = $@"INSERT INTO [PacklisteDatas] (RowNumber, ColumnNumber, Data, Packliste_PacklisteId) VALUES (@RowNumber, @ColumnNumber, @Data, {id})";
+                var sql = $"INSERT INTO [PacklisteDatas] (RowNumber, ColumnNumber, Data, Packliste_PacklisteId) VALUES (@RowNumber, @ColumnNumber, @Data, {id})";
                 db.Open();
 
                 using (var trans = db.BeginTransaction())

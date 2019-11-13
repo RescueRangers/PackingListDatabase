@@ -16,9 +16,10 @@ namespace Packlists.Api.Controllers
         private readonly ICocRepository _repository;
         private readonly ILogger<CocsController> _logger;
 
-        public CocsController(ICocRepository repository)
+        public CocsController(ICocRepository repository, ILogger<CocsController> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         // GET: api/Imports

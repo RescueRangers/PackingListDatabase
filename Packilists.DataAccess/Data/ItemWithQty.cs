@@ -1,19 +1,15 @@
-﻿namespace Packilists.Shared.Data
+﻿using System.Collections.Generic;
+
+namespace Packilists.Shared.Data
 {
     public class ItemWithQty
     {
-        /// <summary>
-        /// Sets and gets the Quantity property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
+        public string ItemName { get; set; }
         public float Quantity { get; set; }
-
-        /// <summary>
-        /// Sets and gets the Item property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public Item Item { get; set; }
-
         public int ItemWithQtyId { get; set; }
+        public int ItemId { get; set; }
+        public int PacklisteId { get; set; }
+        public Item Item { get; set; }
+        public List<MaterialAmount> Materials { get; set; }
     }
 }
