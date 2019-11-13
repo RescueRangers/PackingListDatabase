@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packilists.Shared", "Packil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packlists.Api", "Packlists.Api\Packlists.Api.csproj", "{C036091E-EE69-4794-8C66-594C20CFAD45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packlists.WebUi", "Packlists.WebUi\Packlists.WebUi.csproj", "{A52B86E8-7DB6-4A24-906C-1E662B3675D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packlists.WebUi", "Packlists.WebUi\Packlists.WebUi.csproj", "{A52B86E8-7DB6-4A24-906C-1E662B3675D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

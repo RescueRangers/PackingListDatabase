@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Packilists.DataAccess\Packilists.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Shared\Components\" />
+  </ItemGroup>
+
 </Project>

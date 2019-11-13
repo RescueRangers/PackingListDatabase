@@ -1,0 +1,42 @@
+﻿@page "/itemdetails/{text}"
+@using Packilists.Shared.Data
+@inject HttpClient Http
+
+<h3>Item Details</h3>
+
+@if (_item == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h4>@_item.ItemName</h4>
+
+    <MatTable Items="@_item.Materials" LoadInitialData="true" PageSize="25">
+        <MatTableHeader>
+            <th>Material</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+            <th></th>
+        </MatTableHeader>
+        <MatTableRow Context="Material">
+            <td>@Material.Material.MaterialName</td>
+            <td>@Material.Amount</td>
+            <td>@Material.Material.Unit</td>
+            <td>
+                <a class="text-info" href="#"><MatIcon Icon="@MatIconNames.Remove_red_eye"></MatIcon></a>
+                <a class="text-danger" href="#"><MatIcon Icon="@MatIconNames.Remove_circle_outline"></MatIcon></a>
+            </td>
+        </MatTableRow>
+    </MatTable>
+}
+
+@code {
+    [Parameter] public string Text { get; set; }
+    Item _item;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _item = await Http.GetJsonAsync<Item>($"api/items/{Text}");
+    }
+}
