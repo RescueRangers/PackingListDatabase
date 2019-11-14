@@ -11,5 +11,6 @@ namespace Packlists.Api.Repositories.Interfaces
         Task<Material> GetById(int id);
         Task<bool> Insert(Material material);
         Task<bool> Update(int id, Material material);
+        Task<bool> InsertMaterialAmount(MaterialAmount material);
     }
 }

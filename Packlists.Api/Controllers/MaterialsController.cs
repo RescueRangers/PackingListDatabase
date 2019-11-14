@@ -48,6 +48,15 @@ namespace Packlists.Api.Controllers
             return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
         }
 
+        // POST: api/Materials/amounts
+        [HttpPost("amounts")]
+        public async Task<IActionResult> PostMaterialAmount([FromBody] MaterialAmount material)
+        {
+            var result = await _repository.InsertMaterialAmount(material).ConfigureAwait(false);
+
+            return result ? new StatusCodeResult(200) : new StatusCodeResult(422);
+        }
+
         // PUT: api/Materials/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Material material)

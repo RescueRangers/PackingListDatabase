@@ -43,6 +43,16 @@ namespace Packlists.Api.Repositories
             return result != 0;
         }
 
+        public async Task<bool> InsertMaterialAmount(MaterialAmount material)
+        {
+            using var db = Connection;
+            const string sql = @"INSERT INTO [MaterialAmounts] (Amount, Material_MaterialId, Item_ItemId) VALUES (@Amount, @MaterialId, @ItemId)";
+
+            var result = await db.ExecuteAsync(sql, new { material.Amount, material.MaterialId, material.ItemId }).ConfigureAwait(false);
+
+            return result != 0;
+        }
+
         public async Task<bool> Update(int id, Material material)
         {
             // Update
