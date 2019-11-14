@@ -10,7 +10,6 @@ using Packlists.Api.Repositories.Interfaces;
 
 namespace Packlists.Api.Controllers
 {
-    
     [Route("api/[controller]")]
     [ApiController]
     public class PackingListsController : ControllerBase

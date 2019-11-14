@@ -31,6 +31,28 @@ namespace Packlists.Api.Repositories
 
         public async Task<Packliste> GetById(int id)
         {
+            using (var db = Connection)
+            {
+                var packingList = await db.QueryFirstAsync<Packliste>("SELECT * FROM Packlistes WHERE PacklisteId = @Id", new { id }).ConfigureAwait(false);
+
+                var itemsWithQty = await db.QueryAsync<ItemWithQty>("SELECT * FROM ItemsWithQty_View WHERE PacklisteId = @Id", new { id }).ConfigureAwait(false);
+                var itemIds = itemsWithQty.Select(x => x.ItemId).ToList();
+
+                var materials = await db.QueryAsync<MaterialAmount>("SELECT * FROM MaterialAmount_View WHERE ItemId in @IDs", new { IDs = itemIds }).ConfigureAwait(false);
+
+                var rawUsage = await db.QueryAsync<MaterialAmount>("SELECT * FROM MaterialAmount_View WHERE PacklisteId = @Id", new { id }).ConfigureAwait(false);
+
+                foreach (var item in itemsWithQty)
+                {
+                    item.Materials = materials.Where(x => x.ItemId == item.ItemId).ToList();
+                }
+
+                packingList.ItemsWithQties = itemsWithQty.Where(x => x.PacklisteId == packingList.PacklisteId).ToList();
+                packingList.RawUsage = rawUsage.Where(x => x.PacklisteId == packingList.PacklisteId).ToList();
+
+                return packingList;
+            }
+
             // Select
             using (var db = Connection)
             {
