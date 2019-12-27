@@ -34,5 +34,19 @@ namespace Packlists.Api.Controllers
         {
             return await _repository.BenchMultiMapping(date).ConfigureAwait(false);
         }
+
+        // GET: api/testing/mapping/2019-09-01
+        [HttpGet("itemmapping/{id}")]
+        public async Task<TimeSpan> GetItemMapping(int id)
+        {
+            return await _repository.BenchItemMultiMapping(id).ConfigureAwait(false);
+        }
+
+        // GET: api/testing/mapping/2019-09-01
+        [HttpGet("itemmultiquery/{id}")]
+        public async Task<TimeSpan> GetItemMultiquery(int id)
+        {
+            return await _repository.BenchItemMultiQuery(id).ConfigureAwait(false);
+        }
     }
 }

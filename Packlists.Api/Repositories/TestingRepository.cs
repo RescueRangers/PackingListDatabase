@@ -167,5 +167,81 @@ SELECT A.[PacklisteId]
                 return stopwatch.Elapsed;
             }
         }
+
+        public async Task<TimeSpan> BenchItemMultiQuery(int id)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            using var db = Connection;
+
+            var item = await db.QueryFirstOrDefaultAsync<Item>("SELECT * FROM Items WHERE ItemId = @Id", new { id}).ConfigureAwait(false);
+
+            var materials = await db.QueryAsync<MaterialAmount>("SELECT * FROM MaterialAmount_View WHERE ItemId = @Id", new { id }).ConfigureAwait(false);
+
+            if (materials == null)
+            {
+                stopwatch.Stop();
+                return stopwatch.Elapsed;
+            }
+
+            item.Materials = materials.ToList();
+
+            stopwatch.Stop();
+            return stopwatch.Elapsed;
+        }
+
+        public async Task<TimeSpan> BenchItemMultiMapping(int id)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            using var db = Connection;
+            const string sql = @"
+SELECT A.[ItemId]
+      ,A.[ItemName]
+	  ,B.MaterialAmountId
+	  ,B.Amount
+	  ,B.Material_MaterialId
+	  ,B.Item_ItemId
+      ,C.MaterialId
+	  ,C.MaterialName
+	  ,C.Unit
+  FROM [dbo].[Items] A
+  LEFT OUTER JOIN [dbo].[MaterialAmounts] B
+  ON B.Item_ItemId = A.ItemId
+  LEFT OUTER JOIN [dbo].Materials C
+  ON C.MaterialId = B.Material_MaterialId
+  WHERE A.ItemId = @ItemId";
+
+            var lookup = new Dictionary<int, Item>();
+
+            var list = await db.QueryAsync<Item, MaterialAmount, Material, Item>(sql, (item, materialAmount, material) =>
+            {
+                Item itemEntry;
+                if (!lookup.TryGetValue(item.ItemId, out itemEntry))
+                {
+                    itemEntry = item;
+                    itemEntry.Materials = new List<MaterialAmount>();
+                    lookup.Add(item.ItemId, itemEntry);
+                }
+
+                if (materialAmount == null)
+                {
+                    return itemEntry;
+                }
+
+                if (materialAmount.Material == null)
+                {
+                    materialAmount.Material = material;
+                }
+
+                itemEntry.Materials.Add(materialAmount);
+
+                return itemEntry;
+            }, new { ItemId = id }, splitOn: "ItemId, MaterialAmountId, MaterialId").ConfigureAwait(false);
+
+            stopwatch.Stop();
+
+            return stopwatch.Elapsed;
+        }
     }
 }

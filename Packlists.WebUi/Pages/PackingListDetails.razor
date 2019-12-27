@@ -28,15 +28,15 @@ else
                         <th></th>
                     </MatTableHeader>
                     <MatTableRow Context="Items">
-                        <td>@Items.Item.ItemName</td>
+                        <td>@Items.ItemName</td>
                         <td>@Items.Quantity</td>
                         <td>
-                            @if (@Items.Item.Materials == null || @Items.Item.Materials.Count == 0)
+                            @if (@Items.Materials == null || @Items.Materials.Count == 0)
                                 {
                                 <span class="text-danger">Item has no material</span>
                                 }
                         </td>
-                        <td><a class="text-info" href="/itemdetails/@Items.Item.ItemId"><MatIcon Icon="@MatIconNames.Remove_red_eye"></MatIcon></a></td>
+                        <td><a class="text-info" href="/itemdetails/@Items.ItemId"><MatIcon Icon="@MatIconNames.Remove_red_eye"></MatIcon></a></td>
                     </MatTableRow>
                 </MatTable>
             </div>
@@ -49,9 +49,9 @@ else
                         <th>Unit</th>
                     </MatTableHeader>
                     <MatTableRow Context="Items">
-                        <td>@Items.Material.MaterialName</td>
+                        <td>@Items.MaterialName</td>
                         <td>@Items.Amount</td>
-                        <td>@Items.Material.Unit</td>
+                        <td>@Items.Unit</td>
                     </MatTableRow>
                 </MatTable>
             </div>

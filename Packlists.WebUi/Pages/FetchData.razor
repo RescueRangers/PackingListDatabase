@@ -77,7 +77,7 @@ else
             sb += $" NR |";
         }
 
-        var test = packingList.ItemsWithQties.Where(i => i.Item.Materials == null || i.Item.Materials.Count == 0);
+        var test = packingList.ItemsWithQties.Where(i => i.Materials == null || i.Materials.Count == 0);
 
         if (test.Count() != 0)
         {

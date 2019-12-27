@@ -18,52 +18,24 @@ namespace Packlists.Api.Repositories
             using var db = Connection;
             const string sql = @"SELECT ItemName, ItemId FROM [Items]";
 
-            return await db.QueryAsync<Item>(sql);
+            return await db.QueryAsync<Item>(sql).ConfigureAwait(false);
         }
 
         public async Task<Item> GetById(int id)
         {
             using var db = Connection;
-            const string sql = @"
-SELECT A.[ItemId]
-      ,A.[ItemName]
-	  ,B.MaterialAmountId
-	  ,B.Amount
-	  ,B.Material_MaterialId
-	  ,B.Item_ItemId
-      ,C.MaterialId
-	  ,C.MaterialName
-	  ,C.Unit
-  FROM [dbo].[Items] A
-  INNER JOIN [dbo].[MaterialAmounts] B
-  ON B.Item_ItemId = A.ItemId
-  INNER JOIN [dbo].Materials C
-  ON C.MaterialId = B.Material_MaterialId
-  WHERE A.ItemId = @ItemId";
 
-            var lookup = new Dictionary<int, Item>();
+            var item = await db.QueryFirstOrDefaultAsync<Item>("SELECT * FROM Items WHERE ItemId = @Id", new { id }).ConfigureAwait(false);
 
-            var list = await db.QueryAsync<Item, MaterialAmount, Material, Item>(sql, (item, materialAmount, material) =>
+            var materials = await db.QueryAsync<MaterialAmount>("SELECT * FROM MaterialAmount_View WHERE ItemId = @Id", new { id }).ConfigureAwait(false);
+
+            if (materials == null)
             {
-                Item itemEntry;
-                if (!lookup.TryGetValue(item.ItemId, out itemEntry))
-                {
-                    itemEntry = item;
-                    itemEntry.Materials = new List<MaterialAmount>();
-                    lookup.Add(item.ItemId, itemEntry);
-                }
+                return item;
+            }
 
-                if (materialAmount.Material == null)
-                {
-                    materialAmount.Material = material;
-                }
-
-                itemEntry.Materials.Add(materialAmount);
-
-               return itemEntry;
-            }, new { ItemId = id }, splitOn: "ItemId, MaterialAmountId, MaterialId");
-
-            return list.FirstOrDefault();
+            item.Materials = materials.ToList();
+            return item;
         }
 
         public async Task<bool> Insert(Item item)
@@ -71,7 +43,7 @@ SELECT A.[ItemId]
             using var db = Connection;
             const string sql = @"INSERT INTO [Items] (ItemName) VALUES (@ItemName)";
 
-            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName });
+            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName }).ConfigureAwait(false);
 
             return result != 0;
         }
@@ -81,7 +53,7 @@ SELECT A.[ItemId]
             using var db = Connection;
             const string sql = @"UPDATE [Items] SET ItemName = @ItemName WHERE ItemId = @ItemId";
 
-            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName, ItemId = id });
+            var result = await db.ExecuteAsync(sql, new { ItemName = item.ItemName, ItemId = id }).ConfigureAwait(false);
 
             return result != 0;
         }
@@ -91,7 +63,7 @@ SELECT A.[ItemId]
             using var db = Connection;
             const string sql = @"DELETE FROM [Items] WHERE ItemId = @ItemId";
 
-            var result = await db.ExecuteAsync(sql, new { ItemId = id });
+            var result = await db.ExecuteAsync(sql, new { ItemId = id }).ConfigureAwait(false);
 
             return result != 0;
         }
