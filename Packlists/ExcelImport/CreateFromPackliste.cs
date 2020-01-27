@@ -27,7 +27,6 @@ namespace Packlists.ExcelImport
                 }
 
                 items = itemss.ToList();
-
             }));
 
             if (!dateResult) packDate = DateTime.Now;
@@ -41,10 +40,10 @@ namespace Packlists.ExcelImport
 
                 var packlisteData = GetPacklisteData(worksheet, englishPackliste != null);
 
-                var packlisteItems = (List<ItemWithQty>) GetItems(items, packlisteData, dataService);
+                var packlisteItems = (List<ItemWithQty>)GetItems(items, packlisteData, dataService);
 
                 var results = packlisteItems.GroupBy(item => item.Item).Select(g =>
-                    new ItemWithQty {Item = g.First().Item, Quantity = g.Sum(i => i.Quantity)}).ToList();
+                    new ItemWithQty { Item = g.First().Item, Quantity = g.Sum(i => i.Quantity) }).ToList();
 
                 var packliste = new Packliste
                 {
@@ -55,12 +54,10 @@ namespace Packlists.ExcelImport
                 };
                 callback(packliste, null);
             }
-            
         }
 
         private static IEnumerable<ItemWithQty> GetItems(ICollection<Item> items, Dictionary<Tuple<int, int>, object> packlisteData, IDataService dataService)
         {
-
             if (items == null)
             {
                 throw new ArgumentNullException(nameof(items));
@@ -114,7 +111,6 @@ namespace Packlists.ExcelImport
                         Item = newItem,
                         Quantity = quantityValue
                     };
-
                 }
                 else
                 {
@@ -123,7 +119,6 @@ namespace Packlists.ExcelImport
                         Item = newItem,
                         Quantity = quantityValue
                     };
-
                 }
                 packlisteItems.Add(itemWithQty);
             }
@@ -134,9 +129,9 @@ namespace Packlists.ExcelImport
         private static Dictionary<Tuple<int, int>, object> GetPacklisteData(ExcelWorksheet worksheet, bool isInEnglish)
         {
             var packlisteData = new Dictionary<Tuple<int, int>, object>();
-            
+
             var endRow = worksheet.Cells.First(c => c != null && c.Text == "ID").End.Row - 1;
-            
+
             var columnDimension = worksheet.Dimension.End.Column;
             var rowDimension = worksheet.Dimension.End.Row;
 
@@ -163,22 +158,20 @@ namespace Packlists.ExcelImport
 
                 packlisteData.Add(new Tuple<int, int>(endRow + 1, column), value);
             }
-            
+
             foreach (var row in dataRange)
             {
                 for (var column = 1; column <= columnDimension; column++)
                 {
                     var value = worksheet.Cells[row, column].Value;
-                    
+
                     if (value == null) continue;
 
                     packlisteData.Add(new Tuple<int, int>(row, column), worksheet.Cells[row, column].Value);
                 }
-
             }
 
             return packlisteData;
         }
-    
     }
 }

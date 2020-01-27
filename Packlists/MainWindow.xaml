@@ -76,7 +76,6 @@
                         <MenuItem Command="{Binding CreateTarmPacklisteCommand}" Header="Packliste for Tarm" />
                         <MenuItem Command="{Binding PacklisteFromCOCsCommand}" Header="Packliste from COCs" />
                     </MenuItem>
-
                 </Menu>
 
                 <DataGrid
@@ -223,7 +222,6 @@
                                 Content="Add" />
                         </StackPanel>
                     </Grid>
-
                 </GroupBox>
 
                 <GroupBox
@@ -255,15 +253,9 @@
                                     Header="Unit" />
                             </GridView>
                         </ListView.View>
-
                     </ListView>
-
                 </GroupBox>
-
             </Grid>
-
         </ScrollViewer>
-
     </Grid>
-
 </Window>

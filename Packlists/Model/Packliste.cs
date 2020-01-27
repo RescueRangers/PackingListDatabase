@@ -27,7 +27,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the Destination property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public string Destination
         {
@@ -37,7 +37,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the PacklisteDate property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public DateTime PacklisteDate
         {
@@ -47,7 +47,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the PacklisteNumber property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// If the number is -1 the packliste is a virtual construct created form the bodies of our enemies.
         /// </summary>
         public int PacklisteNumber
@@ -56,11 +56,11 @@ namespace Packlists.Model
             set => Set(nameof(PacklisteNumber), ref _packlisteNumber, value);
         }
 
-       private ObservableCollection<ItemWithQty> _itemsWithQties;
+        private ObservableCollection<ItemWithQty> _itemsWithQties;
 
         /// <summary>
         /// Sets and gets the ItemsWithQties property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public ObservableCollection<ItemWithQty> ItemsWithQties
         {
@@ -77,10 +77,9 @@ namespace Packlists.Model
             return PacklisteNumber == -1 ? "EmptyPackliste" : PacklisteNumber.ToString();
         }
 
-
         public void AddItem(ItemWithQty item)
         {
-            if(ItemsWithQties == null) ItemsWithQties = new ObservableCollection<ItemWithQty>();
+            if (ItemsWithQties == null) ItemsWithQties = new ObservableCollection<ItemWithQty>();
             ItemsWithQties.Add(item);
             RawUsage = CalculateUsage();
         }
@@ -103,10 +102,10 @@ namespace Packlists.Model
                 foreach (var materialWithUsage in itemWithQty.Item.Materials)
                 {
                     rawUsage.Add(new MaterialAmount
-                        {Material = materialWithUsage.Material, Amount = qty * materialWithUsage.Amount});
+                    { Material = materialWithUsage.Material, Amount = qty * materialWithUsage.Amount });
                 }
             }
-            var results = rawUsage.GroupBy(m => m.Material).Select(g => new MaterialAmount{Material = g.Key, Amount = g.Sum(l => l.Amount)}).OrderBy(o => o.Material).ToList();
+            var results = rawUsage.GroupBy(m => m.Material).Select(g => new MaterialAmount { Material = g.Key, Amount = g.Sum(l => l.Amount) }).OrderBy(o => o.Material).ToList();
 
             return new ObservableCollection<MaterialAmount>(results);
         }

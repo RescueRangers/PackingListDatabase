@@ -39,7 +39,6 @@ namespace Packlists.Model
             Cache = default(T);
         }
 
-
         public void CancelEdit()
         {
             foreach (var info in CurrentModel.GetType().GetProperties())
@@ -50,6 +49,6 @@ namespace Packlists.Model
             }
         }
 
-        #endregion
+        #endregion IEditableObject Members
     }
 }

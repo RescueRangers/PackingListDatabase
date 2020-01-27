@@ -34,7 +34,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedItem property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public MaterialAmount SelectedMaterial
         {
@@ -44,7 +44,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Materials property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView MaterialsView
@@ -66,7 +66,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the NewItemName property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public string NewItemName
@@ -88,7 +88,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SearchFilter property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public string SearchFilter
@@ -113,7 +113,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedItem property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public Item SelectedItem
@@ -135,7 +135,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the ItemsWithQties property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView ItemsView
@@ -159,15 +159,15 @@ namespace Packlists.ViewModel
 
         public ICommand AddNewItemCommand { get; private set; }
         public ICommand AddMaterialCommand { get; private set; }
-        public ICommand OpenMaterialsPanelCommand { get; private set; } 
+        public ICommand OpenMaterialsPanelCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
         public ICommand RemoveMaterialCommand { get; private set; }
         public ICommand ImportItemsCommand { get; private set; }
         public ICommand ClosingCommand { get; set; }
 
-        #endregion
+        #endregion Commands
 
-        #endregion
+        #endregion Properties
 
         public ItemsViewModel(IDataService dataService, IDialogService dialogService, IProgressDialogService progressDialog)
         {
@@ -197,7 +197,6 @@ namespace Packlists.ViewModel
                 MaterialsView = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
                 ItemsView = (ListCollectionView)CollectionViewSource.GetDefaultView(items);
                 MaterialsView.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
-
             });
         }
 
@@ -207,7 +206,7 @@ namespace Packlists.ViewModel
         {
             SearchFilter = obj.ItemName;
             var items = ItemsView.Cast<Item>();
-            
+
             SelectedItem = items.FirstOrDefault();
         }
 
@@ -216,7 +215,7 @@ namespace Packlists.ViewModel
             LoadData();
         }
 
-        #endregion
+        #endregion Messages
 
         #region Commands
 
@@ -280,7 +279,6 @@ namespace Packlists.ViewModel
                 }
 
                 LoadData();
-
             }, _excelFile, _dataService);
 
             if (!string.IsNullOrWhiteSpace(added))
@@ -293,20 +291,19 @@ namespace Packlists.ViewModel
             }
         }
 
-        #endregion
+        #endregion Import
 
         private void RemoveMaterial(object o)
         {
             if (o != null)
             {
-                SelectedItem.Materials.Remove((MaterialAmount) o);
+                SelectedItem.Materials.Remove((MaterialAmount)o);
             }
             SelectedItem.Materials.Remove(SelectedMaterial);
         }
 
         private void Save()
         {
-
             var options = new ProgressDialogOptions
             {
                 Label = "Please wait",
@@ -337,7 +334,7 @@ namespace Packlists.ViewModel
 
         private void AddMaterial()
         {
-            if(SelectedItem.Materials == null)
+            if (SelectedItem.Materials == null)
                 SelectedItem.Materials = new ObservableCollection<MaterialAmount>();
             var material = new MaterialAmount();
 
@@ -348,14 +345,14 @@ namespace Packlists.ViewModel
 
         private void AddNewItem()
         {
-            var newItem = new Item {ItemName = _newItemName};
+            var newItem = new Item { ItemName = _newItemName };
             ItemsView.AddNewItem(newItem);
             ItemsView.CommitNew();
             _dataService.Add(newItem);
             _dataService.SaveData();
         }
 
-        #endregion
+        #endregion Commands
 
         private void AddFilter(string value)
         {
@@ -375,6 +372,5 @@ namespace Packlists.ViewModel
             ItemsView.Refresh();
             base.Cleanup();
         }
-
     }
 }

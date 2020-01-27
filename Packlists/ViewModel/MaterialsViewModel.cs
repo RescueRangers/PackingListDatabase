@@ -18,7 +18,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the MaterialView property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast-ed by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView MaterialView
@@ -38,10 +38,9 @@ namespace Packlists.ViewModel
             }
         }
 
-
         public ICommand SaveCommand { get; set; }
-        
-        #endregion
+
+        #endregion Properties
 
         public MaterialsViewModel(IDataService dataService, IDialogService dialogService)
         {
@@ -57,8 +56,7 @@ namespace Packlists.ViewModel
                 }
 
                 //_materials = new ObservableCollection<Material>(materials);
-                MaterialView = (ListCollectionView) CollectionViewSource.GetDefaultView(materials);
-
+                MaterialView = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
             });
 
             MaterialView.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));

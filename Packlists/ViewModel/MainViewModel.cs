@@ -18,7 +18,6 @@ using Packlists.Messages;
 using Packlists.Model;
 using Packlists.Model.Printing;
 using Packlists.Model.ProgressBar;
-using Spire.Pdf.Exporting.XPS.Schema;
 
 namespace Packlists.ViewModel
 {
@@ -35,7 +34,7 @@ namespace Packlists.ViewModel
         private readonly IPrintingService _printing;
         private readonly IProgressDialogService _progressDialog;
         private List<FileInfo> _excelFiles;
-        private List<Packliste> _packlists = new List<Packliste>(); 
+        private List<Packliste> _packlists = new List<Packliste>();
 
         private ListCollectionView _packlistView;
 
@@ -57,7 +56,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Quantity property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public string Quantity
@@ -79,7 +78,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedItem property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public Item SelectedItem
@@ -101,7 +100,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedMonth property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public DateTime SelectedMonth
@@ -126,7 +125,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SearchFilter property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public string SearchFilter
@@ -149,10 +148,9 @@ namespace Packlists.ViewModel
             }
         }
 
-        
         /// <summary>
         /// Sets and gets the SelectedItem property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ItemWithQty SelectedItemWithQty
@@ -174,7 +172,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the ItemsWithQties property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView ItemsView
@@ -196,7 +194,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedPackliste property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public Packliste SelectedPackliste
@@ -216,9 +214,9 @@ namespace Packlists.ViewModel
             }
         }
 
-       /// <summary>
+        /// <summary>
         /// Sets and gets the YearsView property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcast by the MessengerInstance when it changes.
         /// </summary>
         public ListCollectionView PacklistView
@@ -250,7 +248,7 @@ namespace Packlists.ViewModel
         public ICommand EditItemCommand { get; set; }
         public ICommand CreateTarmPacklisteCommand { get; set; }
         public ICommand PrintMonthlyCommand { get; set; }
-        public ICommand OpenImportPanelCommand { get; set; }    
+        public ICommand OpenImportPanelCommand { get; set; }
         public ICommand OpenReportPanelCommand { get; set; }
         public ICommand OpenCocsPanelCommand { get; set; }
         public ICommand PacklisteFromCOCsCommand { get; set; }
@@ -258,9 +256,9 @@ namespace Packlists.ViewModel
         public ICommand PrintMissingPacklistNumbersCommand { get; set; }
         public ICommand RefreshItemsCommand { get; set; }
 
-        #endregion
+        #endregion Commands
 
-        #endregion
+        #endregion Properties
 
         /// <inheritdoc />
         /// <summary>
@@ -276,7 +274,7 @@ namespace Packlists.ViewModel
 
             _dataService.GetItems((items) =>
             {
-                _itemsView = (ListCollectionView) CollectionViewSource.GetDefaultView(items);
+                _itemsView = (ListCollectionView)CollectionViewSource.GetDefaultView(items);
             });
 
             LoadMonthlyData();
@@ -297,7 +295,7 @@ namespace Packlists.ViewModel
                         return;
                     }
 
-                    _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
+                    _packlistView = (ListCollectionView)CollectionViewSource.GetDefaultView(packlists);
                 }, SelectedMonth);
 
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
@@ -341,7 +339,7 @@ namespace Packlists.ViewModel
                         //TODO: Report error here
                         return;
                     }
-                    _packlistView = (ListCollectionView) CollectionViewSource.GetDefaultView(packlists);
+                    _packlistView = (ListCollectionView)CollectionViewSource.GetDefaultView(packlists);
                 }, SelectedMonth);
 
             PacklistView.SortDescriptions.Add(new SortDescription("PacklisteDate", ListSortDirection.Ascending));
@@ -353,7 +351,7 @@ namespace Packlists.ViewModel
             _packlists = PacklistView.OfType<Packliste>().ToList();
             var packlistNumbers = _packlists
                 .Where(p => p.PacklisteDate.Year == SelectedMonth.Year && p.PacklisteDate.Month == SelectedMonth.Month)
-                .Select(p => p.PacklisteNumber).Except(new List<int>{1, -1, 0 });
+                .Select(p => p.PacklisteNumber).Except(new List<int> { 1, -1, 0 });
 
             var missingNumbers = Enumerable.Range(packlistNumbers.Min(), packlistNumbers.Max() - packlistNumbers.Min()).Except(packlistNumbers);
 
@@ -379,15 +377,13 @@ namespace Packlists.ViewModel
                     _dialogService.ShowMessageBox(this, packliste.Item2);
                 }
             }
-
-            
         }
 
         #region PrintMonthlyReport
 
         private bool CanPrintMonthly()
         {
-            if(PacklistView == null) return false;
+            if (PacklistView == null) return false;
             return PacklistView.Count > 1;
         }
 
@@ -428,8 +424,8 @@ namespace Packlists.ViewModel
             _packlists.Clear();
         }
 
-        #endregion
-        
+        #endregion PrintMonthlyReport
+
         #region PrintItemTable
 
         private void PrintItemTable()
@@ -455,10 +451,9 @@ namespace Packlists.ViewModel
             progress.Report(progressReport);
 
             await _printing.PrintItemTable(SelectedPackliste);
-
         }
 
-        #endregion
+        #endregion PrintItemTable
 
         private void CreateTarmPackliste()
         {
@@ -470,7 +465,7 @@ namespace Packlists.ViewModel
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
-            var success =_dialogService.ShowOpenFileDialog(this, openFileOptions);
+            var success = _dialogService.ShowOpenFileDialog(this, openFileOptions);
 
             if (success == true)
             {
@@ -489,10 +484,9 @@ namespace Packlists.ViewModel
                         MessageBoxImage.Error);
                     return;
                 }
-                
-                _dataService.Add(packliste);
 
-            },excelFile, _dataService);
+                _dataService.Add(packliste);
+            }, excelFile, _dataService);
         }
 
         private void EditItem()
@@ -518,8 +512,8 @@ namespace Packlists.ViewModel
         {
             _printing.Print(SelectedPackliste.PacklisteData);
         }
-        
-        #endregion
+
+        #endregion PrintPackliste
 
         #region ImportPackingList
 
@@ -546,7 +540,7 @@ namespace Packlists.ViewModel
                 var progressReport = new ProgressReport
                 {
                     IsIndeterminate = false,
-                    MaxTaskNumber = _excelFiles.Count -1,
+                    MaxTaskNumber = _excelFiles.Count - 1,
                     CurrentTaskNumber = i,
                     CurrentTask = _excelFiles[i].Name
                 };
@@ -587,7 +581,7 @@ namespace Packlists.ViewModel
             _packlists.Clear();
         }
 
-        #endregion
+        #endregion ImportPackingList
 
         private void Save()
         {
@@ -622,9 +616,9 @@ namespace Packlists.ViewModel
             SelectedPackliste.AddItem(itemWithQty);
         }
 
-        #endregion
+        #endregion AddItemToPackliste
 
-        #endregion
+        #endregion Commands
 
         private void GetExcelFiles()
         {

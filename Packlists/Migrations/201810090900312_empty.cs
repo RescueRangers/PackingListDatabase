@@ -1,8 +1,7 @@
 namespace Packlists.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class empty : DbMigration
     {
         public override void Up()
@@ -14,19 +13,19 @@ namespace Packlists.Migrations
             AddForeignKey("dbo.MaterialAmounts", "Packliste_PacklisteId", "dbo.Packlistes", "PacklisteId");
             DropTable("dbo.MaterialWithUsages");
         }
-        
+
         public override void Down()
         {
             CreateTable(
                 "dbo.MaterialWithUsages",
                 c => new
-                    {
-                        MaterialWithUsageId = c.Int(nullable: false, identity: true),
-                        Usage = c.Single(nullable: false),
-                        Material_MaterialId = c.Int(),
-                    })
+                {
+                    MaterialWithUsageId = c.Int(nullable: false, identity: true),
+                    Usage = c.Single(nullable: false),
+                    Material_MaterialId = c.Int(),
+                })
                 .PrimaryKey(t => t.MaterialWithUsageId);
-            
+
             DropForeignKey("dbo.MaterialAmounts", "Packliste_PacklisteId", "dbo.Packlistes");
             DropIndex("dbo.MaterialAmounts", new[] { "Packliste_PacklisteId" });
             DropColumn("dbo.MaterialAmounts", "Packliste_PacklisteId");

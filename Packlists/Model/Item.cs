@@ -8,7 +8,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the ItemName property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public string ItemName
         {
@@ -20,7 +20,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the Materials property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public ObservableCollection<MaterialAmount> Materials
         {

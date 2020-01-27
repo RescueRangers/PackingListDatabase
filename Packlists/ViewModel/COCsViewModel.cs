@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -14,7 +9,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
-using Packlists.ExcelImport;
 using Packlists.Model;
 using Packlists.Model.ProgressBar;
 
@@ -74,7 +68,7 @@ namespace Packlists.ViewModel
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
-            var success =_dialogService.ShowOpenFileDialog(this, openFileOptions);
+            var success = _dialogService.ShowOpenFileDialog(this, openFileOptions);
 
             if (success == true)
             {
@@ -91,7 +85,6 @@ namespace Packlists.ViewModel
                 WindowTitle = "Importing COCs"
             };
             _progressDialog.Execute(Import, options);
-
         }
 
         private async void Import(CancellationToken cancellationToken, IProgress<ProgressReport> progress)

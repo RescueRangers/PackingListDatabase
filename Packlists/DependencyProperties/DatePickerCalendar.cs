@@ -132,6 +132,7 @@ namespace Packlists.DependencyProperties
             Application.Current.Dispatcher.BeginInvoke(
                 DispatcherPriority.Loaded, new Action<DatePicker>(ApplyDateFormat), datePicker);
         }
+
         private static void ApplyDateFormat(DatePicker datePicker)
         {
             var binding = new Binding("SelectedDate")
@@ -163,7 +164,6 @@ namespace Packlists.DependencyProperties
             return (ButtonBase)datePicker.Template.FindName("PART_Button", datePicker);
         }
 
-
         /// <summary>
         ///     Prevents a bug in the DatePicker, where clicking the Dropdown open button results in Text being set to default formatting regardless of StringFormat or binding overrides
         /// </summary>
@@ -182,18 +182,16 @@ namespace Packlists.DependencyProperties
                 // Open dropdown
                 datePicker.SetCurrentValue(DatePicker.IsDropDownOpenProperty, true);
 
-                // Mimic everything else in the standard DatePicker dropdown opening *except* setting textbox value 
+                // Mimic everything else in the standard DatePicker dropdown opening *except* setting textbox value
                 datePicker.SetCurrentValue(DatePicker.DisplayDateProperty, datePicker.SelectedDate.Value);
 
                 // Important otherwise calendar does not work
                 dropDownButton.ReleaseMouseCapture();
 
-                // Prevent datePicker.cs from handling this event 
+                // Prevent datePicker.cs from handling this event
                 e.Handled = true;
             }
         }
-
-
 
         private static TextBox GetTemplateTextBox(Control control)
         {
@@ -263,13 +261,8 @@ namespace Packlists.DependencyProperties
 
                 return canParse ? date : datePicker.SelectedDate;
             }
-
-
         }
-
     }
-
-
 
     public static class FEExten
     {

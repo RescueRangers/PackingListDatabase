@@ -23,29 +23,33 @@ namespace Packlists
 
         private static void NotificationMessageReceived(NotificationMessage obj)
         {
-            
             switch (obj.Notification)
             {
                 case "ShowItemsPanel":
                     var itemsView = new ItemsView();
                     itemsView.Show();
                     break;
+
                 case "ShowMaterialsPanel":
                     var materialsView = new MaterialsView();
                     materialsView.ShowDialog();
                     break;
+
                 case "ShowImportPanel":
                     var importView = new ImportView();
                     importView.Show();
                     break;
+
                 case "ShowMonthlyReport":
                     var reportView = new MonthlyUsageView();
                     reportView.Show();
                     break;
+
                 case "ShowCOCs":
                     var cocsView = new COCsView();
                     cocsView.Show();
                     break;
+
                 default:
                     break;
             }

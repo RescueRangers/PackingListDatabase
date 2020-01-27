@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -26,7 +25,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the Days property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public List<Day> Days
         {
@@ -42,9 +41,7 @@ namespace Packlists.Model
         }
 
         private MonthlyUsageReport()
-        {}
-
-        
+        { }
 
         public MonthlyUsageReport(DateTime month, List<ImportTransport> imports, List<Packliste> exports, List<Material> materials, MonthlyUsageReport previousReport = null)
         {
@@ -60,11 +57,11 @@ namespace Packlists.Model
 
                 var dailyImports = imports.Where(im => im.ImportDate == day).SelectMany(s => s.ImportedMaterials)
                     .GroupBy(g => g.Material).Select(g => new MaterialAmount
-                        {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
+                    { Material = g.Key, Amount = g.Sum(s => s.Amount) }).ToList();
                 var dailyExports = exports.Where(pac => pac.PacklisteDate == day)
                     .SelectMany(s => s.ItemsWithQties.SelectMany(itm => itm.Item.Materials)).GroupBy(g => g.Material)
                     .Select(g => new MaterialAmount
-                        {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
+                    { Material = g.Key, Amount = g.Sum(s => s.Amount) }).ToList();
 
                 for (var j = 0; j < _materials.Count; j++)
                 {
@@ -72,7 +69,7 @@ namespace Packlists.Model
                     var importedMaterial = dailyImports.SingleOrDefault(s => s.Material == material);
                     var exportedMaterial = dailyExports.SingleOrDefault(s => s.Material == material);
 
-                    t.NetMaterialCount.Add(importedMaterial ?? new MaterialAmount {Material = material, Amount = 0});
+                    t.NetMaterialCount.Add(importedMaterial ?? new MaterialAmount { Material = material, Amount = 0 });
 
                     if (exportedMaterial != null)
                     {
@@ -88,8 +85,7 @@ namespace Packlists.Model
                 Days[0].NetMaterialCount.AddRange(lastMonthDay.NetMaterialCount);
 
                 Days[0].NetMaterialCount = Days[0].NetMaterialCount.GroupBy(g => g.Material)
-                    .Select(g => new MaterialAmount {Material = g.Key, Amount = g.Sum(s => s.Amount)}).ToList();
-
+                    .Select(g => new MaterialAmount { Material = g.Key, Amount = g.Sum(s => s.Amount) }).ToList();
             }
 
             for (var i = 1; i < Days.Count; i++)
@@ -102,7 +98,6 @@ namespace Packlists.Model
                     day.NetMaterialCount[index].Amount += previousDay.NetMaterialCount[index].Amount;
                 }
             }
-            
         }
 
         private List<Day> GetDaysInMonth(DateTime month)
@@ -111,7 +106,7 @@ namespace Packlists.Model
 
             for (var i = 1; i <= DateTime.DaysInMonth(month.Year, month.Month); i++)
             {
-                days.Add(new Day{Date = new DateTime(month.Year, month.Month, i)});
+                days.Add(new Day { Date = new DateTime(month.Year, month.Month, i) });
             }
 
             return days;

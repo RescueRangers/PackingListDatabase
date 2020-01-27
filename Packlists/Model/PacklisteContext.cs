@@ -9,6 +9,7 @@ namespace Packlists.Model
         //public DbSet<Month> Months { get; set; }
         //public DbSet<Day> Days { get; set; }
         public DbSet<Packliste> Packlistes { get; set; }
+
         public DbSet<Item> Items { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<ItemWithQty> ItemWithQties { get; set; }
@@ -37,7 +38,6 @@ namespace Packlists.Model
             //Configuration.AutoDetectChangesEnabled = false;
             Configuration.LazyLoadingEnabled = true;
             ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 180;
-            
         }
     }
 }

@@ -4,7 +4,7 @@
       <vm:ViewModelLocatorTemplate xmlns:vm="clr-namespace:PacklistDatabase.ViewModel"
                                    x:Key="Locator" />
   </Application.Resources>
-  
+
   In the View:
   DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
 */
@@ -28,17 +28,15 @@ namespace Packlists.ViewModel
 
         public ViewModelLocator()
         {
-            _kernel = new StandardKernel(new NinjectSettings{AllowNullInjection = true}, new DependencyModule());
+            _kernel = new StandardKernel(new NinjectSettings { AllowNullInjection = true }, new DependencyModule());
         }
 
-        
         /// <summary>
         /// Gets the Main property.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
             "CA1822:MarkMembersAsStatic",
             Justification = "This non-static member is needed for data binding purposes.")]
-
         public MainViewModel Main => _kernel.Get<MainViewModel>();
 
         public ItemsViewModel Items => _kernel.Get<ItemsViewModel>();
@@ -52,7 +50,6 @@ namespace Packlists.ViewModel
         public COCsViewModel COCs => _kernel.Get<COCsViewModel>();
 
         //public ProgressDialogViewModel ProgressDialog => _kernel.Get<ProgressDialogViewModel>();
-
 
         /// <summary>
         /// Cleans up all the resources.

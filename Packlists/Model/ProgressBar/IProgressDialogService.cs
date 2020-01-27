@@ -94,4 +94,3 @@ namespace Packlists.Model.ProgressBar
                                 ProgressDialogOptions options);
     }
 }
-

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 
 namespace Packlists.Model
 {
@@ -11,7 +10,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the Unit property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public string Unit
         {
@@ -21,7 +20,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the MaterialName property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public string MaterialName
         {
