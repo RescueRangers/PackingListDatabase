@@ -38,7 +38,7 @@ namespace Packlists.ExcelImport
                 var englishPackliste = worksheet.Cells.FirstOrDefault(c =>
                     string.Equals(c.Text, "number", StringComparison.InvariantCultureIgnoreCase))?.Address;
 
-                var packlisteData = GetPacklisteData(worksheet, englishPackliste != null);
+                var packlisteData = GetPacklisteData(worksheet);
 
                 var packlisteItems = (List<ItemWithQty>)GetItems(items, packlisteData, dataService);
 
@@ -56,7 +56,7 @@ namespace Packlists.ExcelImport
             }
         }
 
-        private static IEnumerable<ItemWithQty> GetItems(ICollection<Item> items, Dictionary<Tuple<int, int>, object> packlisteData, IDataService dataService)
+        private static IEnumerable<ItemWithQty> GetItems(ICollection<Item> items, List<PacklisteData> packlisteData, IDataService dataService)
         {
             if (items == null)
             {
@@ -64,28 +64,31 @@ namespace Packlists.ExcelImport
             }
 
             var packlisteItems = new List<ItemWithQty>();
-            var quantityColumn = packlisteData.SingleOrDefault(c => c.Value != null && (c.Value.ToString().ToLower().Contains("qty") ||
-                                                                                        c.Value.ToString().ToLower().Contains("antal"))).Key.Item2;
+            var quantityColumn = packlisteData.Find(c => c.Data != null &&
+                (c.Data.IndexOf("qty", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                c.Data.IndexOf("antal", StringComparison.OrdinalIgnoreCase) >= 0)).ColumnNumber;
 
             var itemData = packlisteData.Where(d =>
-                d.Key.Item2 == 1 && d.Value != null && (d.Value.ToString().ToLower().Contains("industri") == false &&
-                                                        d.Value.ToString().ToLower().Contains("total") == false &&
-                                                        d.Value.ToString().ToLower().Contains("item") == false &&
-                                                        d.Value.ToString().ToLower().Contains("varenum") == false));
+                d.ColumnNumber == 3 && (d.Data?.IndexOf("industri", StringComparison.OrdinalIgnoreCase) < 0 &&
+                                                        d.Data.IndexOf("total", StringComparison.OrdinalIgnoreCase) < 0 &&
+                                                        d.Data.IndexOf("item", StringComparison.OrdinalIgnoreCase) < 0 &&
+                                                        d.Data.IndexOf("id", StringComparison.OrdinalIgnoreCase) < 0 &&
+                                                        d.Data.IndexOf("varenum", StringComparison.OrdinalIgnoreCase) < 0));
 
             foreach (var item in itemData)
             {
-                var newItem = items.FirstOrDefault(itm => string.Equals(itm.ItemName, item.Value.ToString(), StringComparison.CurrentCultureIgnoreCase));
+                var newItem = items.FirstOrDefault(itm => string.Equals(itm.ItemName, item.Data, StringComparison.CurrentCultureIgnoreCase));
                 ItemWithQty itemWithQty;
 
                 float quantityValue;
                 var quantityResult =
-                    packlisteData.TryGetValue(new Tuple<int, int>(item.Key.Item1, quantityColumn),
-                        out var quantity);
+                    float.TryParse(
+                        packlisteData.Find(f => f.RowNumber == item.RowNumber && f.ColumnNumber == quantityColumn)?
+                            .Data, out quantityValue);
 
                 if (quantityResult)
                 {
-                    var floatResult = float.TryParse(quantity.ToString(), out quantityValue);
+                    var floatResult = float.TryParse(quantityValue.ToString(), out quantityValue);
                     if (!floatResult)
                     {
                         quantityValue = 0f;
@@ -100,7 +103,7 @@ namespace Packlists.ExcelImport
                 {
                     newItem = new Item
                     {
-                        ItemName = item.Value.ToString(),
+                        ItemName = item.Data
                     };
 
                     dataService.Add(newItem);
@@ -126,28 +129,17 @@ namespace Packlists.ExcelImport
             return packlisteItems;
         }
 
-        private static Dictionary<Tuple<int, int>, object> GetPacklisteData(ExcelWorksheet worksheet, bool isInEnglish)
+        private static List<PacklisteData> GetPacklisteData(ExcelWorksheet worksheet)
         {
-            var packlisteData = new Dictionary<Tuple<int, int>, object>();
+            var packlisteData = new List<PacklisteData>();
 
             var endRow = worksheet.Cells.First(c => c != null && c.Text == "ID").End.Row - 1;
 
             var columnDimension = worksheet.Dimension.End.Column;
             var rowDimension = worksheet.Dimension.End.Row;
 
-            int[] dataRange;
-
-            if (isInEnglish)
-            {
-                var totalsRow = worksheet.Cells[endRow + 1, 1, rowDimension, 1].First(c => c.Text.ToLower().Contains("totals")).End.Row;
-                dataRange = worksheet.Cells[totalsRow + 3, 1, rowDimension, 1]
-                    .Where(c => c.End.Row % 2 == (totalsRow + 3) % 2).Select(c => c.End.Row).ToArray();
-            }
-            else
-            {
-                dataRange = worksheet.Cells[endRow + 1, 1, rowDimension, columnDimension]
-                    .Where(c => c.Address.Contains("A") && c.Text.ToLower().Contains("totaler")).Select(c => c.End.Row + 3).ToArray();
-            }
+            int[] dataRange = worksheet.Cells[endRow + 3, 3, rowDimension, 3]
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Text)).Select(c => c.End.Row).ToArray();
 
             //Add table headers to the last row of pack list header
             for (var column = 1; column <= columnDimension; column++)
@@ -156,8 +148,23 @@ namespace Packlists.ExcelImport
 
                 if (value == null) continue;
 
-                packlisteData.Add(new Tuple<int, int>(endRow + 1, column), value);
+                packlisteData.Add(new PacklisteData { ColumnNumber = column, RowNumber = endRow + 1, Data = value.ToString() });
             }
+
+            for (var row = 1; row <= endRow; row++)
+            {
+                for (var column = 1; column <= columnDimension; column++)
+                {
+                    var value = worksheet.Cells[row, column].Value;
+
+                    if (value == null) continue;
+
+                    packlisteData.Add(new PacklisteData { ColumnNumber = column, RowNumber = row, Data = value.ToString() });
+                }
+            }
+
+            //Offset the target row by 3 for visual distinction from header
+            var targetRow = endRow + 3;
 
             foreach (var row in dataRange)
             {
@@ -167,8 +174,10 @@ namespace Packlists.ExcelImport
 
                     if (value == null) continue;
 
-                    packlisteData.Add(new Tuple<int, int>(row, column), worksheet.Cells[row, column].Value);
+                    packlisteData.Add(new PacklisteData { ColumnNumber = column, RowNumber = targetRow, Data = value.ToString() });
                 }
+
+                targetRow++;
             }
 
             return packlisteData;

@@ -261,8 +261,6 @@ namespace Packlists.ExcelImport
 
             if (isInEnglish)
             {
-                //var totalsRow = worksheet.Cells[endRow + 1, 1, rowDimension, 1].First(c => c.Text.ToLower().Contains("totals")).End.Row;
-
                 dataRange = worksheet.Cells[endRow + 3, 3, rowDimension, 3]
                     .Where(c => !string.IsNullOrWhiteSpace(c.Text)).Select(c => c.End.Row).ToArray();
             }
