@@ -25,7 +25,7 @@ namespace Packlists.Model.Printing
             try
             {
                 var wb = app.Workbooks.Open(path);
-                var ws = (Excel.Worksheet)wb.Worksheets[1];
+                var ws = (Excel.Worksheet) wb.Worksheets[1];
 
                 // Print out 1 copy to the default printer:
                 ws.PrintOut();
@@ -83,7 +83,7 @@ namespace Packlists.Model.Printing
                 file.Delete();
             }
 
-            using (var excel = new ExcelPackage(file))
+            using(var excel = new ExcelPackage(file))
             {
                 var worksheet = excel.Workbook.Worksheets.Add(
                     $"{imports.ElementAt(0).ImportDate.Year}-{imports.ElementAt(0).ImportDate.Month}");
@@ -95,7 +95,7 @@ namespace Packlists.Model.Printing
                 worksheet.Cells[1, 2].Value =
                     CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(imports.ElementAt(0).ImportDate.Month);
 
-                using (var range = worksheet.Cells[1, 1, 1, 2])
+                using(var range = worksheet.Cells[1, 1, 1, 2])
                 {
                     range.Style.Font.Bold = true;
                     range.Style.Font.Size = 14;
@@ -137,7 +137,7 @@ namespace Packlists.Model.Printing
                     {
                         var materialRow =
                             worksheet.Cells.SingleOrDefault(c => string.Equals(c.Text, usage.Material.MaterialName)).End
-                                .Row;
+                            .Row;
 
                         worksheet.Cells[materialRow, column].Value = usage.Amount;
                         worksheet.Cells[materialRow, column].Style.Numberformat.Format = "0.00";
@@ -146,7 +146,7 @@ namespace Packlists.Model.Printing
                     column++;
                 }
 
-                using (var range = worksheet.Cells[1, 1, materials.Count + 2, column - 1])
+                using(var range = worksheet.Cells[1, 1, materials.Count + 2, column - 1])
                 {
                     range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -229,7 +229,7 @@ namespace Packlists.Model.Printing
                 file.Delete();
             }
 
-            using (var excel = new ExcelPackage(file))
+            using(var excel = new ExcelPackage(file))
             {
                 var worksheet = excel.Workbook.Worksheets.Add(
                     $"{packlists.ElementAt(0).PacklisteDate.Year}-{packlists.ElementAt(0).PacklisteDate.Month}");
@@ -242,7 +242,7 @@ namespace Packlists.Model.Printing
                     CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(packlists.ElementAt(0).PacklisteDate
                         .Month);
 
-                using (var range = worksheet.Cells[1, 1, 1, 2])
+                using(var range = worksheet.Cells[1, 1, 1, 2])
                 {
                     range.Style.Font.Bold = true;
                     range.Style.Font.Size = 14;
@@ -284,7 +284,7 @@ namespace Packlists.Model.Printing
                     {
                         var materialRow =
                             worksheet.Cells.SingleOrDefault(c => string.Equals(c.Text, usage.Material.MaterialName)).End
-                                .Row;
+                            .Row;
 
                         worksheet.Cells[materialRow, column].Value = usage.Amount;
                         worksheet.Cells[materialRow, column].Style.Numberformat.Format = "0.00";
@@ -293,7 +293,7 @@ namespace Packlists.Model.Printing
                     column++;
                 }
 
-                using (var range = worksheet.Cells[1, 1, materials.Count + 2, column - 1])
+                using(var range = worksheet.Cells[1, 1, materials.Count + 2, column - 1])
                 {
                     range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -336,7 +336,7 @@ namespace Packlists.Model.Printing
 
         private static void OpenPdf(string path)
         {
-            using (var process = new Process())
+            using(var process = new Process())
             {
                 var startInfo = new ProcessStartInfo(path);
                 process.StartInfo = startInfo;
@@ -404,7 +404,7 @@ namespace Packlists.Model.Printing
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\temp.xlsx";
 
-            using (var excel = new ExcelPackage(new FileInfo(path)))
+            using(var excel = new ExcelPackage(new FileInfo(path)))
             {
                 var worksheet = excel.Workbook.Worksheets.Add("Sheet 1");
 
@@ -414,7 +414,7 @@ namespace Packlists.Model.Printing
                 worksheet.Cells[2, 1].Value = "Item number";
                 worksheet.Cells[2, 2].Value = "Quantity";
 
-                using (var range = worksheet.Cells[1, 1, 2, 2])
+                using(var range = worksheet.Cells[1, 1, 2, 2])
                 {
                     range.Style.Font.Bold = true;
                     range.Style.Border.BorderAround(ExcelBorderStyle.Medium);
@@ -445,7 +445,7 @@ namespace Packlists.Model.Printing
                     row++;
                 }
 
-                using (var range = worksheet.Cells[2, 1, row - 1, 2])
+                using(var range = worksheet.Cells[2, 1, row - 1, 2])
                 {
                     range.Style.Border.BorderAround(ExcelBorderStyle.Medium);
                     range.Style.Border.BorderAround(ExcelBorderStyle.Medium);
@@ -584,8 +584,6 @@ namespace Packlists.Model.Printing
             var reqCol = 0;
             var ordCol = 0;
             var qtyCol = 0;
-
-
 
             for (var i = packlisteData.First().RowNumber; i <= lineCount; i++)
             {
