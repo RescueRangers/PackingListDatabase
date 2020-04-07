@@ -1,0 +1,99 @@
+﻿@page "/packinglists"
+@using Packilists.Shared.Data
+@inject HttpClient Http
+
+<h1>Packing lists</h1>
+
+@if (_packingLists == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MatDatePicker Label="Data packing listy" EnableWeekNumbers="true" @oninput="@OnDateChanged"></MatDatePicker>
+    <MatTable Class="mat-elevation-z5" Items="@_packingLists" LoadInitialData="true" Striped="true" DebounceMilliseconds="450" PageSize="25">
+        <MatTableHeader>
+            <th>Number</th>
+            <th>Date</th>
+            <th style="min-width: 20%">Destination</th>
+            <th>Comment</th>
+            <th></th>
+        </MatTableHeader>
+        <MatTableRow Context="PackingListRow">
+            <td>@PackingListRow.PacklisteNumber</td>
+            <td>@PackingListRow.PacklisteDate.ToString("yyyy-MM-dd")</td>
+            <td>@PackingListRow.Destination</td>
+            <td class="text-danger">@GetRowComment(PackingListRow)</td>
+            <td>
+                <a class="text-info" href="/packinglistdetails/@PackingListRow.PacklisteId"><MatIcon Icon="@MatIconNames.Remove_red_eye"></MatIcon></a>
+                <a class="text-danger" href="/packinglistdetails/@PackingListRow.PacklisteId"><MatIcon Icon="@MatIconNames.Remove_circle_outline"></MatIcon></a>
+            </td>
+        </MatTableRow>
+    </MatTable>
+
+    <p class="text-info">
+        <details>
+            Legend: <br />
+            <span class="text-danger">NI</span> - Packing list does not contain any items.<br />
+            <span class="text-danger">NR</span> - Packing list does not have raw material usage.<br />
+            <span class="text-danger">NM</span> - At least one of the items on packing list does not have it's material usage.
+        </details>
+    </p>
+}
+
+@code {
+    Packliste[] _packingLists;
+    string _test;
+    string _test1;
+    string _test2;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _packingLists = await Http.GetJsonAsync<Packliste[]>($"api/PackingLists/ByDate/{DateTime.Now.ToString("yyyy-MM-dd")}");
+    }
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        _test = e.Value.ToString();
+        var test = DateTime.TryParse(e.Value.ToString(), out var date);
+        _test1 = test.ToString();
+        _test2 = date.ToString();
+        if (test)
+        {
+            _packingLists = await Http.GetJsonAsync<Packliste[]>($"api/PackingLists/ByDate/{date.ToString("yyyy-MM-dd")}");
+        }
+    }
+
+    private string GetRowComment(Packliste packingList)
+    {
+        var sb = "";
+
+        if (packingList.ItemsWithQties == null || packingList.ItemsWithQties.Count == 0)
+        {
+            sb += $"NI |";
+        }
+        if (packingList.RawUsage == null || packingList.RawUsage.Count == 0)
+        {
+            sb += $" NR |";
+        }
+
+        var test = packingList.ItemsWithQties.Where(i => i.Materials == null || i.Materials.Count == 0);
+
+        if (test.Count() != 0)
+        {
+            sb += " NM";
+        }
+
+        if (sb.EndsWith("|"))
+        {
+            sb = sb.Substring(0, sb.Length -1);
+            sb = sb.Trim();
+        }
+        else
+        {
+            sb = sb.Trim();
+        }
+
+        return sb;
+    }
+}

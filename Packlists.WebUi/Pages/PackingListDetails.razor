@@ -1,0 +1,76 @@
+﻿@page "/packinglistdetails/{text}"
+@using Packilists.Shared.Data
+@inject HttpClient Http
+
+<h3>Packing List Details</h3>
+
+@if (_packliste == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        Packing list number: @_packliste.PacklisteNumber <br />
+        Packing list date: @_packliste.PacklisteDate.ToString("yyyy-MM-dd") <br />
+        Packing list destination: @_packliste.Destination
+    </p>
+
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h4>Items on packing list</h4>
+                <MatTable Class="mat-elevation-z5" Items="@_packliste.ItemsWithQties" LoadInitialData="true" Striped="true" DebounceMilliseconds="450" PageSize="25">
+                    <MatTableHeader>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Materials</th>
+                        <th></th>
+                    </MatTableHeader>
+                    <MatTableRow Context="Items">
+                        <td>@Items.ItemName</td>
+                        <td>@Items.Quantity</td>
+                        <td>
+                            @if (@Items.Materials == null || @Items.Materials.Count == 0)
+                                {
+                                <span class="text-danger">Item has no material</span>
+                                }
+                        </td>
+                        <td><a class="text-info" href="/itemdetails/@Items.ItemId"><MatIcon Icon="@MatIconNames.Remove_red_eye"></MatIcon></a></td>
+                    </MatTableRow>
+                </MatTable>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <h4>Raw material usage</h4>
+                <MatTable Class="mat-elevation-z5" Items="@_packliste.RawUsage" LoadInitialData="true" Striped="true" DebounceMilliseconds="450" PageSize="25">
+                    <MatTableHeader>
+                        <th style="min-width: 35%">Material</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                    </MatTableHeader>
+                    <MatTableRow Context="Items">
+                        <td>@Items.MaterialName</td>
+                        <td>@Items.Amount</td>
+                        <td>@Items.Unit</td>
+                    </MatTableRow>
+                </MatTable>
+            </div>
+        </div>
+    </div>
+    
+}
+
+
+@code {
+    [Parameter] public string Text { get; set; }
+
+    Packliste _packliste;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Text))
+        {
+            _packliste = await Http.GetJsonAsync<Packliste>($"api/PackingLists/{Text}");
+        }
+    }
+}

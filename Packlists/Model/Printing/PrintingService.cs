@@ -589,6 +589,7 @@ namespace Packlists.Model.Printing
             {
                 var iLine = packlisteData.Where(l => l.RowNumber == i).ToList();
 
+
                 if (iLine.Count == 0)
                 {
                     continue;
@@ -626,7 +627,9 @@ namespace Packlists.Model.Printing
                 }
             }
 
+
             var pdfRenderer = new PdfDocumentRenderer { Document = document };
+
             pdfRenderer.RenderDocument();
 
             pdfRenderer.PdfDocument.Save(path);
