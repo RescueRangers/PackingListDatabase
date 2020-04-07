@@ -27,7 +27,7 @@ SELECT [CocId]
       ,[Quantity]
       ,[ItemId]
       ,[ItemName]
-  FROM [db_owner].[COC_View]";
+  FROM COC_View";
 
                 return await db.QueryAsync<COC>(sql).ConfigureAwait(false);
             }
@@ -46,7 +46,7 @@ SELECT [CocId]
       ,[Quantity]
       ,[ItemId]
       ,[ItemName]
-  FROM [db_owner].[COC_View]
+  FROM COC_View
   WHERE [CocId] = @CocId";
 
                 return await db.QueryFirstOrDefaultAsync<COC>(sql, new { CocId = id }).ConfigureAwait(false);
