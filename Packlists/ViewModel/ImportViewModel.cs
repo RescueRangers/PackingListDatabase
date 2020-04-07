@@ -34,12 +34,12 @@ namespace Packlists.ViewModel
         private ListCollectionView _imports;
         private ListCollectionView _materials;
         private MaterialAmount _selectedMaterialAmount;
-        
+
         #region Properties
 
         /// <summary>
         /// Sets and gets the SelectedMaterialAmount property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public MaterialAmount SelectedMaterialAmount
@@ -61,10 +61,10 @@ namespace Packlists.ViewModel
                 RaisePropertyChanged(nameof(SelectedMaterialAmount), oldValue, value, true);
             }
         }
-        
+
         /// <summary>
         /// Sets and gets the SelectedDate property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public DateTime SelectedDate
@@ -86,7 +86,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Sender property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public string Sender
@@ -108,7 +108,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Quantity property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// This property's value is broadcasted by the MessengerInstance when it changes.
         /// </summary>
         public string Quantity
@@ -130,7 +130,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedMonth property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public DateTime SelectedMonth
         {
@@ -151,11 +151,9 @@ namespace Packlists.ViewModel
             }
         }
 
-        
-
         /// <summary>
         /// Sets and gets the SelectedImport property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public ImportTransport SelectedImport
         {
@@ -165,7 +163,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the SelectedMaterial property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public Material SelectedMaterial
         {
@@ -175,7 +173,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Imports property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public ListCollectionView Imports
         {
@@ -185,7 +183,7 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Materials property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public ListCollectionView Materials
         {
@@ -213,9 +211,9 @@ namespace Packlists.ViewModel
         public ICommand RemoveMaterialAmountCommand { get; set; }
         public ICommand PrintMonthlyReportCommand { get; set; }
 
-        #endregion
+        #endregion Commands
 
-        #endregion
+        #endregion Properties
 
         public ImportViewModel(IPrintingService printing, IDialogService dialogService, IDataService dataService, IProgressDialogService progressDialog)
         {
@@ -228,11 +226,9 @@ namespace Packlists.ViewModel
             {
                 _materials = (ListCollectionView)CollectionViewSource.GetDefaultView(materials);
                 _materials.SortDescriptions.Add(new SortDescription("MaterialName", ListSortDirection.Ascending));
-
             }));
 
             LoadCommands();
-
         }
 
         #region Commands
@@ -252,7 +248,7 @@ namespace Packlists.ViewModel
 
         private bool CanPrintMonthly()
         {
-            if(Imports == null) return false;
+            if (Imports == null) return false;
             return Imports.Count > 1;
         }
 
@@ -292,7 +288,7 @@ namespace Packlists.ViewModel
             }
         }
 
-        #endregion
+        #endregion PrintMonthly
 
         private void RemoveMaterialAmount()
         {
@@ -309,7 +305,7 @@ namespace Packlists.ViewModel
         private void ImportedMaterialEnter(Key key)
         {
             if (!CanAddMaterial()) return;
-            if (key == Key.Enter) 
+            if (key == Key.Enter)
                 AddImportedMaterial();
         }
 
@@ -342,7 +338,7 @@ namespace Packlists.ViewModel
                 Amount = float.Parse(Quantity, CultureInfo.InvariantCulture)
             };
 
-            if(SelectedImport.ImportedMaterials == null)
+            if (SelectedImport.ImportedMaterials == null)
                 SelectedImport.ImportedMaterials = new ObservableCollection<MaterialAmount>();
 
             SelectedImport.ImportedMaterials.Add(materialAmount);
@@ -360,7 +356,7 @@ namespace Packlists.ViewModel
             return qtyResult;
         }
 
-        #endregion
+        #endregion Commands
 
         private void LoadMonthlyData()
         {
@@ -373,7 +369,6 @@ namespace Packlists.ViewModel
 
                 _imports = (ListCollectionView)CollectionViewSource.GetDefaultView(transports);
                 _imports.SortDescriptions.Add(new SortDescription("ImportDate", ListSortDirection.Ascending));
-
             }), _selectedMonth);
         }
 

@@ -9,7 +9,9 @@ namespace Packlists.Model.ProgressBar
     {
         private readonly TaskFactory _taskFactory;
 
-        public ProgressDialogService() : this(Task.Factory) { }
+        public ProgressDialogService() : this(Task.Factory)
+        {
+        }
 
         private ProgressDialogService(TaskFactory taskFactory)
         {
@@ -137,9 +139,9 @@ namespace Packlists.Model.ProgressBar
                     options, cancellationToken, cancelCommand);
 
                 var window = new ProgressDialog
-                                 {
-                                     DataContext = viewModel,
-                                 };
+                {
+                    DataContext = viewModel,
+                };
 
                 var task = _taskFactory
                     .StartNew(() => action(cancellationToken, viewModel.Progress),

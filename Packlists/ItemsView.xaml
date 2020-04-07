@@ -121,7 +121,6 @@
                             </Border>
                         </StackPanel>
                     </StackPanel>
-
                 </DataTemplate>
             </ListView.ItemTemplate>
 
@@ -165,9 +164,6 @@
                 Margin="0,5"
                 Command="{Binding ImportItemsCommand}"
                 Content="Import items" />
-
         </StackPanel>
-
-
     </Grid>
 </Window>

@@ -10,7 +10,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the Sender property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public string Sender
         {
@@ -22,7 +22,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the ImportDate property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public DateTime ImportDate
         {
@@ -34,7 +34,7 @@ namespace Packlists.Model
 
         /// <summary>
         /// Sets and gets the ImportedMaterials property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public ObservableCollection<MaterialAmount> ImportedMaterials
         {

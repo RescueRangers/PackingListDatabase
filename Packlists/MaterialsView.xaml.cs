@@ -21,6 +21,5 @@ namespace Packlists
             Settings.Default.Save();
             base.OnClosing(e);
         }
-
     }
 }

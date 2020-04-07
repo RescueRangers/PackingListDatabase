@@ -14,30 +14,29 @@
         Width="{Binding Source={x:Static properties:Settings.Default}, Path=MaterialWidth, Mode=TwoWay}"
         Title="Materials"
         DataContext="{Binding Materials, Source={StaticResource Locator}}">
-    
+
     <Window.Resources>
         <collections:ArrayList x:Key="Units">
-            <collections:DictionaryEntry Key="kg" Value="kg"/>
-            <collections:DictionaryEntry Key="m" Value="m"/>
-            <collections:DictionaryEntry Key="m²" Value="m2"/>
-            <collections:DictionaryEntry Key="pcs." Value="pcs."/>
+            <collections:DictionaryEntry Key="kg" Value="kg" />
+            <collections:DictionaryEntry Key="m" Value="m" />
+            <collections:DictionaryEntry Key="m²" Value="m2" />
+            <collections:DictionaryEntry Key="pcs." Value="pcs." />
         </collections:ArrayList>
     </Window.Resources>
-    
-    
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
         </Grid.RowDefinitions>
 
         <DataGrid ItemsSource="{Binding MaterialView}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="True">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Material" 
-                                    Binding="{Binding MaterialName}"/>
-                <DataGridComboBoxColumn Header="Unit" 
+                <DataGridTextColumn Header="Material"
+                                    Binding="{Binding MaterialName}" />
+                <DataGridComboBoxColumn Header="Unit"
                                         SelectedValueBinding="{Binding Unit}"
                                         ItemsSource="{StaticResource Units}"
                                         SelectedValuePath="Value"
@@ -45,10 +44,9 @@
                 </DataGridComboBoxColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <Button Content="Save changes"
                 Command="{Binding SaveCommand}"
-                Grid.Row="1"/>
-
+                Grid.Row="1" />
     </Grid>
 </Window>

@@ -6,7 +6,7 @@ namespace Packlists.Model.ProgressBar
 {
     public class CancelCommand : ICommand
     {
-        readonly CancellationTokenSource cancellationTokenSource;
+        private readonly CancellationTokenSource cancellationTokenSource;
 
         public event EventHandler CanExecuteChanged;
 

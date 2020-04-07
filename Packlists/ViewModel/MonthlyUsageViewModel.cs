@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
-using OfficeOpenXml;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MvvmDialogs;
+using MvvmDialogs.FrameworkDialogs.MessageBox;
+using OfficeOpenXml;
 using Packlists.Model;
 using Packlists.Model.Printing;
-using System.IO;
-using System.Diagnostics;
-using MvvmDialogs.FrameworkDialogs.MessageBox;
 
 namespace Packlists.ViewModel
 {
@@ -78,14 +78,13 @@ namespace Packlists.ViewModel
 
         /// <summary>
         /// Sets and gets the Report property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public float[,] Report
         {
             get => _report;
             set => Set(nameof(Report), ref _report, value);
         }
-
 
         public MonthlyUsageViewModel(IDataService dataService, IDialogService dialogService, IPrintingService printing)
         {
@@ -106,29 +105,29 @@ namespace Packlists.ViewModel
                 var rowLength = Report.GetLength(0) + 2;
                 var colLength = Report.GetLength(1) + 2;
                 var ws = excel.Workbook.Worksheets.Add("Worksheet1");
-                ws.Cells[2,1, colLength, 1].LoadFromCollection(RowHeaders);
-                
+                ws.Cells[2, 1, colLength, 1].LoadFromCollection(RowHeaders);
+
                 for (int i = 0; i < Report.GetLength(0); i++)
                 {
                     for (int j = 0; j < Report.GetLength(1); j++)
                     {
                         ws.Cells[1, j + 2].Value = ColumnHeaders[j];
-                        ws.Column(j+1).AutoFit();
-                        ws.Cells[i+2,j+2].Value = Report[i,j];
+                        ws.Column(j + 1).AutoFit();
+                        ws.Cells[i + 2, j + 2].Value = Report[i, j];
                     }
                 }
 
-                ws.Cells[2,2, rowLength, colLength].Style.Numberformat.Format = "0.00";
-                ws.Column(colLength-1).AutoFit();
+                ws.Cells[2, 2, rowLength, colLength].Style.Numberformat.Format = "0.00";
+                ws.Column(colLength - 1).AutoFit();
 
-                var address = new ExcelAddress(2,colLength-1,rowLength-1, colLength-1);
+                var address = new ExcelAddress(2, colLength - 1, rowLength - 1, colLength - 1);
                 var cfRule1 = ws.ConditionalFormatting.AddGreaterThan(address);
                 var cfRule2 = ws.ConditionalFormatting.AddLessThan(address);
                 cfRule1.Style.Fill.BackgroundColor.Color = System.Drawing.Color.LawnGreen;
                 cfRule1.Formula = "0";
                 cfRule2.Style.Fill.BackgroundColor.Color = System.Drawing.Color.Crimson;
                 cfRule2.Formula = "0";
-                ws.View.FreezePanes(2,2);
+                ws.View.FreezePanes(2, 2);
 
                 var filename = $"{System.IO.Path.GetTempPath()}{Guid.NewGuid()}.xlsx";
                 excel.SaveAs(new FileInfo(filename));
@@ -213,7 +212,7 @@ namespace Packlists.ViewModel
                         for (var j = 0; j < materials.Count; j++)
                         {
                             var packlisteMaterial = rawMaterial.Where(r => r.Material.Equals(materials[j]));
-                            
+
                             Console.WriteLine(j);
 
                             var packlisteAmounts = packlisteMaterial.Sum(s => s.Amount);
@@ -233,7 +232,7 @@ namespace Packlists.ViewModel
                     for (var j = 0; j < materials.Count; j++)
                     {
                         var importedMaterial = rawImportedMaterial.Where(r => r.Material.Equals(materials[j]));
-                        
+
                         Console.WriteLine(j);
 
                         report[j, i] = importedMaterial.Sum(s => s.Amount);
@@ -320,7 +319,7 @@ namespace Packlists.ViewModel
                             var importedAmounts = importedMaterial.Sum(s => s.Amount);
                             var packlisteAmounts = packlisteMaterial.Sum(s => s.Amount);
 
-                            report[j,i] = importedAmounts - packlisteAmounts;
+                            report[j, i] = importedAmounts - packlisteAmounts;
                         }
                     }
                     else
@@ -331,7 +330,7 @@ namespace Packlists.ViewModel
 
                             var packlisteAmounts = packlisteMaterial.Sum(s => s.Amount);
 
-                            report[j, i] = - packlisteAmounts;
+                            report[j, i] = -packlisteAmounts;
                         }
                     }
                 }
@@ -356,7 +355,7 @@ namespace Packlists.ViewModel
 
             for (int i = 0; i < materials.Count; i++)
             {
-                report[i,columns-1] = SumRow(report, i);
+                report[i, columns - 1] = SumRow(report, i);
             }
 
             Report = report;
@@ -372,7 +371,7 @@ namespace Packlists.ViewModel
             float sum = 0;
             for (int i = 0; i < matrix.GetLength(1); i++)
             {
-                sum += matrix[row,i];
+                sum += matrix[row, i];
             }
             return sum;
         }

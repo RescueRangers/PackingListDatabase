@@ -66,7 +66,6 @@
                     <MenuItem Header="Print">
                         <MenuItem Command="{Binding PrintMonthlyReportCommand}" Header="Print monthly report" />
                     </MenuItem>
-
                 </Menu>
 
                 <DatePicker
@@ -93,7 +92,6 @@
                         <DataGridTextColumn Binding="{Binding ImportDate, StringFormat=d, ConverterCulture=PL-pl}" Header="Date" />
 
                         <DataGridTextColumn Binding="{Binding Sender}" Header="Sender" />
-
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -163,7 +161,6 @@
                                         Header="Unit" />
                                 </GridView>
                             </ListView.View>
-
                         </ListView>
 
                         <StackPanel Grid.Row="1" Orientation="Horizontal">
@@ -215,7 +212,6 @@
                                 Content="Add" />
                         </StackPanel>
                     </Grid>
-
                 </GroupBox>
 
                 <Button
@@ -224,7 +220,6 @@
                     Margin="5,5,5,5"
                     Command="{Binding PrintMonthlyReportCommand}"
                     Content="Print monthly import report" />
-
             </Grid>
         </ScrollViewer>
     </Grid>

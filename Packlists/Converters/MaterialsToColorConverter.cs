@@ -10,7 +10,7 @@ namespace Packlists.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var materials = (IList<MaterialAmount>) value;
+            var materials = (IList<MaterialAmount>)value;
 
             if (materials == null || materials.Count == 0)
             {
@@ -19,7 +19,7 @@ namespace Packlists.Converters
 
             foreach (var item in materials)
             {
-                if(item.Material == null) return "Red";
+                if (item.Material == null) return "Red";
             }
 
             return "Transparent";

@@ -13,12 +13,10 @@ namespace Packlists.ExcelImport
     {
         public static Task<string> FromExcel(Action<ICollection<Item>, Exception> callback, FileInfo excelFile, IDataService dataService)
         {
-            
             var existingMaterials = new List<Material>();
             var items = new List<Item>();
             var addedMaterialCount = 0;
             var addedItemCount = 0;
-
 
             dataService.GetItems(((itms, materials, exception) =>
             {
@@ -31,9 +29,9 @@ namespace Packlists.ExcelImport
                 items = itms.ToList();
             }));
 
-            if(!excelFile.Exists)
+            if (!excelFile.Exists)
             {
-                callback( null, new FileLoadException());
+                callback(null, new FileLoadException());
                 return Task.FromResult(result: "failurs");
             }
 
@@ -44,9 +42,8 @@ namespace Packlists.ExcelImport
             {
                 var worksheet = excel.Workbook.Worksheets[1];
 
-                for (var i = 1; i < worksheet.Dimension.End.Column; i+=2)
+                for (var i = 1; i < worksheet.Dimension.End.Column; i += 2)
                 {
-
                     var exists = items.Any(it =>
                         string.Equals(it.ItemName, worksheet.Cells[1, i].Text.Trim(Environment.NewLine.ToCharArray()), StringComparison.InvariantCultureIgnoreCase));
 
@@ -76,19 +73,19 @@ namespace Packlists.ExcelImport
                             newMaterialWithUsage = new MaterialAmount
                             {
                                 Material = material,
-                                Amount = float.Parse(worksheet.Cells[j, i+1].Text)
+                                Amount = float.Parse(worksheet.Cells[j, i + 1].Text)
                             };
                         }
                         else
                         {
-                            var newMaterial = new Material{MaterialName = worksheet.Cells[j, i].Text.Trim(Environment.NewLine.ToCharArray())};
+                            var newMaterial = new Material { MaterialName = worksheet.Cells[j, i].Text.Trim(Environment.NewLine.ToCharArray()) };
                             existingMaterials.Add(newMaterial);
                             dataService.Add(newMaterial);
 
                             newMaterialWithUsage = new MaterialAmount
                             {
                                 Material = newMaterial,
-                                Amount = float.Parse(worksheet.Cells[j, i+1].Text)
+                                Amount = float.Parse(worksheet.Cells[j, i + 1].Text)
                             };
                             addedMaterialCount++;
                             addedMaterials.Add(newMaterial);
@@ -114,7 +111,6 @@ namespace Packlists.ExcelImport
             dataService.SaveData();
 
             return Task.FromResult(result: message);
-
         }
     }
 }

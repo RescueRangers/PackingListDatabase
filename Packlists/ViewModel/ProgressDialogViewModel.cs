@@ -6,19 +6,19 @@ using Packlists.Model.ProgressBar;
 
 namespace Packlists.ViewModel
 {
-    public class ProgressDialogViewModel : ViewModelBase 
+    public class ProgressDialogViewModel : ViewModelBase
     {
         #region Privates
 
-        string _windowTitle;
-        string _label;
-        string _subLabel;
+        private string _windowTitle;
+        private string _label;
+        private string _subLabel;
         private int _currentTaskNumber;
         private int _maxTaskNumber;
         private bool _isIndeterminate;
-        bool _close;
+        private bool _close;
 
-        #endregion
+        #endregion Privates
 
         #region Publics
 
@@ -65,7 +65,7 @@ namespace Packlists.ViewModel
             get => _maxTaskNumber;
             set
             {
-                _maxTaskNumber = value; 
+                _maxTaskNumber = value;
                 RaisePropertyChanged(nameof(MaxTaskNumber));
             }
         }
@@ -75,12 +75,12 @@ namespace Packlists.ViewModel
             get => _currentTaskNumber;
             set
             {
-                _currentTaskNumber = value; 
+                _currentTaskNumber = value;
                 RaisePropertyChanged(nameof(CurrentTaskNumber));
             }
         }
 
-        #endregion
+        #endregion Publics
 
         public ProgressDialogViewModel
         (
@@ -97,7 +97,7 @@ namespace Packlists.ViewModel
             Progress = new Progress<ProgressReport>(OnProgress);
         }
 
-        void OnCancelled()
+        private void OnCancelled()
         {
             // Cancellation may come from a background thread.
             if (DispatcherHelper.UIDispatcher != null)
@@ -106,14 +106,13 @@ namespace Packlists.ViewModel
                 Close = true;
         }
 
-        void OnProgress(ProgressReport obj)
+        private void OnProgress(ProgressReport obj)
         {
             // Progress will probably come from a background thread.
             if (DispatcherHelper.UIDispatcher != null)
                 DispatcherHelper.CheckBeginInvokeOnUI(() => OnProgressReceived(obj));
             else
                 OnProgressReceived(obj);
-
         }
 
         private void OnProgressReceived(ProgressReport progressReport)
@@ -129,6 +128,5 @@ namespace Packlists.ViewModel
             MaxTaskNumber = progressReport.MaxTaskNumber;
             IsIndeterminate = progressReport.IsIndeterminate;
         }
-
     }
 }

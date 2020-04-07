@@ -7,7 +7,7 @@ namespace Packlists.Converters
     {
         public object Convert(object value, object parameter)
         {
-            var args = (KeyEventArgs) value;
+            var args = (KeyEventArgs)value;
             var key = args.Key;
 
             return key;

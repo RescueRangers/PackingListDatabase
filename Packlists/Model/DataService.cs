@@ -1,6 +1,4 @@
-﻿using Spire.Pdf.Exporting.XPS.Schema;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
@@ -14,12 +12,14 @@ namespace Packlists.Model
     {
         //private ObservableCollection<Packliste> _packlists;
         private ObservableCollection<Item> _items;
+
         //private ObservableCollection<ImportTransport> _imports;
         private ObservableCollection<Material> _materials;
+
         //private ObservableCollection<COC> _cocs;
         private ObservableCollection<ItemWithQty> _itemsWithQty;
-        private readonly PacklisteContext _packlisteContext;
 
+        private readonly PacklisteContext _packlisteContext;
 
         public DataService()
         {
@@ -33,7 +33,6 @@ namespace Packlists.Model
             _itemsWithQty = _packlisteContext.ItemWithQties.Local;
         }
 
-        
         public void GetPacklists(Action<ICollection<Packliste>, Exception> callback, DateTime month)
         {
             _packlisteContext.Packlistes
@@ -120,7 +119,6 @@ namespace Packlists.Model
             var changes = _packlisteContext.SaveChanges();
 
             Console.WriteLine(changes);
-
         }
 
         public void CreateMonthlyReport(Action<MonthlyUsageReport, Exception> callback, DateTime month)
@@ -135,7 +133,6 @@ namespace Packlists.Model
             callback(report, null);
         }
 
-
         /// <inheritdoc />
         /// <summary>
         /// Adds an object to the database
@@ -149,21 +146,20 @@ namespace Packlists.Model
 
             if (type == typeof(Item))
             {
-                var item = (Item) obj;
+                var item = (Item)obj;
                 _packlisteContext.SaveChanges();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     _packlisteContext.Items.Add(item);
                 });
-                
             }
             if (type == typeof(Material))
             {
-                var material = (Material) obj;
+                var material = (Material)obj;
                 _packlisteContext.Materials.Add(material);
                 _packlisteContext.SaveChanges();
-                
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     _materials.Add(material);
@@ -171,14 +167,14 @@ namespace Packlists.Model
             }
             if (type == typeof(Packliste))
             {
-                var packliste = (Packliste) obj;
+                var packliste = (Packliste)obj;
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     _packlisteContext.Packlistes.Add(packliste);
                 });
                 _packlisteContext.SaveChanges();
-                
+
                 //Application.Current.Dispatcher.Invoke(() =>
                 //{
                 //    _packlists.Add(packliste);
@@ -186,7 +182,7 @@ namespace Packlists.Model
             }
             if (type == typeof(ImportTransport))
             {
-                var transport = (ImportTransport) obj;
+                var transport = (ImportTransport)obj;
 
                 _packlisteContext.ImportTransports.Add(transport);
                 _packlisteContext.SaveChanges();
@@ -198,7 +194,7 @@ namespace Packlists.Model
             }
             if (type == typeof(COC))
             {
-                var coc = (COC) obj;
+                var coc = (COC)obj;
 
                 _packlisteContext.Cocs.Add(coc);
                 _packlisteContext.SaveChanges();
@@ -208,7 +204,6 @@ namespace Packlists.Model
                 //    _cocs.Add(coc);
                 //});
             }
-
         }
 
         public void BulkAdd(object obj)
@@ -221,7 +216,7 @@ namespace Packlists.Model
             {
                 SaveData();
 
-                var cocs = (IEnumerable<COC>) obj;
+                var cocs = (IEnumerable<COC>)obj;
 
                 Application.Current.Dispatcher.Invoke(() => _packlisteContext.Cocs.AddRange(cocs));
             }
@@ -230,7 +225,7 @@ namespace Packlists.Model
             {
                 SaveData();
 
-                var items = (IEnumerable<Item>) obj;
+                var items = (IEnumerable<Item>)obj;
 
                 Application.Current.Dispatcher.Invoke(() => _packlisteContext.Items.AddRange(items));
             }
@@ -238,12 +233,12 @@ namespace Packlists.Model
             if (type == typeof(List<Packliste>))
             {
                 SaveData();
-                var packlists = (IList<Packliste>) obj;
+                var packlists = (IList<Packliste>)obj;
                 Application.Current.Dispatcher.Invoke(() => { _packlisteContext.Packlistes.AddRange(packlists); });
                 SaveData();
             }
         }
-        
+
         public void GetCOCs(Action<ICollection<COC>, Exception> callback, DateTime month)
         {
             _packlisteContext.Cocs.Where(i =>

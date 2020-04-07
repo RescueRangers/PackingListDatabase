@@ -10,7 +10,7 @@ namespace Packlists.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var packlists = (ICollection<Packliste>) value;
+            var packlists = (ICollection<Packliste>)value;
             if (packlists == null || packlists.Count == 0)
             {
                 return "Transparent";

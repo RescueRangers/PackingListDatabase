@@ -15,7 +15,7 @@ namespace Packlists.AttachedProperties
             DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            if (d is Window window && (bool?) e.NewValue == true)
+            if (d is Window window && (bool?)e.NewValue == true)
                 window.Close();
         }
 

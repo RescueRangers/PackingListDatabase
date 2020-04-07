@@ -1,8 +1,7 @@
 namespace Packlists.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class MaterialAmount : DbMigration
     {
         public override void Up()
@@ -12,7 +11,7 @@ namespace Packlists.Migrations
             CreateIndex("dbo.MaterialAmounts", "Item_ItemId");
             DropColumn("dbo.MaterialWithUsages", "Item_ItemId");
         }
-        
+
         public override void Down()
         {
             AddColumn("dbo.MaterialWithUsages", "Item_ItemId", c => c.Int());
