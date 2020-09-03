@@ -16,5 +16,6 @@ namespace Packlists.Api.Repositories.Interfaces
         Task InsertPacklisteData(int id, List<PacklisteData> packlisteDatas);
         Task<IEnumerable<Packliste>> GetByMonth(DateTime month);
         Task<IEnumerable<Packliste>> GetByPacklisteNumber(int packlisteNumber);
+        Task<IEnumerable<ItemWithQty>> GetPacklisteItems(int id);
     }
 }

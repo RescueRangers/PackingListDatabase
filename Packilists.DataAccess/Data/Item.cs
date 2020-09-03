@@ -7,15 +7,17 @@ namespace Packilists.Shared.Data
     {
         /// <summary>
         /// Sets and gets the ItemName property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public string ItemName { get; set; }
 
         /// <summary>
         /// Sets and gets the Materials property.
-        /// Changes to that property's value raise the PropertyChanged event. 
+        /// Changes to that property's value raise the PropertyChanged event.
         /// </summary>
         public List<MaterialAmount> Materials { get; set; }
+
+        public bool IsEmpty;
 
         public int ItemId { get; set; }
 

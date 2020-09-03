@@ -1,0 +1,238 @@
+﻿@page "/datagridfeatures"
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Data
+@using Packilists.Shared.Data
+@using PacklistsWebUI.Repositories.Interfaces
+@using PacklistsWebUI.DataAdaptors
+@using Syncfusion.Blazor.Inputs
+@using System.IO
+@using System.Globalization
+@using Syncfusion.Blazor.Navigations
+
+@inject IPackingListsRepository _packingRepo
+@inject Services.PacklisteService _packlisteService
+
+<h2>DataGrid</h2>
+
+<br />
+<div id="ControlRegion" class="row">
+    <div class="col-4 col-sm-6">
+        <SfDatePicker TValue="DateTime?" Value="PackingMonth" @ref="_packingMonthDatePicker" Placeholder="Wybierz miesiąc Packlisty" Format="MMMM yyyy" Start="CalendarView.Year" Depth="CalendarView.Year">
+            <DatePickerEvents TValue="DateTime?" ValueChange="PackingMonthChanged" Focus="DatePickerFocusHandler"></DatePickerEvents>
+        </SfDatePicker>
+    </div>
+    <div class="col-6">Showing raw material for packing list: @SelectedPacklisteNumber</div>
+</div>
+<div class="row">
+    <div class="col-6 mb-4">
+        <SfGrid @ref="Grid" AllowPaging="false" AllowResizing="true" AllowGrouping="true"
+                AllowExcelExport="true" AllowSelection="true" AllowSorting="true" TValue="Packliste" Query="GetPacklisteQuery()">
+            <SfToolbar>
+                <ToolbarItems>
+                    <ToolbarItem Type="ItemType.Button" PrefixIcon="e-edit" TooltipText="Edit" Text="Edit" OnClick="EditPackinglist"></ToolbarItem>
+                    <ToolbarItem Type="ItemType.Button" PrefixIcon="e-delete" TooltipText="Delete" Text="Delete" OnClick="DeletePackingList"></ToolbarItem>
+                    <ToolbarItem Type="ItemType.Button" PrefixIcon="e-excelexport" TooltipText="Export to Excel" Text="Export to Excel"></ToolbarItem>
+                    <ToolbarItem Type="ItemType.Button" PrefixIcon="e-print" TooltipText="Print" Text="Print"></ToolbarItem>
+                    <ToolbarItem Type="ItemType.Separator"></ToolbarItem>
+                    <ToolbarItem Type="ItemType.Input">
+                        <Template>
+                            <SfUploader AutoUpload="true" DropArea=".control-fluid" Multiple="true" ShowFileList="false" AllowedExtensions=".xlsx">
+                                <UploaderEvents ValueChange="OnUpload"></UploaderEvents>
+                                <UploaderButtonsProps Browse="New Packing List from excel"></UploaderButtonsProps>
+                            </SfUploader>
+                        </Template>
+                    </ToolbarItem>
+                </ToolbarItems>
+            </SfToolbar>
+            <SfDataManager AdaptorInstance="@typeof(PackingListAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager>
+            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
+            <GridSearchSettings IgnoreAccent="true" IgnoreCase="true"></GridSearchSettings>
+            <GridSelectionSettings Type="SelectionType.Single" PersistSelection="true"></GridSelectionSettings>
+            <GridEvents RowSelected="RowSelectedHandler" TValue="Packliste"></GridEvents>
+            <GridTemplates>
+                <DetailTemplate>
+                    @{
+                        var packliste = (context as Packliste);
+                        <SfGrid AllowPaging="false" AllowFiltering="false" AllowSelection="true" AllowSorting="true"
+                                TValue="ItemWithQty" Query="GetPacklisteItemsQuery(packliste.PacklisteId)" Toolbar="@(new List<string>() { "Search" })">
+                            <SfDataManager AdaptorInstance="@typeof(PackingListItemsAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager>
+                            <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                            <GridSearchSettings IgnoreAccent="true" IgnoreCase="true"></GridSearchSettings>
+                            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
+                            <GridEvents OnToolbarClick="ToolbarClick" TValue="ItemWithQty"></GridEvents>
+                            <GridTemplates>
+                                <DetailTemplate Context="ItemContext">
+                                    @{
+                                        var item = (ItemContext as ItemWithQty);
+                                        <SfGrid AllowPaging="false" AllowFiltering="false" AllowSelection="true" AllowSorting="true"
+                                                TValue="MaterialAmount" Query="GetMaterialQuery(item.ItemId)" Toolbar="@(new List<string>() { "Search" })">
+                                            <SfDataManager AdaptorInstance="@typeof(MaterialAmountAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager>
+                                            <GridSearchSettings IgnoreAccent="true" IgnoreCase="true"></GridSearchSettings>
+                                            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
+                                            <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                                            <GridColumns>
+                                                <GridColumn Field=@nameof(MaterialAmount.MaterialName) IsPrimaryKey="true" HeaderText="Material" Width="120"></GridColumn>
+                                                <GridColumn Field=@nameof(MaterialAmount.Amount) HeaderText="Quantity" Width="120"></GridColumn>
+                                                <GridColumn Field="@nameof(MaterialAmount.Unit)" HeaderText="Unit" EditType="EditType.DropDownEdit" Edit="@UnitsEditParams" Width="30"></GridColumn>
+                                            </GridColumns>
+                                        </SfGrid>
+                                    }
+                                </DetailTemplate>
+                            </GridTemplates>
+                            <GridColumns>
+                                <GridColumn Field=@nameof(ItemWithQty.ItemName) IsPrimaryKey="true" HeaderText="Item" Width="120"></GridColumn>
+                                <GridColumn Field=@nameof(ItemWithQty.Quantity) HeaderText="Quantity" Width="120"></GridColumn>
+                                <GridColumn Field="@nameof(ItemWithQty.IsEmpty)" HeaderText="Is empty?" AllowEditing="false" DisplayAsCheckBox="true"></GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                    }
+                </DetailTemplate>
+            </GridTemplates>
+            <GridColumns>
+                <GridColumn Field="@nameof(Packliste.PacklisteId)" IsPrimaryKey="true" Visible="false"></GridColumn>
+                <GridColumn Field=@nameof(Packliste.PacklisteNumber) IsPrimaryKey="false" HeaderText="Number" Width="50" AutoFit="false"></GridColumn>
+                <GridColumn Field=@nameof(Packliste.PacklisteDate) HeaderText="Date" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Right" Type="ColumnType.Date" Width="60" AutoFit="false"></GridColumn>
+                <GridColumn Field=@nameof(Packliste.Destination) HeaderText="Destination" Format="d" TextAlign="TextAlign.Left" AutoFit="false"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+
+    <div class="col-6 mb-4">
+        <SfGrid TValue="MaterialAmount" Query="GetRawMaterialQuery()">
+            <SfDataManager AdaptorInstance="@typeof(RawUsageAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager>
+            <GridColumns>
+                <GridColumn Field=@nameof(MaterialAmount.MaterialAmountId) HeaderText="Material ID" Width="110" IsPrimaryKey="true" Visible="false"> </GridColumn>
+                <GridColumn Field=@nameof(MaterialAmount.MaterialName) HeaderText="Material" Width="80"></GridColumn>
+                <GridColumn Field=@nameof(MaterialAmount.Amount) HeaderText="Quantity" Width="30"></GridColumn>
+                <GridColumn Field=@nameof(MaterialAmount.Unit) HeaderText="Unit" Width="30"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+
+@code{
+    public object UnitsEditParams = new
+    {
+@@params = new Syncfusion.Blazor.DropDowns.SfDropDownList<string, MaterialAmount>() { Value = "m2" }
+    };
+
+private List<string> _units = new List<string> { "m", "kg", "m²", "pcs" };
+SfGrid<Packliste> Grid;
+public DateTime? PackingMonth { get; set; } = DateTime.Now;
+public string SelectedPacklisteNumber { get; set; }
+public int SelectedpacklisteId { get; set; }
+
+
+private SfDatePicker<DateTime?> _packingMonthDatePicker;
+private bool _changed;
+
+public void DatePickerFocusHandler(Syncfusion.Blazor.Calendars.FocusEventArgs args)
+{
+    _packingMonthDatePicker.Show();
+}
+
+public async Task OnUpload(UploadChangeEventArgs args)
+{
+    foreach (var file in args.Files)
+    {
+        var dateResult = DateTime.TryParse(file.FileInfo.Name.Substring(0, 10), CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var packDate);
+
+        if (!dateResult) packDate = DateTime.Now;
+
+        await _packlisteService.CreateFromStream(file.Stream, packDate).ConfigureAwait(false);
+        file.Stream.Close();
+    }
+}
+
+public void EditPackinglist()
+{
+    if (Grid.SelectedRowIndex != 0)
+    {
+        Grid.StartEdit();
+    }
+}
+
+public void DeletePackingList()
+{
+    Grid.DeleteRecord();
+}
+
+public void PackingMonthChanged(ChangedEventArgs<DateTime?> args)
+{
+    var val = args.Value;
+    if (val != null && !_changed)
+    {
+        PackingMonth = val;
+        Grid.Refresh();
+    }
+    _changed = !_changed;
+}
+
+#region Queries
+
+public Query GetPacklisteItemsQuery(int packlisteId)
+{
+    return new Query().AddParams("PacklisteId", packlisteId);
+}
+
+public Query GetPacklisteQuery()
+{
+    return new Query().AddParams("Month", PackingMonth.Value);
+}
+
+public Query GetMaterialQuery(int itemId)
+{
+    return new Query().AddParams("ItemId", itemId);
+}
+
+public Query GetRawMaterialQuery()
+{
+    if (SelectedpacklisteId == default)
+    {
+        return new Query();
+    }
+    return new Query().AddParams("PacklisteId", SelectedpacklisteId);
+}
+
+#endregion
+
+public void RowSelectedHandler(RowSelectEventArgs<Packliste> args)
+{
+    SelectedPacklisteNumber = args.Data.PacklisteNumber.ToString();
+    SelectedpacklisteId = args.Data.PacklisteId;
+}
+
+public void RowDeselectinghandler(RowDeselectEventArgs<Packliste> args)
+{
+    args.Cancel = true;
+}
+
+public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+{
+    if (args.Item.Id == "Grid_add")
+    {
+    }
+    if (args.Item.Id == "Grid_pdfexport")
+    {
+        this.Grid.PdfExport();
+    }
+    if (args.Item.Id == "Grid_excelexport")
+    {
+        this.Grid.ExcelExport();
+    }
+    if (args.Item.Id == "Grid_csvexport")
+    {
+        this.Grid.CsvExport();
+    }
+}
+public class Order
+{
+    public int? OrderID { get; set; }
+    public string CustomerID { get; set; }
+    public DateTime? OrderDate { get; set; }
+    public double? Freight { get; set; }
+    public string ShipCountry { get; set; }
+}
+}

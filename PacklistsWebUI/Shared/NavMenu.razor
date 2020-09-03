@@ -1,0 +1,73 @@
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">PacklistsWebUI</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Syncfusion Blazor Samples
+            </NavLink>
+        </li>
+			<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="datagridfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-datagrid" aria-hidden="true"></span>DataGrid
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="progressbarfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-progressbar" aria-hidden="true"></span>ProgressBar
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="datepickerfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-datepicker" aria-hidden="true"></span>DatePicker
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="dialogfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-dialog" aria-hidden="true"></span>Dialog
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="listviewfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-listview" aria-hidden="true"></span>ListView
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="numerictextboxfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-numerictextbox" aria-hidden="true"></span>Numeric TextBox
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="fileuploadfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload" aria-hidden="true"></span>File Upload
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="buttonfeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-button" aria-hidden="true"></span>Button
+ 	</NavLink>
+ 	</li>
+	<li class="nav-item px-3">
+ 	<NavLink class="nav-link" href="pdffeatures">
+ 	<span class="syncfusion-blazor-icons syncfusion-blazor-icon-pdf" aria-hidden="true"></span>PDF
+ 	</NavLink>
+ 	</li>
+
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

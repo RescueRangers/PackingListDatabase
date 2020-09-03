@@ -1,0 +1,44 @@
+﻿@page "/pdffeatures"
+@using System.IO;
+@using PacklistsWebUI;
+@inject PacklistsWebUI.Data.PdfService service
+@inject Microsoft.JSInterop.IJSRuntime JS
+<h2>PDF</h2>
+<br/>
+<div id = "ControlRegion">
+<p>The Blazor PDF Library is a feature-rich and high-performance library that allows you to add robust PDF functionalities to any Blazor application. It allows you to create, read, and edit PDF documents programmatically. This library also offers functionality to merge, split, stamp, and secure PDF files.</p>
+<button class="btn btn-primary" @onclick="@CreatePdf">Create PDF</button>
+</div>
+<br/>
+<div>
+  <h3>Selected Features:</h3>
+    <ul class="ulstyle">
+      <li class="list"> Default</li>
+<li class="list"> Theme - Bootstrap v4</li>
+    </ul>
+</div>
+<br/>
+<style>
+    .ulstyle {
+        margin: 0px;
+        padding-left: 20px;
+        display: inline-block;
+    }
+    .list {
+    float: left;
+    line-height: 20px;
+    margin: 10px;
+    min-width: 200px;
+    }
+</style>
+@code {
+    MemoryStream documentStream;
+    /// <summary>
+    /// Create and download the Pdf document
+    /// </summary>
+    protected async void CreatePdf()
+    {
+        documentStream = service.CreatePdf();
+        await JS.SaveAs("Sample.pdf", documentStream.ToArray());
+    }
+}

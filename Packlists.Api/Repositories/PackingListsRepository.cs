@@ -162,6 +162,14 @@ SELECT A.[PacklisteId]
             }
         }
 
+        public async Task<IEnumerable<ItemWithQty>> GetPacklisteItems(int id)
+        {
+            using (var db = Connection)
+            {
+                return await db.QueryAsync<ItemWithQty>("SELECT * FROM ItemsWithQty_View WHERE PacklisteId = @Id", new { id }).ConfigureAwait(false);
+            }
+        }
+
         public async Task<IEnumerable<PacklisteData>> GetPacklisteData(int id)
         {
             // Select

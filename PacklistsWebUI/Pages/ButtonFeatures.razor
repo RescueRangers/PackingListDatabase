@@ -1,0 +1,55 @@
+﻿@page "/buttonfeatures"
+@using Syncfusion.Blazor.Buttons
+<h2>Button</h2>
+<br/>
+<div id = "ControlRegion">
+              <h5>Default Button</h5>
+                <SfButton Content="Normal"></SfButton>
+                <br />
+				<br />
+              <h5>Radio Button</h5>
+                <div style="margin-left:1px" class="row">
+                    <SfRadioButton Label="Credit/Debit Card" Name="payment" Value="credit/debit" Checked="true"></SfRadioButton>
+                </div>
+                <br />
+                <div style="margin-left:1px" class="row">
+                    <SfRadioButton Label="Net Banking" Checked="false" Name="payment" Value="netbanking"></SfRadioButton>
+                </div>
+              <br />
+			  <br />
+              <h5>Checkbox</h5>
+                <SfCheckBox Checked="true" Label="CheckBox"></SfCheckBox>
+              <br />
+			  <br />
+              <h5>Switch </h5>
+                <div>
+                    <label for="checked" style="padding: 10px 70px 10px 0"> USB Tethering </label>
+                    <SfSwitch Checked="true"></SfSwitch>
+                </div>
+			       <br />
+</div>
+<br/>
+<div>
+  <h3>Selected Features:</h3>
+    <ul class="ulstyle">
+      <li class="list"> Default Button</li>
+<li class="list"> Radio Button</li>
+<li class="list"> Checkbox</li>
+<li class="list"> Switch Button</li>
+<li class="list"> Theme - Bootstrap v4</li>
+    </ul>
+</div>
+<br/>
+<style>
+    .ulstyle {
+        margin: 0px;
+        padding-left: 20px;
+        display: inline-block;
+    }
+    .list {
+    float: left;
+    line-height: 20px;
+    margin: 10px;
+    min-width: 200px;
+    }
+</style>
