@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <ContainerDevelopmentMode>Regular</ContainerDevelopmentMode>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,10 +35,9 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="18.1.0.45" />
-    <PackageReference Include="Syncfusion.Blazor" Version="18.2.0.56" />
-    <PackageReference Include="Syncfusion.Blazor.PdfViewerServer.Windows" Version="18.1.0.45" />
-    <PackageReference Include="Syncfusion.Blazor.WordProcessor" Version="18.1.0.45" />
+      <PackageReference Include="Syncfusion.Blazor" Version="18.2.0.56" />
+      <PackageReference Include="Syncfusion.Blazor.PdfViewerServer.Linux" Version="18.2.0.56" />
+      <PackageReference Include="Syncfusion.Blazor.PdfViewerServer.Windows" Version="18.2.0.56" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0-preview2.19523.17" />
 </ItemGroup>
 
@@ -50,4 +50,5 @@
     <TransformOnBuild>true</TransformOnBuild>
   </Content>
 </ItemGroup>
+
 </Project>

@@ -59,9 +59,11 @@ namespace PacklistsWebUI
             else
             {
                 app.UseExceptionHandler("/Error");
+                app.UseHsts();
 
             }
-
+            app.UseHttpsRedirection();
+            app.UseResponseCompression();
             app.UseStaticFiles();
 
             app.UseRouting();
