@@ -91,8 +91,8 @@
             </GridTemplates>
             <GridColumns>
                 <GridColumn Field="@nameof(Packliste.PacklisteId)" IsPrimaryKey="true" Visible="false"></GridColumn>
-                <GridColumn Field=@nameof(Packliste.PacklisteNumber) IsPrimaryKey="false" HeaderText="Number" EditType="EditType.DefaultEdit" Width="80"></GridColumn>
-                <GridColumn Field=@nameof(Packliste.PacklisteDate) HeaderText="Date" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Right" Type="ColumnType.Date" Width="70"></GridColumn>
+                <GridColumn Field=@nameof(Packliste.PacklisteNumber) IsPrimaryKey="false" HeaderText="Number" EditType="EditType.NumericEdit" Format="###" EditorSettings="NumericEditorParams" Type="ColumnType.String" Width="135"></GridColumn>
+                <GridColumn Field=@nameof(Packliste.PacklisteDate) HeaderText="Date" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Right" Type="ColumnType.Date" Width="160"></GridColumn>
                 <GridColumn Field=@nameof(Packliste.Destination) HeaderText="Destination" Format="d" TextAlign="TextAlign.Left" AutoFit="false"></GridColumn>
             </GridColumns>
         </SfGrid>
@@ -122,6 +122,11 @@ SfGrid<Packliste> Grid;
 public DateTime? PackingMonth { get; set; } = DateTime.Now;
 public string SelectedPacklisteNumber { get; set; }
 public int SelectedpacklisteId { get; set; }
+
+public IEditorSettings NumericEditorParams = new NumericEditCellParams
+{
+    Params = new NumericTextBoxModel<object>() { ShowClearButton = true, ShowSpinButton = false, Format = "###"}
+};
 
 
 private SfDatePicker<DateTime?> _packingMonthDatePicker;
