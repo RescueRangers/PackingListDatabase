@@ -32,9 +32,14 @@ namespace PacklistsWebUI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSyncfusionBlazor();
+            services.AddResponseCompression();
             //services.AddSingleton<PdfService>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            var syncfusionKey = Configuration.GetValue<string>("SyncfusionLicense");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionKey);
+
             services.AddSingleton<IPackingListsRepository>(new PackingListsRepository(Configuration));
             services.AddSingleton<IMaterialsRepository>(new MaterialsRepository(Configuration));
             services.AddSingleton<IItemsRepository>(new ItemsRepository(Configuration));
@@ -49,9 +54,6 @@ namespace PacklistsWebUI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var syncfusionKey = Configuration.GetValue<string>("SyncfusionLicense");
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionKey);
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
